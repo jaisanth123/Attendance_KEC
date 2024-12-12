@@ -15,32 +15,44 @@ const ActionCard = ({ label, onClick }) => (
 function ViewAttendance({ toggleSidebar }) {
   const navigate = useNavigate();
 
+
   return (
-    <div className="flex items-center justify-center h-full pt-10">
-      <div className="grid w-full max-w-3xl grid-cols-2 gap-6 px-1 sm:grid-cols-3 lg:grid-cols-3 lg:gap-4">
-      {/* Generate Message Card */}
-        <ActionCard
-          label="Generate Message"
-          onClick={() => navigate("/generateMessage")}
-        />
+    <>
+      <div className="flex flex-col h-full pt-10">
+      <h1 className="h-20 text-4xl font-bold text-center text-gray-800 ">
+          View Attendance Page
+        </h1>
+        <div className="flex items-center justify-center flex-grow">
+          <div className="grid w-full max-w-5xl grid-cols-2 gap-6 px-1 sm:grid-cols-4 lg:grid-cols-4 lg:gap-4">
+            {/* Classes Information Card */}
+            <ActionCard
+              label="Classes Information"
+              onClick={() => navigate("/ClassInfo")}
+            />
 
-        {/* Generate Excel Card */}
+            {/* Generate Message Card */}
+            <ActionCard
+              label="Generate Message"
+              onClick={() => navigate("/generateMessage")}
+            />
 
-        {/* Report Card */}
-        <ActionCard
-          label="Generate Report"
-          onClick={() => navigate("/generateReport")}
-        />
-                <ActionCard
-          label="Generate Email"
-          onClick={() => navigate("/send-email")}
-        />
-        
+            {/* Generate Report Card */}
+            <ActionCard
+              label="Generate Report"
+              onClick={() => navigate("/generateReport")}
+            />
 
-
+            {/* Generate Hostel Report Card */}
+            <ActionCard
+              label="Generate Hostel Report"
+              onClick={() => navigate("/hostelreport")}
+            />
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
+
 
 export default ViewAttendance;

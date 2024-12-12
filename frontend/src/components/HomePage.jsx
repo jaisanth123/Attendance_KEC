@@ -24,7 +24,11 @@ function HomePage({ toggleSidebar }) {
     setRole(userRole);
   }, []);
 
-  return (
+  return (      
+  <div className="flex flex-col h-full pt-10">
+    <h1 className="text-4xl font-bold text-center text-gray-800 ">
+      Home Page
+    </h1>
     <div className="flex items-center justify-center h-full pt-10">
       <div className="grid w-full max-w-5xl grid-cols-2 gap-6 px-1 sm:grid-cols-3 lg:grid-cols-4 lg:gap-4">
         {/* Attendance Card */}
@@ -48,6 +52,7 @@ function HomePage({ toggleSidebar }) {
         )}
 
       </div>
+    </div>
     </div>
   );
 }

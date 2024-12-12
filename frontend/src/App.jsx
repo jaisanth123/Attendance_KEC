@@ -17,6 +17,8 @@ import SendEmail from "./components/SendMail";
 import ProtectedRoute from "./components/ProtectedRoute"; // Import ProtectedRoute
 import NotFound from "./components/NotFound"; // Import the NotFound component
 import UpdateAttendace from "./components/UpdateAttendance";
+import Hostelreport from "./components/Hostelreport";
+import ClassInfo from "./components/ClassInfo";
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -97,6 +99,8 @@ function App() {
               <Route path="/generateMessage" element={<GenerateMessage toggleSidebar={toggleSidebar} />} />
               <Route path="/generateExcel" element={<GenerateExcel />} />
               <Route path="/send-email" element={<SendEmail />} />
+              <Route path="/hostelreport" element={<Hostelreport />} />
+              <Route path="/classinfo" element={<ClassInfo />} />
               <Route path="/generateReport" element={<GenerateReport />} />
             </Route>
 

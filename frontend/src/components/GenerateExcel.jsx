@@ -120,14 +120,25 @@ const GenerateExcel = () => {
           </button>
         </div>
         {/* Navigate to Send Email Page */}
+
+
+        //! ------------------------ updated -------------------------------------
 <div className="mb-4">
+  <button
+    onClick={() => navigate("/hostelreport")} // Adjust this path based on your route setup
+    className="w-full px-6 py-2 font-semibold text-white transition-all duration-500 transform bg-blue-600 rounded-md hover:scale-105 hover:bg-blue-700"
+  >
+    Go to Send Email Page
+  </button>
+</div>
+{/* <div className="mb-4">
   <button
     onClick={() => navigate("/send-email")} // Adjust this path based on your route setup
     className="w-full px-6 py-2 font-semibold text-white transition-all duration-500 transform bg-blue-600 rounded-md hover:scale-105 hover:bg-blue-700"
   >
     Go to Send Email Page
   </button>
-</div>
+</div> */}
 
 
         {/* Back Button */}
