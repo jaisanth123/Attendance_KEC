@@ -22,16 +22,16 @@ const ClassInfo = () => {
 
   const courses = [
     { yearOfStudy: "II", branch: "AIDS", section: "A" },
-  //   { yearOfStudy: "II", branch: "AIDS", section: "B" },
-  //   { yearOfStudy: "II", branch: "AIDS", section: "C" },
-  //   { yearOfStudy: "II", branch: "AIML", section: "A" },
-  //   { yearOfStudy: "II", branch: "AIML", section: "B" },
-  //   { yearOfStudy: "III", branch: "AIDS", section: "A" },
-  //   { yearOfStudy: "III", branch: "AIDS", section: "B" },
+    { yearOfStudy: "II", branch: "AIDS", section: "B" },
+    { yearOfStudy: "II", branch: "AIDS", section: "C" },
+    { yearOfStudy: "II", branch: "AIML", section: "A" },
+    { yearOfStudy: "II", branch: "AIML", section: "B" },
+    { yearOfStudy: "III", branch: "AIDS", section: "A" },
+    { yearOfStudy: "III", branch: "AIDS", section: "B" },
      { yearOfStudy: "III", branch: "AIML", section: "A" },
-  //   { yearOfStudy: "III", branch: "AIML", section: "B" },
-  //   { yearOfStudy: "IV", branch: "AIDS", section: "A" },
-  //   { yearOfStudy: "IV", branch: "AIML", section: "A" },
+    { yearOfStudy: "III", branch: "AIML", section: "B" },
+    { yearOfStudy: "IV", branch: "AIDS", section: "-" },
+    { yearOfStudy: "IV", branch: "AIML", section: "-" },
   ];
   //Fetch attendance data for a specific course and date
   const fetchAttendanceData = async (course, date) => {
