@@ -153,25 +153,7 @@ const Hostelreport = () => {
           </select>
         </div>
 
-        {/* Hosteller/Day Scholar dropdown */}
-        <div className="mb-4">
-          <label
-            htmlFor="hostellerDayScholar"
-            className="block text-sm font-medium text-gray-300"
-          >
-            Hostel Type:
-          </label>
-          <select
-            id="hostellerDayScholar"
-            value={hostellerDayScholar}
-            onChange={handleHostellerDayScholarChange}
-            className="block w-full px-3 py-2 mt-1 text-white bg-gray-700 border border-gray-500 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="ALL">ALL</option>
-            <option value="HOSTELLER">HOSTELLER</option>
-            <option value="DAY SCHOLAR">DAY SCHOLAR</option>
-          </select>
-        </div>
+
 
         {/* Year of Study dropdown */}
         <div className="mb-4">
@@ -238,7 +220,7 @@ const Hostelreport = () => {
         {/* Button to download report */}
         <button
           onClick={handleDownload}
-          className={`w-full px-4 py-2 font-bold text-white transition duration-500 rounded-md shadow  ${isLoading? "bg-gray-600 hover:bg-gray-700 cursor-not-allowed":"bg-blue-600 hover:scale-110"}`}
+          className={`w-full px-4 py-2 font-bold text-white transition duration-500 rounded-md shadow  ${isLoading? "bg-gray-600 hover:bg-gray-700 cursor-not-allowed":"bg-blue-600 hover:scale-105"}`}
         >
           {isLoading ? "Loading..." : "Download Report"}
         </button>
@@ -248,7 +230,7 @@ const Hostelreport = () => {
         {/* Back button */}
         <button
           onClick={() => navigate(-1)} // Replace with actual back navigation logic
-          className="w-full px-4 py-2 mt-4 font-bold text-white transition duration-500 bg-gray-600 rounded-md shadow hover:scale-110 hover:bg-gray-700"
+          className="w-full px-4 py-2 mt-4 font-bold text-white transition duration-500 bg-gray-600 rounded-md shadow hover:scale-105 hover:bg-gray-700"
         >
           Back
         </button>

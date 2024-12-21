@@ -24,6 +24,7 @@ function UpdateAttendance() {
       toast.error("Authorization token is missing. Please log in again.", {
         autoClose: 800,
       });
+
       setIsLoading(false);
       return;
     }
@@ -32,6 +33,13 @@ function UpdateAttendance() {
       return;
     }
     setIsLoading(true);
+    
+    console.log("Fetching data with:", {
+      yearOfStudy:yearOfStudy,
+      class: branch,
+      section:section,
+      date,
+    });
     try{
       setRollNumbers([]);
       const response = await axios.get("http://localhost:5000/api/attendance/get-attendancestatus", {

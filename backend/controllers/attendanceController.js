@@ -329,6 +329,7 @@ exports.markSuperPaccAttendance = async (req, res) => {
 
 
 
+
 exports.getAttendanceStates = async (req, res) => {
   const { yearOfStudy, branch, section, date } = req.query;
 
@@ -394,6 +395,89 @@ exports.getAttendanceStates = async (req, res) => {
       res.status(500).json({ message: "Server error" });
   }
 };
+
+
+
+
+
+exports.getAttendanceStatusCount = async (req, res) => {
+  const { yearOfStudy, branch, section, date } = req.query;
+
+  // Ensure all required query parameters are provided
+  if (!yearOfStudy || !branch || !section || !date) {
+    return res.status(400).json({ message: "Please provide yearOfStudy, branch, section, and date" });
+  }
+
+  console.log("Query Parameters:", { yearOfStudy, branch, section, date });
+
+  try {
+    // Fetch all students in the specified year, branch, and section
+    const allStudents = await Student.find({
+      yearOfStudy,
+      branch,
+      section,
+    }).select('rollNo name -_id'); // Retrieve rollNo and name fields, excluding _id
+
+    console.log("All Students Found:", allStudents);
+
+    // Fetch attendance records for the specified date
+    const attendanceRecords = await Attendance.find({
+      date,
+      yearOfStudy,
+      branch,
+      section,
+    }).select('rollNo status'); // Retrieve rollNo and attendance status fields
+
+    console.log("Attendance Records Found:", attendanceRecords);
+
+    // If no attendance records are found, return NaN for counts
+    if (attendanceRecords.length === 0) {
+      const classs = `${yearOfStudy}-${branch}-${section}`;
+      return res.json({
+        classs,
+        absentCount: "N/A",
+        otherStatusCount: "N/A",
+      });
+    }
+
+    // Map the attendance states for each student
+    const attendanceMap = attendanceRecords.reduce((acc, record) => {
+      acc[record.rollNo] = record.status; // Map rollNo to its attendance status (e.g., "Present", "Absent", "On Duty")
+      return acc;
+    }, {});
+
+    // For each student, get their attendance state from the attendance map, defaulting to "Absent" if no record exists
+    const attendanceStates = allStudents.map(student => ({
+      rollNo: student.rollNo,
+      name: student.name,
+      state: attendanceMap[student.rollNo] || 'Absent', // Default state is "Absent" if no record exists
+    }));
+
+    // Count students with "Absent" status and all other statuses
+    let absentCount = 0;
+    let otherStatusCount = 0;
+
+    attendanceStates.forEach(student => {
+      if (student.state === 'Absent') {
+        absentCount++;
+      } else {
+        otherStatusCount++;
+      }
+    });
+
+    const classs = `${yearOfStudy}-${branch}-${section}`;
+    // Send the counts of "Absent" and "Other" statuses
+    res.json({
+      classs,
+      absentCount,
+      otherStatusCount,
+    });
+  } catch (error) {
+    console.error("Error retrieving attendance status counts:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 
 exports.updateAttendanceStatus = async (req, res) => {
   const { yearOfStudy, branch, section, date, rollNumberStateMapping } = req.body;
