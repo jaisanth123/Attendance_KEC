@@ -188,4 +188,3 @@ const ClassInfo = () => {
 };
 
 export default ClassInfo;
-git 
