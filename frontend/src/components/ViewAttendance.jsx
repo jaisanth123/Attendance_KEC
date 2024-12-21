@@ -53,7 +53,7 @@ function ViewAttendance({ toggleSidebar }) {
         {/* Home Button as a Rectangle */}
         <div className="flex justify-center mt-0">
           <button
-            className="w-64 h-16 py-2 mt-20 text-3xl font-bold text-white transition-all duration-500 transform bg-gray-700 shadow-md hover:scale-110 hover:bg-gray-800"
+            className="w-64 h-16 py-2 mt-20 text-3xl font-bold text-white transition-all duration-500 transform bg-gray-700 shadow-md rounded-xl hover:scale-110 hover:bg-gray-800"
             onClick={() => navigate("/homePage")}
           >
             Home

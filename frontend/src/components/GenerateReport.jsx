@@ -9,7 +9,7 @@ const GenerateReport = () => {
   const [message, setMessage] = useState(""); // State to hold message when no students are absent
   const [date, setDate] = useState(""); // State to store selected date
   const [gender, setGender] = useState("ALL"); // State to store selected gender
-  const [hostellerDayScholar, setHostellerDayScholar] = useState("ALL"); // Hosteller/Day Scholar selection
+  const [hostellerDayScholar, setHostellerDayScholar] = useState("HOSTELLERgi"); // Hosteller/Day Scholar selection
   const [yearOfStudy, setYearOfStudy] = useState("ALL"); // Selected year of study
   const [section, setSection] = useState("ALL"); // Selected section
   const [branch, setBranch] = useState("ALL"); // Selected branch
