@@ -109,6 +109,16 @@ const ClassInfo = () => {
 
   const navigate = useNavigate();
 
+  const totalAbsentCount = attendanceData.reduce(
+    (sum, item) => sum + (parseInt(item.absentCount, 10) || 0),
+    0
+  );
+
+  const totalOtherStatusCount = attendanceData.reduce(
+    (sum, item) => sum + (parseInt(item.otherStatusCount, 10) || 0),
+    0
+  );
+
   return (
     <div className="container p-4 mx-auto">
       <div className="flex items-center justify-center">
@@ -179,6 +189,11 @@ const ClassInfo = () => {
                   <td className="px-6 py-4">{attendance.otherStatusCount}</td>
                 </tr>
               ))}
+              <tr className="text-xl font-bold text-white bg-gray-800">
+                <td className="px-6 py-4">Total</td>
+                <td className="px-6 py-4">{totalAbsentCount}</td>
+                <td className="px-6 py-4">{totalOtherStatusCount}</td>
+              </tr>
             </tbody>
           </table>
         </div>
