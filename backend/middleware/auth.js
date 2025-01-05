@@ -61,7 +61,7 @@ const authenticateUser = async (req, res, next) => {
 // Admin authentication middleware
 const authenticateAdmin = async (req, res, next) => {
   const authToken = getTokenFromHeaders(req);
-  console.log(authToken);
+  //console.log(authToken);
 
   // Check if token is available
   if (!authToken) {

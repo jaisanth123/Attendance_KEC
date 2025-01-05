@@ -27,8 +27,7 @@ function Absentees() {
   const [selectedRollNos, setSelectedRollNos] = useState([]); // To keep track of selected roll numbers
   const [markPresentDisabled, setMarkPresentDisabled] = useState(true); // Disable Mark Present button initially
   const [markPresentVisible, setMarkPresentVisible] = useState(false);
-  const [showGenerateMessageButton, setShowGenerateMessageButton] =
-    useState(false);
+  const [showGenerateMessageButton, setShowGenerateMessageButton] =useState(false);
   const [markabsentbutton, setMarkabsentButton] = useState(false);
   const [errorMessage, setErrorMessage] = useState(""); // State to store the error message
   const [marksuperpacc, setmarksuperpacc] = useState(false);
@@ -95,7 +94,7 @@ function Absentees() {
     <div
       onClick={onClick}
       className={`flex items-center justify-center p-6 text-white text-xl font-semibold rounded-lg cursor-pointer shadow-md transition-transform transform ${
-        isSelected ? "bg-blue-600" : "bg-gray-700"
+        isSelected ? "bg-red-600" : "bg-gray-700"
       } hover:scale-110`}
     >
       {rollNumber}

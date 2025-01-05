@@ -19,7 +19,7 @@ function ViewAttendance({ toggleSidebar }) {
   return (
     <>
       <div className="flex flex-col pt-10 h-3/4">
-        <h1 className="text-4xl font-bold text-center text-gray-800 min-h-64">
+        <h1 className="text-4xl font-bold text-center text-gray-800 min-h-56">
           View Attendance Page
         </h1>
         <div className="flex items-center justify-center flex-grow">
