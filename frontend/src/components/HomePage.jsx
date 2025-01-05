@@ -5,7 +5,7 @@ import RoleFromToken from "./RoleFromToken"; // Import the function to get the r
 // Reusable Card Component
 const ActionCard = ({ label, onClick }) => (
   <div
-    className="flex flex-col items-center justify-center h-64 p-6 transition-all duration-300 transform bg-gray-800 shadow-2xl cursor-pointer w-full sm:max-w-[10rem] md:max-w-[12rem] lg:max-w-[14rem] rounded-xl hover:bg-gray-700 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 active:scale-110"
+    className="flex flex-col items-center justify-center h-64 p-6 transition-all duration-300 transform bg-slate-800 shadow-2xl cursor-pointer w-full sm:max-w-[10rem] md:max-w-[12rem] lg:max-w-[14rem] rounded-xl hover:bg-gray-700 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 active:scale-110"
     aria-label={`${label} card`}
     onClick={onClick}
   >
