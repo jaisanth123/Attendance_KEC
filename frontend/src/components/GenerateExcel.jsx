@@ -22,8 +22,7 @@ const GenerateExcel = () => {
     const year = date.getFullYear();
     return `${day}-${month}-${year}`;
   };
-
-  const handleDownload = () => {
+  const handleDownload = () => {d
     if (!date) {
       toast.info("Please select a date.", { autoClose: 800 });
       return;

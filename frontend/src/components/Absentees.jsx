@@ -95,7 +95,7 @@ function Absentees() {
     <div
       onClick={onClick}
       className={`flex items-center justify-center p-6 text-white text-xl font-semibold rounded-lg cursor-pointer shadow-md transition-transform transform ${
-        isSelected ? "bg-blue-600" : "bg-gray-700"
+        isSelected ? "bg-red-600" : "bg-gray-700"
       } hover:scale-110`}
     >
       {rollNumber}
