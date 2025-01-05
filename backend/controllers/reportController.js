@@ -356,7 +356,7 @@ exports.handleDownloadAbsentReport = async (gender, req, res) => {
 
 
 exports.handleCustomDownloadAbsentReport = async (req, res) => {
-    const { gender, date, hostellerDayScholar, yearOfStudy, section, branch } = req.query; // Added branch filter from query params
+    const { gender, date, hostellerDayScholar, yearOfStudy, section, branch } = req.query;
     console.log('Request received to generate report for gender:', gender, 'date:', date, 'hostellerDayScholar:', hostellerDayScholar, 'yearOfStudy:', yearOfStudy, 'section:', section, 'branch:', branch);
 
     try {
@@ -410,46 +410,62 @@ exports.handleCustomDownloadAbsentReport = async (req, res) => {
             const yearA = romanToInt(a.yearOfStudy);
             const yearB = romanToInt(b.yearOfStudy);
 
-            // If the years are the same, sort by branch (AIDS before AIML)
             if (yearA === yearB) {
-                const branchOrder = ['AIDS', 'AIML']; // Custom order for branches
+                const branchOrder = ['AIDS', 'AIML'];
                 const branchAIndex = branchOrder.indexOf(a.branch);
                 const branchBIndex = branchOrder.indexOf(b.branch);
 
                 if (branchAIndex === branchBIndex) {
-                    // If branches are the same, sort by rollNo
-                    const rollNoA = parseInt(a.rollNo.replace(/\D/g, '')); // Extract numeric part of rollNo
+                    const rollNoA = parseInt(a.rollNo.replace(/\D/g, ''));
                     const rollNoB = parseInt(b.rollNo.replace(/\D/g, ''));
-                    return rollNoA - rollNoB; // Sort by rollNo if branch is the same
+                    return rollNoA - rollNoB;
                 }
 
-                return branchAIndex - branchBIndex; // Sort by custom branch order
+                return branchAIndex - branchBIndex;
             }
 
-            return yearA - yearB; // If years are different, sort by year
+            return yearA - yearB;
         });
 
         console.log('Absent students sorted successfully');
         const formattedDate = formatDate(date);
 
-        // Prepare the report data with merged header rows
+        // Dynamic title based on filters
+        const titleParts = [
+            'Students Absentees List',
+            gender !== 'ALL' ? `Gender: ${gender}` : null,
+            branch !== 'ALL' ? `Branch: ${branch}` : null,
+            yearOfStudy !== 'ALL' ? `Year: ${yearOfStudy}` : null,
+            section !== 'ALL' ? `Section: ${section}` : null,
+            hostellerDayScholar !== 'ALL' ? `Resident Type: ${hostellerDayScholar}` : null,
+        ].filter(Boolean).join(', ');
+
+        const headers = hostellerDayScholar === 'ALL'
+            ? ['S.No', 'Roll No', 'Student Name', 'Year', 'Branch', 'ResidentType']
+            : ['S.No', 'Roll No', 'Student Name', 'Year', 'Branch'];
+
         const reportData = [
             ['Kongu Engineering College'],
             ['Department of Artificial Intelligence'],
-            [`Students Absentees List - ${formattedDate}`],
-            ['S.No', 'Roll No', 'Student Name', 'Year', 'Branch','ResidentType']
+            [titleParts],
+            headers,
         ];
 
         // Add the absent students' data
         absentStudents.forEach((student, index) => {
-            reportData.push([
+            const row = [
                 index + 1,
                 student.rollNo,
                 student.name,
                 student.yearOfStudy,
                 `${student.branch}-${student.section}`,
-                student.hostellerDayScholar
-            ]);
+            ];
+
+            if (hostellerDayScholar === 'ALL') {
+                row.push(student.hostellerDayScholar);
+            }
+
+            reportData.push(row);
         });
 
         // Create a new workbook and worksheet
@@ -460,15 +476,15 @@ exports.handleCustomDownloadAbsentReport = async (req, res) => {
         worksheet.addRows(reportData);
 
         // Apply row height adjustments
-        worksheet.getRow(1).height = 25; // First header row
-        worksheet.getRow(2).height = 25; // Second header row
-        worksheet.getRow(3).height = 25; // Third header row
-        worksheet.getRow(4).height = 25; // Column headers row
+        worksheet.getRow(1).height = 25;
+        worksheet.getRow(2).height = 25;
+        worksheet.getRow(3).height = 25;
+        worksheet.getRow(4).height = 25;
         for (let row = 5; row <= reportData.length; row++) {
-            worksheet.getRow(row).height = 25; // Data rows
+            worksheet.getRow(row).height = 25;
         }
 
-        // Apply thicker borders around the header and filled cells (data rows)
+        // Apply thicker borders and alignment
         const borderStyle = {
             top: { style: 'medium' },
             left: { style: 'medium' },
@@ -476,18 +492,18 @@ exports.handleCustomDownloadAbsentReport = async (req, res) => {
             right: { style: 'medium' },
         };
 
-        // Apply borders for header row (row 4)
-        for (let col = 1; col <= 6; col++) {
+        const columnCount = headers.length;
+
+        for (let col = 1; col <= columnCount; col++) {
             worksheet.getCell(4, col).border = borderStyle;
-            worksheet.getCell(4, col).alignment = { horizontal: 'center', vertical: 'middle' }; // Center-align
+            worksheet.getCell(4, col).alignment = { horizontal: 'center', vertical: 'middle' };
             worksheet.getCell(4, col).font = { bold: true, name: 'Times New Roman', size: 12 };
         }
 
-        // Apply borders for each row with student data (starting from row 5)
         for (let row = 5; row <= reportData.length; row++) {
-            for (let col = 1; col <= 6; col++) {
+            for (let col = 1; col <= columnCount; col++) {
                 worksheet.getCell(row, col).border = borderStyle;
-                worksheet.getCell(row, col).alignment = { horizontal: 'center', vertical: 'middle' }; // Center-align
+                worksheet.getCell(row, col).alignment = { horizontal: 'center', vertical: 'middle' };
                 worksheet.getCell(row, col).font = { name: 'Times New Roman', size: 12 };
             }
         }
@@ -495,11 +511,10 @@ exports.handleCustomDownloadAbsentReport = async (req, res) => {
         console.log('Borders and alignment applied successfully.');
 
         // Merge and center the header cells
-        worksheet.mergeCells('A1:E1'); // Merging the first header row
-        worksheet.mergeCells('A2:E2'); // Merging the second header row
-        worksheet.mergeCells('A3:E3'); // Merging the third header row
+        worksheet.mergeCells(`A1:${String.fromCharCode(64 + columnCount)}1`);
+        worksheet.mergeCells(`A2:${String.fromCharCode(64 + columnCount)}2`);
+        worksheet.mergeCells(`A3:${String.fromCharCode(64 + columnCount)}3`);
 
-        // Set header cell alignment to center
         worksheet.getCell('A1').alignment = { horizontal: 'center', vertical: 'middle' };
         worksheet.getCell('A1').font = { name: 'Times New Roman', size: 12, bold: true };
         worksheet.getCell('A2').alignment = { horizontal: 'center', vertical: 'middle' };
@@ -511,10 +526,10 @@ exports.handleCustomDownloadAbsentReport = async (req, res) => {
 
         // Set the file as an attachment for download
         res.attachment(`Absent_Students_${formattedDate}.xlsx`);
-        
+
         // Write the workbook to the response as a stream
         await workbook.xlsx.write(res);
-        res.end(); // End the response stream to indicate completion
+        res.end();
         console.log('Excel file sent to the client successfully.');
 
     } catch (error) {
@@ -522,6 +537,7 @@ exports.handleCustomDownloadAbsentReport = async (req, res) => {
         res.status(500).json({ message: 'Error generating absent students report' });
     }
 };
+
 
 
 
