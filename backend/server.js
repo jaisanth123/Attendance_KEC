@@ -12,7 +12,7 @@ connectDB();
 require('dotenv').config(); // Load environment variables from .env file
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173', // Allow requests only from the frontend origin
+  origin: 'http://localhost:5173',   // Allow requests only from the frontend origin
   methods: 'GET,POST', // Specify allowed methods
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'], // Explicitly allow these headers
