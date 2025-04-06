@@ -33,7 +33,7 @@ function ViewAttendance({ toggleSidebar }) {
               onClick={() => navigate("/ClassInfo")}
             />
 
-            {/* Generate Message Card */}
+            {/* Generate  */}
             <ActionCard
               label="Generate Message"
               onClick={() => navigate("/generateMessage")}
