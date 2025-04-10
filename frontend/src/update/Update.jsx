@@ -21,7 +21,9 @@ function Update() {
         Update Options
       </h1>
       <div className="flex justify-center items-center pt-10 h-full">
-        <div className="grid grid-cols-1 gap-4 w-full max-w-5xl sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
+        <div className="grid grid-cols-2 gap-6 px-1 w-full max-w-5xl sm:grid-cols-3 lg:grid-cols-4 lg:gap-4">
+          {/* <div className="flex justify-center items-center pt-10 h-full">
+        <div className="grid grid-cols-1 gap-4 w-full max-w-5xl sm:grid-cols-2 lg:grid-cols-3 lg:gap-4"> */}
           {/* Update Attendance Card */}
           <ActionCard
             label="Update Attendance"
@@ -33,7 +35,10 @@ function Update() {
             label="Update Student Data"
             onClick={() => navigate("/update-data")}
           />
-
+          <ActionCard
+            label="Update Password"
+            onClick={() => navigate("/update-data")}
+          />
           {/* Update Password Card */}
           <ActionCard
             label="Update Password"
