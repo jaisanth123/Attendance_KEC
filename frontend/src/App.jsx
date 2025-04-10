@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { BrowserRouter as Router, Route, Routes , Navigate} from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import Toastify CSS
 import Navbar from "./components/Navbar";
@@ -19,6 +24,7 @@ import NotFound from "./components/NotFound"; // Import the NotFound component
 import UpdateAttendace from "./components/UpdateAttendance";
 import Hostelreport from "./components/Hostelreport";
 import ClassInfo from "./components/ClassInfo";
+import Update from "./update/Update";
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -45,7 +51,11 @@ function App() {
     let isMounted = true;
 
     const handleClickOutside = (event) => {
-      if (sidebarRef.current && !sidebarRef.current.contains(event.target) && isMounted) {
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        isMounted
+      ) {
         setIsSidebarOpen(false);
       }
     };
@@ -65,17 +75,16 @@ function App() {
     window.location.href = "/signin";
   };
 
-
   return (
     <Router>
       <div className="flex flex-col h-screen">
         {/* Render Navbar only if authenticated */}
-        { <Navbar toggleSidebar={toggleSidebar} logoutHandler={logoutHandler} />}
+        {<Navbar toggleSidebar={toggleSidebar} logoutHandler={logoutHandler} />}
 
         {/* Sidebar Overlay for Mobile */}
         {isSidebarOpen && (
           <div
-            className="fixed inset-0 transition-opacity duration-300 bg-black opacity-50 md:hidden"
+            className="fixed inset-0 bg-black opacity-50 transition-opacity duration-300 md:hidden"
             onClick={() => setIsSidebarOpen(false)}
             aria-label="Close Sidebar"
           ></div>
@@ -90,18 +99,39 @@ function App() {
 
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
-              <Route path="/homePage" element={<HomePage toggleSidebar={toggleSidebar} />} />
-              <Route path="/duty" element={<DutyPage selectedCourse={selectedItem} />} />
-              <Route path="/absentees" element={<Absentees selectedCourse={selectedItem} />} />
-              <Route path="/message" element={<MessagePage selectedCourse={selectedItem} toggleSidebar={toggleSidebar} />} />
+              <Route
+                path="/homePage"
+                element={<HomePage toggleSidebar={toggleSidebar} />}
+              />
+              <Route
+                path="/duty"
+                element={<DutyPage selectedCourse={selectedItem} />}
+              />
+              <Route
+                path="/absentees"
+                element={<Absentees selectedCourse={selectedItem} />}
+              />
+              <Route
+                path="/message"
+                element={
+                  <MessagePage
+                    selectedCourse={selectedItem}
+                    toggleSidebar={toggleSidebar}
+                  />
+                }
+              />
               <Route path="/viewattendance" element={<ViewAttendance />} />
               <Route path="/update-attendance" element={<UpdateAttendace />} />
-              <Route path="/generateMessage" element={<GenerateMessage toggleSidebar={toggleSidebar} />} />
+              <Route
+                path="/generateMessage"
+                element={<GenerateMessage toggleSidebar={toggleSidebar} />}
+              />
               <Route path="/generateExcel" element={<GenerateExcel />} />
               <Route path="/send-email" element={<SendEmail />} />
               <Route path="/hostelreport" element={<Hostelreport />} />
               <Route path="/classinfo" element={<ClassInfo />} />
               <Route path="/generateReport" element={<GenerateReport />} />
+              <Route path="/update" element={<Update />} />
             </Route>
 
             {/* Catch all unmatched routes */}
