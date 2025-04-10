@@ -59,7 +59,9 @@ exports.searchStudentsByName = async (req, res) => {
 
     // Find students whose names match the search pattern
     const students = await Student.find({ name: nameRegex })
-      .select("rollNo name yearOfStudy branch section")
+      .select(
+        "rollNo name hostellerDayScholar gender yearOfStudy branch section parentMobileNo studentMobileNo superPacc"
+      )
       .sort("rollNo");
 
     // Check if any students were found
@@ -125,7 +127,38 @@ exports.getStudentByRollNo = async (req, res) => {
   }
 };
 
+//! <======= get all students name and class info for suggestion =======>
+exports.getAllStudentsBasicInfo = async (req, res) => {
+  try {
+    // Find all students but only select the needed fields
+    const students = await Student.find()
+      .select("rollNo name yearOfStudy branch section")
+      .sort("rollNo");
 
+    // Check if any students exist
+    if (students.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No students found in the database",
+        data: [],
+      });
+    }
+
+    // Return the students data
+    res.status(200).json({
+      success: true,
+      count: students.length,
+      data: students,
+    });
+  } catch (error) {
+    console.error("Error fetching students basic info:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching students information",
+      error: error.message,
+    });
+  }
+};
 
 //! <======= Update student data ============>
 exports.updateStudentData = async (req, res) => {

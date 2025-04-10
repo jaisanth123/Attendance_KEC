@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, User, Save, X, ChevronDown, Edit, Loader } from "lucide-react";
+import { Search, User, Save, X, Edit, Loader } from "lucide-react";
 
 export default function UpdateStudentData() {
   const [searchType, setSearchType] = useState("rollNo");
@@ -59,12 +59,14 @@ export default function UpdateStudentData() {
   const fetchStudentByRollNo = async (rollNo) => {
     try {
       setIsLoading(true);
+      console.log(`Fetching student with roll number: ${rollNo}`);
       const response = await fetch(
         `http://localhost:5000/api/students/${encodeURIComponent(rollNo)}`
       );
       const data = await response.json();
 
       if (data.success && data.data) {
+        console.log("Student data received:", data.data);
         setSelectedStudent(data.data);
         // Initialize updatedData with the current student data
         setUpdatedData(data.data);
@@ -140,18 +142,31 @@ export default function UpdateStudentData() {
 
     try {
       setIsLoading(true);
-      const response = await fetch(
-        `http://localhost:5000/api/students/update-student-data/${encodeURIComponent(
-          selectedStudent.rollNo
-        )}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedData),
-        }
+      console.log(
+        `Updating student with roll number: ${selectedStudent.rollNo}`
       );
+      console.log("Update data being sent:", updatedData);
+
+      const url = `http://localhost:5000/api/students/${encodeURIComponent(
+        selectedStudent.rollNo
+      )}`;
+      console.log("Update URL:", url);
+
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error response:", response.status, errorText);
+        throw new Error(
+          `Server responded with ${response.status}: ${errorText}`
+        );
+      }
 
       const data = await response.json();
 
@@ -171,7 +186,7 @@ export default function UpdateStudentData() {
     } catch (error) {
       console.error("Error updating student data:", error);
       setMessage({
-        text: "Error connecting to the server",
+        text: error.message || "Error connecting to the server",
         type: "error",
       });
     } finally {
@@ -369,8 +384,8 @@ export default function UpdateStudentData() {
                     className="p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select Type</option>
-                    <option value="Hosteller">Hosteller</option>
-                    <option value="Day Scholar">Day Scholar</option>
+                    <option value="HOSTELLER">HOSTELLER</option>
+                    <option value="DAY SCHOLAR">DAY SCHOLAR</option>
                   </select>
                 </div>
 
@@ -386,9 +401,9 @@ export default function UpdateStudentData() {
                     className="p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
+                    <option value="MALE">MALE</option>
+                    <option value="FEMALE">FEMALE</option>
+                    <option value="OTHER">OTHER</option>
                   </select>
                 </div>
 
@@ -404,10 +419,10 @@ export default function UpdateStudentData() {
                     className="p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select Year</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
+                    <option value="I">I</option>
+                    <option value="II">II</option>
+                    <option value="III">III</option>
+                    <option value="IV">IV</option>
                   </select>
                 </div>
 
@@ -479,8 +494,8 @@ export default function UpdateStudentData() {
                     className="p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select Option</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
+                    <option value="YES">YES</option>
+                    <option value="NO">NO</option>
                   </select>
                 </div>
               </div>
@@ -521,7 +536,7 @@ export default function UpdateStudentData() {
                   Student Type
                 </div>
                 <div className="font-semibold">
-                  {selectedStudent.hostellerDayScholar}
+                  {selectedStudent.hostellerDayScholar || "Not specified"}
                 </div>
               </div>
 
@@ -529,7 +544,9 @@ export default function UpdateStudentData() {
                 <div className="mb-1 text-sm font-medium text-gray-500">
                   Gender
                 </div>
-                <div className="font-semibold">{selectedStudent.gender}</div>
+                <div className="font-semibold">
+                  {selectedStudent.gender || "Not specified"}
+                </div>
               </div>
 
               <div className="p-4 bg-white rounded-lg border border-gray-200">
@@ -537,7 +554,7 @@ export default function UpdateStudentData() {
                   Year of Study
                 </div>
                 <div className="font-semibold">
-                  {selectedStudent.yearOfStudy}
+                  {selectedStudent.yearOfStudy || "Not specified"}
                 </div>
               </div>
 
@@ -545,14 +562,18 @@ export default function UpdateStudentData() {
                 <div className="mb-1 text-sm font-medium text-gray-500">
                   Branch
                 </div>
-                <div className="font-semibold">{selectedStudent.branch}</div>
+                <div className="font-semibold">
+                  {selectedStudent.branch || "Not specified"}
+                </div>
               </div>
 
               <div className="p-4 bg-white rounded-lg border border-gray-200">
                 <div className="mb-1 text-sm font-medium text-gray-500">
                   Section
                 </div>
-                <div className="font-semibold">{selectedStudent.section}</div>
+                <div className="font-semibold">
+                  {selectedStudent.section || "Not specified"}
+                </div>
               </div>
 
               <div className="p-4 bg-white rounded-lg border border-gray-200">
@@ -560,7 +581,7 @@ export default function UpdateStudentData() {
                   Parent Mobile Number
                 </div>
                 <div className="font-semibold">
-                  {selectedStudent.parentMobileNo}
+                  {selectedStudent.parentMobileNo || "Not specified"}
                 </div>
               </div>
 
@@ -569,7 +590,7 @@ export default function UpdateStudentData() {
                   Student Mobile Number
                 </div>
                 <div className="font-semibold">
-                  {selectedStudent.studentMobileNo}
+                  {selectedStudent.studentMobileNo || "Not specified"}
                 </div>
               </div>
 
@@ -577,7 +598,9 @@ export default function UpdateStudentData() {
                 <div className="mb-1 text-sm font-medium text-gray-500">
                   Super PACC
                 </div>
-                <div className="font-semibold">{selectedStudent.superPacc}</div>
+                <div className="font-semibold">
+                  {selectedStudent.superPacc || "Not specified"}
+                </div>
               </div>
             </div>
           )}
