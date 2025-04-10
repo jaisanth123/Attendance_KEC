@@ -58,10 +58,11 @@ export default function UpdateStudentData() {
   // Function to fetch student details by roll number
   const fetchStudentByRollNo = async (rollNo) => {
     try {
+      const upperCase = rollNo.toUpperCase();
       setIsLoading(true);
       console.log(`Fetching student with roll number: ${rollNo}`);
       const response = await fetch(
-        `http://localhost:5000/api/students/${encodeURIComponent(rollNo)}`
+        `http://localhost:5000/api/students/${encodeURIComponent(upperCase)}`
       );
       const data = await response.json();
 
@@ -147,7 +148,7 @@ export default function UpdateStudentData() {
       );
       console.log("Update data being sent:", updatedData);
 
-      const url = `http://localhost:5000/api/students/${encodeURIComponent(
+      const url = `http://localhost:5000/api/students/update-student-data/${encodeURIComponent(
         selectedStudent.rollNo
       )}`;
       console.log("Update URL:", url);
@@ -281,7 +282,7 @@ export default function UpdateStudentData() {
                         </div>
                       </div>
                       <div className="text-sm text-gray-500">
-                        {student.branch}, {student.section}
+                        {student.yearOfStudy}-{student.branch}-{student.section}
                       </div>
                     </div>
                   ))}
