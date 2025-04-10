@@ -25,6 +25,7 @@ import UpdateAttendace from "./components/UpdateAttendance";
 import Hostelreport from "./components/Hostelreport";
 import ClassInfo from "./components/ClassInfo";
 import Update from "./update/Update";
+import UpdateStudentData from "./update/UpdateStudentData";
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -122,6 +123,7 @@ function App() {
               />
               <Route path="/viewattendance" element={<ViewAttendance />} />
               <Route path="/update-attendance" element={<UpdateAttendace />} />
+              <Route path="/update-data" element={<UpdateStudentData />} />
               <Route
                 path="/generateMessage"
                 element={<GenerateMessage toggleSidebar={toggleSidebar} />}

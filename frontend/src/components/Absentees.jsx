@@ -286,7 +286,7 @@ function Absentees() {
     };
 
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm animate-fadeIn">
+      <div className="flex fixed inset-0 justify-center items-center bg-black bg-opacity-60 backdrop-blur-sm animate-fadeIn">
         <div
           className={`p-8 rounded-lg shadow-lg ${
             popupStyles[color] || popupStyles["bg-gray-800"]
@@ -303,14 +303,14 @@ function Absentees() {
                 onConfirm(); // Confirm action
                 setShowMarkPresentPopup(false); // Close the popup
               }}
-              className="px-6 py-2 font-semibold text-white transition-colors bg-blue-700 rounded-md hover:bg-blue-800"
+              className="px-6 py-2 font-semibold text-white bg-blue-700 rounded-md transition-colors hover:bg-blue-800"
             >
               {confirmText}
             </button>
             {/* Cancel Button */}
             <button
               onClick={onCancel}
-              className="px-6 py-2 font-semibold text-white transition-colors bg-red-600 rounded-md hover:bg-red-700"
+              className="px-6 py-2 font-semibold text-white bg-red-600 rounded-md transition-colors hover:bg-red-700"
             >
               {cancelText}
             </button>
@@ -321,12 +321,12 @@ function Absentees() {
   };
 
   return (
-    <div className="flex flex-col items-center flex-1 p-6 md:p-8 lg:p-12">
+    <div className="flex flex-col flex-1 items-center p-6 md:p-8 lg:p-12">
       <div className="p-4 text-center text-black">
         <h1 className="text-4xl font-semibold">{selectedCourse}</h1>
         <h3 className="text-2xl font-semibold">Absentees Page</h3>
-        <div className="w-full max-w-sm mt-6">
-          <label htmlFor="date" className="block mb-2 text-xl font-medium ">
+        <div className="mt-6 w-full max-w-sm">
+          <label htmlFor="date" className="block mb-2 text-xl font-medium">
             Select Date:
           </label>
           <input
@@ -336,17 +336,17 @@ function Absentees() {
             onChange={(e) => {
               setDate(e.target.value), setSelectedRollNos([]);
             }}
-            className="w-full px-4 py-2 text-black bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+            className="px-4 py-2 w-full text-black bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-blue-300"
           />
         </div>
       </div>
       {/* Display error message on the page if there's one */}
       {errorMessage && (
-        <div className="p-4 mb-4 font-bold text-red-600 rounded-md ">
+        <div className="p-4 mb-4 font-bold text-red-600 rounded-md">
           {errorMessage}
         </div>
       )}
-      <div className="grid w-full grid-cols-2 gap-4 mt-6 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8">
+      <div className="grid grid-cols-2 gap-4 mt-6 w-full sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8">
         {rollNumbers.map((rollNumber, index) => (
           <RollNumberCard
             key={index}
@@ -357,7 +357,7 @@ function Absentees() {
         ))}
       </div>
       {selectedRollNos.length > 0 && (
-        <div className="w-full p-4 mt-6 text-lg text-black">
+        <div className="p-4 mt-6 w-full text-lg text-black">
           <h4 className="mb-10 text-3xl font-semibold text-center">
             Selected Roll Numbers:
           </h4>
@@ -367,7 +367,7 @@ function Absentees() {
                 (student) => student.rollNo === rollNo
               );
               return (
-                <span key={index} className="text-xl font-bold ">
+                <span key={index} className="text-xl font-bold">
                   {student ? `${student.rollNo} - ${student.name}` : rollNo}
                 </span>
               );
@@ -379,7 +379,7 @@ function Absentees() {
         {!markabsentbutton && (
           <button
             onClick={handleConfirm}
-            className="w-full px-8 py-4 text-xl font-semibold text-white transition-all duration-500 bg-red-600 rounded-lg hover:scale-110 hover:bg-red-700"
+            className="px-8 py-4 w-full text-xl font-semibold text-white bg-red-600 rounded-lg transition-all duration-500 hover:scale-110 hover:bg-red-700"
           >
             Mark Absentees
           </button>
@@ -397,7 +397,7 @@ function Absentees() {
             className={`w-full px-8 py-4 text-xl duration-500 hover:scale-110 font-semibold rounded-lg transition-all ${
               isSuperMarkingLoading
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-800 text-white"
+                : "text-white bg-blue-600 hover:bg-blue-800"
             }`}
           >
             {isSuperMarkingLoading
@@ -415,16 +415,16 @@ function Absentees() {
             className={`w-full px-8 py-4 text-xl transition-all duration-500 font-semibold rounded-lg hover:scale-110 ${
               isMarkingLoading
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-green-600 hover:bg-green-700 text-white"
+                : "text-white bg-green-600 hover:bg-green-700"
             }`}
           >
             {isMarkingLoading ? "Marking Present..." : "Mark Present"}
           </button>
         )}
-        <div className="h-10 mb-4">
+        <div className="mb-4 h-10">
           <button
             onClick={() => navigate("/homePage")} // Navigate to the home page
-            className="w-full px-8 py-4 text-xl font-semibold text-white transition-all duration-500 transform bg-gray-600 rounded-md hover:bg-gray-700 hover:scale-110"
+            className="px-8 py-4 w-full text-xl font-semibold text-white bg-gray-600 rounded-md transition-all duration-500 transform hover:bg-gray-700 hover:scale-110"
           >
             Home
           </button>

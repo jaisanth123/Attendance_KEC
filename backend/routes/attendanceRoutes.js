@@ -28,4 +28,3 @@ const upload = multer({ storage: storage });
 router.post("/send-email",upload.single("file"), attendanceController.sendEmail);
 router.post("/hostelreport",upload.single("file"), attendanceController.sendEmail);
 module.exports = router;
-
