@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
-import { Search, User, Save, X, Edit, Loader } from "lucide-react";
+import {
+  Search,
+  User,
+  Save,
+  X,
+  Edit,
+  Loader,
+  Trash2,
+  AlertTriangle,
+} from "lucide-react";
 
 export default function UpdateStudentData() {
   const [searchType, setSearchType] = useState("rollNo");
@@ -11,6 +20,8 @@ export default function UpdateStudentData() {
   const [message, setMessage] = useState({ text: "", type: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [showNameDropdown, setShowNameDropdown] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Clear message after 5 seconds
   useEffect(() => {
@@ -201,6 +212,46 @@ export default function UpdateStudentData() {
     setEditMode(false);
   };
 
+  // Delete student function
+  const deleteStudent = async () => {
+    if (!selectedStudent || !selectedStudent.rollNo) return;
+
+    try {
+      setDeleteLoading(true);
+      const response = await fetch(
+        `http://localhost:5000/api/students/delete/${encodeURIComponent(
+          selectedStudent.rollNo
+        )}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        setMessage({
+          text: "Student deleted successfully",
+          type: "success",
+        });
+        setSelectedStudent(null);
+        setSearchTerm("");
+        setShowDeleteConfirm(false);
+      } else {
+        throw new Error(data.message || "Failed to delete student");
+      }
+    } catch (error) {
+      console.error("Error deleting student:", error);
+      setMessage({
+        text: error.message || "Error deleting student",
+        type: "error",
+      });
+    } finally {
+      setDeleteLoading(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
   return (
     <div className="p-6 mx-auto w-full max-w-4xl bg-white rounded-lg shadow-md">
       <h1 className="flex items-center mb-6 text-2xl font-bold text-gray-800">
@@ -315,6 +366,47 @@ export default function UpdateStudentData() {
         </div>
       )}
 
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="flex fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-50">
+          <div className="p-6 mx-4 w-full max-w-md bg-white rounded-lg shadow-xl">
+            <div className="flex justify-center items-center mx-auto mb-4 w-12 h-12 bg-red-100 rounded-full">
+              <AlertTriangle className="w-6 h-6 text-red-600" />
+            </div>
+            <h3 className="mb-4 text-lg font-medium text-center text-gray-900">
+              Confirm Delete
+            </h3>
+            <p className="mb-6 text-center text-gray-500">
+              Are you sure you want to delete the student record for{" "}
+              <span className="font-semibold">{selectedStudent?.name}</span> (
+              {selectedStudent?.rollNo})? This action cannot be undone.
+            </p>
+            <div className="flex justify-center space-x-4">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={deleteStudent}
+                disabled={deleteLoading}
+                className="flex justify-center items-center px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none"
+              >
+                {deleteLoading ? (
+                  <Loader className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    <Trash2 className="mr-2 w-5 h-5" />
+                    Delete
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Student Profile/Edit Form */}
       {selectedStudent && (
         <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
@@ -322,25 +414,37 @@ export default function UpdateStudentData() {
             <h2 className="text-xl font-semibold text-gray-800">
               {editMode ? "Edit Student Information" : "Student Profile"}
             </h2>
-            {!editMode ? (
-              <button
-                type="button"
-                onClick={() => setEditMode(true)}
-                className="flex items-center px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
-              >
-                <Edit className="mr-2 w-4 h-4" />
-                Edit
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleCancelEdit}
-                className="flex items-center px-4 py-2 text-white bg-gray-600 rounded-lg hover:bg-gray-700"
-              >
-                <X className="mr-2 w-4 h-4" />
-                Cancel
-              </button>
-            )}
+            <div className="flex space-x-2">
+              {!editMode ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setEditMode(true)}
+                    className="flex items-center px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                  >
+                    <Edit className="mr-2 w-4 h-4" />
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="flex items-center px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700"
+                  >
+                    <Trash2 className="mr-2 w-4 h-4" />
+                    Delete
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleCancelEdit}
+                  className="flex items-center px-4 py-2 text-white bg-gray-600 rounded-lg hover:bg-gray-700"
+                >
+                  <X className="mr-2 w-4 h-4" />
+                  Cancel
+                </button>
+              )}
+            </div>
           </div>
 
           {editMode ? (
@@ -432,13 +536,16 @@ export default function UpdateStudentData() {
                   <label className="block mb-1 text-sm font-medium text-gray-700">
                     Branch
                   </label>
-                  <input
-                    type="text"
+                  <select
                     name="branch"
                     value={updatedData.branch || ""}
                     onChange={handleInputChange}
                     className="p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                  >
+                    <option value="">Select Branch</option>
+                    <option value="AIDS">AI & DS</option>
+                    <option value="AIML">AI & ML</option>
+                  </select>
                 </div>
 
                 {/* Section */}
@@ -446,13 +553,18 @@ export default function UpdateStudentData() {
                   <label className="block mb-1 text-sm font-medium text-gray-700">
                     Section
                   </label>
-                  <input
-                    type="text"
+                  <select
                     name="section"
                     value={updatedData.section || ""}
                     onChange={handleInputChange}
                     className="p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                  >
+                    <option value="">Select Section</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                  </select>
                 </div>
 
                 {/* Parent Mobile */}

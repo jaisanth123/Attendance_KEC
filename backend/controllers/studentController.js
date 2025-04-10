@@ -127,6 +127,46 @@ exports.getStudentByRollNo = async (req, res) => {
   }
 };
 
+//! delete Controller function
+exports.deleteStudentByRollNo = async (req, res) => {
+  const { rollNo } = req.params;
+
+  try {
+    // Validate roll number
+    if (!rollNo) {
+      return res.status(400).json({
+        success: false,
+        message: "Roll number is required",
+      });
+    }
+
+    // Find and delete the student
+    const deletedStudent = await Student.findOneAndDelete({ rollNo });
+
+    // Check if student existed
+    if (!deletedStudent) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found with the provided roll number",
+      });
+    }
+
+    // Return success response
+    res.status(200).json({
+      success: true,
+      message: "Student deleted successfully",
+      data: deletedStudent,
+    });
+  } catch (error) {
+    console.error("Error deleting student:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error deleting student",
+      error: error.message,
+    });
+  }
+};
+
 //! create student
 exports.createStudent = async (req, res) => {
   const studentData = req.body;
@@ -151,7 +191,9 @@ exports.createStudent = async (req, res) => {
     }
 
     // Check if student with this roll number already exists
-    const existingStudent = await Student.findOne({ rollNo: studentData.rollNo });
+    const existingStudent = await Student.findOne({
+      rollNo: studentData.rollNo,
+    });
     if (existingStudent) {
       return res.status(409).json({
         success: false,
