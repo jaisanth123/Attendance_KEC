@@ -10,7 +10,9 @@ function UpdateAttendance() {
   const [section, setSection] = useState("nan");
   const location = useLocation();
   const navigate = useNavigate();
-  const [date, setDate] = useState(() => new Date().toISOString().split("T")[0]); // Set default to current date
+  const [date, setDate] = useState(
+    () => new Date().toISOString().split("T")[0]
+  ); // Set default to current date
   const [rollNumbers, setRollNumbers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
@@ -19,40 +21,48 @@ function UpdateAttendance() {
   const [initialStates, setInitialStates] = useState([]);
 
   const authToken = sessionStorage.getItem("authToken");
-  
-    if (!authToken) {
-      toast.error("Authorization token is missing. Please log in again.", {
-        autoClose: 800,
-      });
 
-      setIsLoading(false);
-      return;
-    }
+  if (!authToken) {
+    toast.error("Authorization token is missing. Please log in again.", {
+      autoClose: 800,
+    });
+
+    setIsLoading(false);
+    return;
+  }
   const fetchStudentData = async () => {
-    if (yearOfStudy === "nan" || branch === "nan" || section === "nan" || !date) {
+    if (
+      yearOfStudy === "nan" ||
+      branch === "nan" ||
+      section === "nan" ||
+      !date
+    ) {
       return;
     }
     setIsLoading(true);
-    
+
     console.log("Fetching data with:", {
-      yearOfStudy:yearOfStudy,
+      yearOfStudy: yearOfStudy,
       class: branch,
-      section:section,
+      section: section,
       date,
     });
-    try{
+    try {
       setRollNumbers([]);
-      const response = await axios.get("http://localhost:5000/api/attendance/get-attendancestatus", {
-        headers: {
-          Authorization: `Bearer ${authToken}`, // Add the token to the header
-        },
-        params: {
-          yearOfStudy,
-          branch,
-          section,
-          date,
-        },
-      });
+      const response = await axios.get(
+        "http://localhost:5000/api/attendance/get-attendancestatus",
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`, // Add the token to the header
+          },
+          params: {
+            yearOfStudy,
+            branch,
+            section,
+            date,
+          },
+        }
+      );
 
       const { attendanceStates } = response.data;
       setRollNumbers(
@@ -76,7 +86,8 @@ function UpdateAttendance() {
         });
       } else {
         toast.error("Failed to fetch student data. Please try again.");
-      }    } finally {
+      }
+    } finally {
       setIsLoading(false);
     }
   };
@@ -99,25 +110,32 @@ function UpdateAttendance() {
         return acc;
       }, {});
 
-      const response = await axios.post("http://localhost:5000/api/attendance/mark-updatestatus", {
-        yearOfStudy,
-        branch,
-        section,
-        date,
-        rollNumberStateMapping,
-      }, {
-        headers: {
-          Authorization: `Bearer ${authToken}`, // Add the token to the header
+      const response = await axios.post(
+        "http://localhost:5000/api/attendance/mark-updatestatus",
+        {
+          yearOfStudy,
+          branch,
+          section,
+          date,
+          rollNumberStateMapping,
         },
-      });
-      toast.success(response.data.message || "Attendance updated successfully!", {
-        autoClose: 800,
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`, // Add the token to the header
+          },
+        }
+      );
+      toast.success(
+        response.data.message || "Attendance updated successfully!",
+        {
+          autoClose: 800,
+        }
+      );
       setIsConfirmed(false);
       await fetchStudentData();
 
       // Reset attendance logs after update
-      setAttendanceLogs([]);  // Reset logs after successful update
+      setAttendanceLogs([]); // Reset logs after successful update
     } catch (error) {
       console.error("Error updating attendance status:", error);
       toast.error("Failed to update attendance status.");
@@ -129,14 +147,14 @@ function UpdateAttendance() {
   const [changedStudents, setChangedStudents] = useState([]); // Track students who have changed their attendance
   const navigateToHome = () => {
     // Close the card before navigating
-       navigate("/homePage"); // Navigate to home page
-     };
-   
+    navigate("/homePage"); // Navigate to home page
+  };
+
   const toggleState = (index) => {
     const updatedRollNumbers = [...rollNumbers];
-  
+
     const currentState = updatedRollNumbers[index].state;
- const previousState = currentState;
+    const previousState = currentState;
 
     const newState =
       currentState === "Present"
@@ -153,7 +171,7 @@ function UpdateAttendance() {
     // Add log entry for the state change
     const { rollNo, name } = updatedRollNumbers[index];
 
-    const initialState = initialStates[rollNo] 
+    const initialState = initialStates[rollNo];
     // Check if a log already exists for this student and update it
     const existingLogIndex = attendanceLogs.findIndex(
       (log) => log.rollNo === rollNo
@@ -182,70 +200,84 @@ function UpdateAttendance() {
   };
 
   return (
-    <div className="flex flex-col items-center flex-1 p-6 md:p-8 lg:p-12">
-      <div className="w-full max-w-4xl p-6 bg-gray-800 rounded-lg shadow-lg">
-        <h1 className="text-4xl font-semibold text-center text-white">Update Attendance</h1>
+    <div className="flex flex-col flex-1 items-center p-6 md:p-8 lg:p-12">
+      <div className="p-6 w-full max-w-4xl bg-gray-800 rounded-lg shadow-lg">
+        <h1 className="text-4xl font-semibold text-center text-white">
+          Update Attendance
+        </h1>
 
         {/* Dropdowns */}
-        <div className="flex flex-wrap justify-center w-full mt-4 gap-x-4 gap-y-4">
+        <div className="flex flex-wrap gap-x-4 gap-y-4 justify-center mt-4 w-full">
           <Dropdown
             label="Year"
             value={yearOfStudy}
             options={["IV", "III", "II"]}
-            onChange={(e) => {setYearOfStudy(e.target.value);fetchStudentData();}}
-            
+            onChange={(e) => {
+              setYearOfStudy(e.target.value);
+              fetchStudentData();
+            }}
           />
           <Dropdown
             label="Branch"
             value={branch}
             options={["AIDS", "AIML"]}
-            onChange={(e) =>{fetchStudentData(); setBranch(e.target.value)}}
+            onChange={(e) => {
+              fetchStudentData();
+              setBranch(e.target.value);
+            }}
           />
           <Dropdown
             label="Section"
             value={section}
             options={["A", "B", "C"]}
-            onChange={(e) => {setSection(e.target.value);fetchStudentData();}}
+            onChange={(e) => {
+              setSection(e.target.value);
+              fetchStudentData();
+            }}
           />
         </div>
 
         {/* Date Selection */}
-        <div className="flex items-center justify-center pb-5 mt-8">
+        <div className="flex justify-center items-center pb-5 mt-8">
           <div className="w-full max-w-sm">
-            <label htmlFor="date" className="block mb-2 text-lg font-medium text-center text-white">
-            Date:
+            <label
+              htmlFor="date"
+              className="block mb-2 text-lg font-medium text-center text-white"
+            >
+              Date:
             </label>
             <input
               type="date"
               id="date"
               value={date}
-              onChange={(e) => {setDate(e.target.value);fetchStudentData();}}
-                    max={new Date().toISOString().split("T")[0]} // Restrict future dates
-
-              className="w-full px-4 py-2 text-black bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-gray-600"
+              onChange={(e) => {
+                setDate(e.target.value);
+                fetchStudentData();
+              }}
+              max={new Date().toISOString().split("T")[0]} // Restrict future dates
+              className="px-4 py-2 w-full text-black bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-gray-600"
             />
           </div>
         </div>
       </div>
-      <div className="flex justify-center gap-4 my-6">
-          <button className="px-6 py-3 text-white rounded-lg shadow bg-amber-600 hover:bg-amber-700">
-            SuperPacc
-          </button>
-          <button className="px-6 py-3 text-white bg-red-600 rounded-lg shadow hover:bg-red-700">
-            Absent
-          </button>
-          <button className="px-6 py-3 text-white bg-green-900 rounded-lg shadow hover:bg-green-800">
-            Present
-          </button>
-          <button className="px-6 py-3 text-white rounded-lg shadow bg-sky-700 hover:bg-sky-600">
-            On Duty
-          </button>
-        </div>
-
+      <div className="flex gap-4 justify-center my-6">
+        <button className="px-6 py-3 text-white bg-amber-600 rounded-lg shadow hover:bg-amber-700">
+          SuperPacc
+        </button>
+        <button className="px-6 py-3 text-white bg-red-600 rounded-lg shadow hover:bg-red-700">
+          Absent
+        </button>
+        <button className="px-6 py-3 text-white bg-green-900 rounded-lg shadow hover:bg-green-800">
+          Present
+        </button>
+        <button className="px-6 py-3 text-white bg-sky-700 rounded-lg shadow hover:bg-sky-600">
+          On Duty
+        </button>
+      </div>
 
       {/* Roll Numbers */}
       {rollNumbers.length > 0 && (
-        <div className="grid w-full grid-cols-2 gap-4 mt-6 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8">
+        <div className="grid grid-cols-2 gap-4 mt-6 w-full sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8">
           {rollNumbers.map((rollNumber, index) => (
             <div
               key={index}
@@ -269,85 +301,95 @@ function UpdateAttendance() {
       {/* Update Button */}
 
       {/* Attendance Logs */}
-{/* Attendance Logs */}
-{attendanceLogs.length > 0 && (
-  <div className="w-full max-w-3xl p-6 mt-8 rounded-lg shadow-lg">
-    <h2 className="text-2xl font-bold text-center ">Attendance Change Logs</h2>
-    <div className="mt-4">
-      {attendanceLogs.map((log, index) => (
-        <div key={index} className="flex justify-between mb-3 font-semibold ">
-          <span>{log.rollNo} - {log.name}</span>
-          <span>{log.initialState} → {log.newState}</span>
+      {/* Attendance Logs */}
+      {attendanceLogs.length > 0 && (
+        <div className="p-6 mt-8 w-full max-w-3xl rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold text-center">
+            Attendance Change Logs
+          </h2>
+          <div className="mt-4">
+            {attendanceLogs.map((log, index) => (
+              <div
+                key={index}
+                className="flex justify-between mb-3 font-semibold"
+              >
+                <span>
+                  {log.rollNo} - {log.name}
+                </span>
+                <span>
+                  {log.initialState} → {log.newState}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
-      ))}
-    </div>
-  </div>
-)}
+      )}
 
-            {rollNumbers.length > 0 && (
+      {rollNumbers.length > 0 && (
         <button
           onClick={() => setIsConfirmed(true)}
           disabled={isUpdating} // Disable button when updating
-          className={`w-full px-6 py-3 mt-6  h-20 text-white text-2xl transition-all duration-500 ${isUpdating ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-800'} rounded-lg lg:w-1/4 md:w-1/5 sm:w-1/2 hover:scale-110 hover:bg-gray-600`}
+          className={`w-full px-6 py-3 mt-6  h-20 text-white text-2xl transition-all duration-500 ${
+            isUpdating ? "bg-gray-400 cursor-not-allowed" : "bg-gray-800"
+          } rounded-lg lg:w-1/4 md:w-1/5 sm:w-1/2 hover:scale-110 hover:bg-gray-600`}
         >
-          {isUpdating ? "Updating Attendance..." : "Update Attendance"} {/* Update button text */}
+          {isUpdating ? "Updating Attendance..." : "Update Attendance"}{" "}
+          {/* Update button text */}
         </button>
       )}
 
-
-<button onClick={navigateToHome} className="w-full h-20 px-6 py-3 mt-5 text-2xl text-white transition-all duration-500 transform bg-gray-800 rounded-lg hover:bg-gray-600 hover:scale-110 lg:w-1/4 md:w-1/5 sm:w-1/2 ">
-            Home
-          </button>
-     
-
+      <button
+        onClick={navigateToHome}
+        className="px-6 py-3 mt-5 w-full h-20 text-2xl text-white bg-gray-800 rounded-lg transition-all duration-500 transform hover:bg-gray-600 hover:scale-110 lg:w-1/4 md:w-1/5 sm:w-1/2"
+      >
+        Home
+      </button>
 
       {/* Confirmation Popup */}
       {isConfirmed && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-md animate-fadeIn">
-    <div className="relative w-full max-w-lg p-8 border border-gray-600 shadow-lg bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800 rounded-xl">
-      <div className="absolute flex items-center justify-center w-16 h-16 transform -translate-x-1/2 bg-green-600 rounded-full shadow-md -top-6 left-1/2">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2}
-          stroke="white"
-          className="w-8 h-8"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M5 13l4 4L19 7"
-          />
-        </svg>
-      </div>
-      <h2 className="mt-8 text-2xl font-bold text-center text-white">
-        Confirm Update Attendance
-      </h2>
-      <p className="mt-4 text-lg text-center text-gray-300">
-        {rollNumbers.length > 0
-          ? `Students' attendance will be updated as specified.`
-          : "No students to update."}
-      </p>
-      <div className="flex justify-between mt-6">
-      <button
-          onClick={updateAttendanceStatus}
-          className="w-1/2 py-2 mr-3 font-medium text-white bg-green-500 rounded-lg shadow-md x-4 hover:bg-green-600 focus:ring-4 focus:ring-green-300"
-        >
-          Confirm
-        </button>
-        <button
-          onClick={handleClosePopup}
-          className="w-1/2 px-4 py-2 font-medium text-white bg-red-500 rounded-lg shadow-md hover:bg-red-600 focus:ring-4 focus:ring-red-300"
-        >
-          Cancel
-        </button>
-
-      </div>
-    </div>
-  </div>
-)}
-
+        <div className="flex fixed inset-0 justify-center items-center bg-black bg-opacity-70 backdrop-blur-md animate-fadeIn">
+          <div className="relative p-8 w-full max-w-lg bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800 rounded-xl border border-gray-600 shadow-lg">
+            <div className="flex absolute -top-6 left-1/2 justify-center items-center w-16 h-16 bg-green-600 rounded-full shadow-md transform -translate-x-1/2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="white"
+                className="w-8 h-8"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <h2 className="mt-8 text-2xl font-bold text-center text-white">
+              Confirm Update Attendance
+            </h2>
+            <p className="mt-4 text-lg text-center text-gray-300">
+              {rollNumbers.length > 0
+                ? `Students' attendance will be updated as specified.`
+                : "No students to update."}
+            </p>
+            <div className="flex justify-between mt-6">
+              <button
+                onClick={updateAttendanceStatus}
+                className="py-2 mr-3 w-1/2 font-medium text-white bg-green-500 rounded-lg shadow-md x-4 hover:bg-green-600 focus:ring-4 focus:ring-green-300"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={handleClosePopup}
+                className="px-4 py-2 w-1/2 font-medium text-white bg-red-500 rounded-lg shadow-md hover:bg-red-600 focus:ring-4 focus:ring-red-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -355,15 +397,19 @@ function UpdateAttendance() {
 function Dropdown({ label, value, options, onChange }) {
   return (
     <div className="w-full max-w-[250px]">
-      <label htmlFor={label} className="block mb-2 text-white">{label}</label>
+      <label htmlFor={label} className="block mb-2 text-white">
+        {label}
+      </label>
       <select
         value={value}
         onChange={onChange}
-        className="w-full px-4 py-2 text-white bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring focus:ring-gray-600"
+        className="px-4 py-2 w-full text-white bg-gray-700 rounded-lg border border-gray-600 focus:outline-none focus:ring focus:ring-gray-600"
       >
         <option value="nan">Select {label}</option>
         {options.map((option, idx) => (
-          <option key={idx} value={option}>{option}</option>
+          <option key={idx} value={option}>
+            {option}
+          </option>
         ))}
       </select>
     </div>

@@ -26,6 +26,7 @@ import Hostelreport from "./components/Hostelreport";
 import ClassInfo from "./components/ClassInfo";
 import Update from "./update/Update";
 import UpdateStudentData from "./update/UpdateStudentData";
+import AddStudent from "./update/AddStudent";
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -129,6 +130,7 @@ function App() {
                 element={<GenerateMessage toggleSidebar={toggleSidebar} />}
               />
               <Route path="/generateExcel" element={<GenerateExcel />} />
+              <Route path="/add-student" element={<AddStudent />} />
               <Route path="/send-email" element={<SendEmail />} />
               <Route path="/hostelreport" element={<Hostelreport />} />
               <Route path="/classinfo" element={<ClassInfo />} />

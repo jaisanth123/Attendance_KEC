@@ -127,6 +127,79 @@ exports.getStudentByRollNo = async (req, res) => {
   }
 };
 
+//! create student
+exports.createStudent = async (req, res) => {
+  const studentData = req.body;
+  try {
+    // Check if student data is provided
+    if (!studentData || Object.keys(studentData).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No student data provided",
+      });
+    }
+
+    // Validate required fields
+    const requiredFields = ["rollNo", "name", "branch"];
+    for (const field of requiredFields) {
+      if (!studentData[field]) {
+        return res.status(400).json({
+          success: false,
+          message: `${field} is required`,
+        });
+      }
+    }
+
+    // Check if student with this roll number already exists
+    const existingStudent = await Student.findOne({ rollNo: studentData.rollNo });
+    if (existingStudent) {
+      return res.status(409).json({
+        success: false,
+        message: "Student with this roll number already exists",
+      });
+    }
+
+    // Filter to only include allowed fields (same as in update controller)
+    const allowedFields = [
+      "rollNo",
+      "name",
+      "hostellerDayScholar",
+      "gender",
+      "yearOfStudy",
+      "branch",
+      "section",
+      "parentMobileNo",
+      "studentMobileNo",
+      "superPacc",
+    ];
+
+    // Filter out any fields that aren't in our schema
+    const validStudentData = Object.keys(studentData)
+      .filter((key) => allowedFields.includes(key))
+      .reduce((obj, key) => {
+        obj[key] = studentData[key];
+        return obj;
+      }, {});
+
+    // Create new student document
+    const newStudent = new Student(validStudentData);
+    await newStudent.save();
+
+    // Respond with success and the new student data
+    res.status(201).json({
+      success: true,
+      message: "Student created successfully",
+      data: newStudent,
+    });
+  } catch (error) {
+    console.error("Error creating student:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error creating student",
+      error: error.message,
+    });
+  }
+};
 //! <======= get all students name and class info for suggestion =======>
 exports.getAllStudentsBasicInfo = async (req, res) => {
   try {

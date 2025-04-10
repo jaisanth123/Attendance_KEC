@@ -41,8 +41,8 @@ function Update() {
           />
           {/* Update Password Card */}
           <ActionCard
-            label="Update Password"
-            onClick={() => navigate("/update-password")}
+            label="Add Student "
+            onClick={() => navigate("/add-student")}
           />
         </div>
       </div>
