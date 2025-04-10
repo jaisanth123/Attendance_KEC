@@ -7,8 +7,5 @@ router.get("/remaining", studentController.fetchRemainingStudents);
 //! update studnets data
 router.get("/search", studentController.searchStudentsByName); // search by name
 router.get("/:rollNo", studentController.getStudentByRollNo); // setch by rollno
-router.post(
-  "/update-student-data/:rollNo",
-  studentController.updateStudentData
-); // update by roll no
+router.put("/update-student-data/:rollNo", studentController.updateStudentData); // update by roll no
 module.exports = router;
