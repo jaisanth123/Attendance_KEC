@@ -1,5 +1,5 @@
-const Student = require('../models/Student');
-const Attendance = require('../models/Attendance');
+const Student = require("../models/Student");
+const Attendance = require("../models/Attendance");
 const nodemailer = require("nodemailer");
 const multer = require("multer");
 const path = require("path");
@@ -11,129 +11,155 @@ exports.markOnDuty = async (req, res) => {
   console.log(rollNumbers, date, yearOfStudy, branch, section);
   try {
     // Array to track roll numbers that are already marked
-  
+
     // Create new On Duty records for the roll numbersd
     const result = await Attendance.updateMany(
       {
         rollNo: { $in: rollNumbers }, // Match roll numbers in the provided array
-        date,                        // Match the specified date
-        yearOfStudy,                 // Match the year of study
-        branch,                      // Match the branch
-        section,                     // Match the section
-        status: 'Absent',            // Only update records marked as "Absent"
+        date, // Match the specified date
+        yearOfStudy, // Match the year of study
+        branch, // Match the branch
+        section, // Match the section
+        status: "Absent", // Only update records marked as "Absent"
       },
       {
-        $set: { status: 'On Duty' }, // Set the status to "On Duty"
+        $set: { status: "On Duty", leaveCount: 0 }, // Set the status to "On Duty"
       }
     );
-    res.json({ message: 'Marked as On Duty successfully' });
-
+    res.json({ message: "Marked as On Duty successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error marking as On Duty' });
+    res.status(500).json({ message: "Error marking as On Duty" });
   }
 };
 
-
 // 2. Fetch Remaining Students (those not marked as "On Duty")
 
-
-// Controller function to fetch students without attendance on a specified date
+// Controller function to fetch studeconst mongoose = require('mongoose');nts without attendance on a specified date
 exports.getStudentsWithoutAttendance = async (req, res) => {
   const { yearOfStudy, branch, section, date } = req.query;
 
   // Ensure all required query parameters are provided
   if (!yearOfStudy || !branch || !section || !date) {
-      return res.status(400).json({ message: "Please provide yearOfStudy, branch, section, and date" });
+    return res.status(400).json({
+      message: "Please provide yearOfStudy, branch, section, and date",
+    });
   }
 
   console.log("Query Parameters:", { yearOfStudy, branch, section, date });
 
   try {
-      // Fetch all students in the specified year, branch, and section
-      const allStudents = await Student.find({
-          yearOfStudy,
-          branch,
-          section
-      }).select('rollNo name -_id'); // Retrieve rollNo and name fields, excluding _id
+    // Fetch all students in the specified year, branch, and section
+    const allStudents = await Student.find({
+      yearOfStudy,
+      branch,
+      section,
+    }).select("rollNo name -_id"); // Retrieve rollNo and name fields, excluding _id
 
-      console.log("All Students Found:", allStudents);
+    console.log("All Students Found:", allStudents);
 
-      // Fetch students who have an attendance record for the specified date
-      const attendanceRecords = await Attendance.find({
-          date,
-          yearOfStudy,
-          branch,
-          section
-      }).select('rollNo'); // Retrieve only the roll numbers of students with attendance records
+    // Fetch students who have an attendance record for the specified date
+    const attendanceRecords = await Attendance.find({
+      date,
+      yearOfStudy,
+      branch,
+      section,
+    }).select("rollNo"); // Retrieve only the roll numbers of students with attendance records
 
-      console.log("Attendance Records Found:", attendanceRecords);
+    console.log("Attendance Records Found:", attendanceRecords);
 
-      // If attendance records and students are identical, send the message that attendance has already been marked
-      const allRollNumbers = allStudents.map(student => student.rollNo);
-      const attendedRollNumbers = attendanceRecords.map(record => record.rollNo);
+    // If attendance records and students are identical, send the message that attendance has already been marked
+    const allRollNumbers = allStudents.map((student) => student.rollNo);
+    const attendedRollNumbers = attendanceRecords.map(
+      (record) => record.rollNo
+    );
 
-      // Check if the attendance records cover all students and are the same
-      if (allRollNumbers.length === attendedRollNumbers.length && 
-          allRollNumbers.every(rollNo => attendedRollNumbers.includes(rollNo))) {
-          return res.status(200).json({ message: "Attendance has already been marked for all students." });
-      }
-
-      // Filter students who do not have an attendance record for the specified date
-      const studentsWithoutAttendance = allStudents.filter(student =>
-          !attendedRollNumbers.includes(student.rollNo)
-      );
-
-      // Sort the resulting students by roll number (numeric part only)
-      studentsWithoutAttendance.sort((a, b) => {
-          const numA = parseInt(a.rollNo.replace(/[^0-9]/g, ''), 10);
-          const numB = parseInt(b.rollNo.replace(/[^0-9]/g, ''), 10);
-          return numA - numB;
+    // Check if the attendance records cover all students and are the same
+    if (
+      allRollNumbers.length === attendedRollNumbers.length &&
+      allRollNumbers.every((rollNo) => attendedRollNumbers.includes(rollNo))
+    ) {
+      return res.status(200).json({
+        message: "Attendance has already been marked for all students.",
       });
+    }
 
-      // Send the filtered roll numbers and the total count of all students
-      res.json({
-          students: studentsWithoutAttendance.map(student => ({
-              rollNo: student.rollNo,
-              name: student.name
-          })), // Send both rollNo and name
-          totalStudents: allStudents.length // Send the total count of students found
-      });
+    // Filter students who do not have an attendance record for the specified date
+    const studentsWithoutAttendance = allStudents.filter(
+      (student) => !attendedRollNumbers.includes(student.rollNo)
+    );
+
+    // Sort the resulting students by roll number (numeric part only)
+    studentsWithoutAttendance.sort((a, b) => {
+      const numA = parseInt(a.rollNo.replace(/[^0-9]/g, ""), 10);
+      const numB = parseInt(b.rollNo.replace(/[^0-9]/g, ""), 10);
+      return numA - numB;
+    });
+
+    // Send the filtered roll numbers and the total count of all students
+    res.json({
+      students: studentsWithoutAttendance.map((student) => ({
+        rollNo: student.rollNo,
+        name: student.name,
+      })), // Send both rollNo and name
+      totalStudents: allStudents.length, // Send the total count of students found
+    });
   } catch (error) {
-      console.error("Error retrieving students without attendance:", error);
-      res.status(500).json({ message: "Server error" });
+    console.error("Error retrieving students without attendance:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
 // 3. Mark students as "Absent"
+// Updated markAbsent function with proper limit to get only the most recent previous record
 exports.markAbsent = async (req, res) => {
   const { rollNumbers, date, yearOfStudy, branch, section } = req.body;
 
   console.log(rollNumbers, date, yearOfStudy, branch, section);
   try {
-    // Iterate over each roll number
-
     // Create new absent records for the roll numbers
-    const absentRecords = rollNumbers.map(rollNo => ({
-      rollNo,
-      date,
-      status: 'Absent',
-      yearOfStudy,
-      branch,
-      section,
-      locked: false
-    }));
+    const absentRecords = [];
+
+    // Process each roll number
+    for (const rollNo of rollNumbers) {
+      // Find the most recent record for this student before the current date
+      // Added limit(1) to ensure we get only the most recent record
+      const previousRecord = await Attendance.findOne({
+        rollNo,
+        yearOfStudy,
+        branch,
+        section,
+        date: { $lt: date },
+      })
+        .sort({ date: -1 })
+        .limit(1);
+
+      // Calculate new leaveCount (increment from previous or start at 1)
+      const leaveCount = previousRecord
+        ? (previousRecord.leaveCount || 0) + 1
+        : 1;
+
+      // Create the new attendance record with updated leaveCount
+      absentRecords.push({
+        rollNo,
+        date,
+        status: "Absent",
+        yearOfStudy,
+        branch,
+        section,
+        locked: false,
+        leaveCount,
+      });
+    }
 
     // Insert the new "Absent" records
     await Attendance.insertMany(absentRecords);
-    res.json({ message: 'Marked as Absent successfully' });
-
+    res.json({ message: "Marked as Absent successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error marking as Absent' });
+    res.status(500).json({ message: "Error marking as Absent" });
   }
 };
-
 
 // 4. Mark remaining students as "Present"
 exports.markRemainingPresent = async (req, res) => {
@@ -141,7 +167,11 @@ exports.markRemainingPresent = async (req, res) => {
 
   try {
     // Fetch all students in the specified year, branch, and section
-    const allStudents = await Student.find({ yearOfStudy, branch, section }).select('rollNo');
+    const allStudents = await Student.find({
+      yearOfStudy,
+      branch,
+      section,
+    }).select("rollNo");
 
     // Fetch roll numbers from attendance records marked as "Absent", "On Duty", or "Present" already
     const markedAttendance = await Attendance.find({
@@ -149,42 +179,45 @@ exports.markRemainingPresent = async (req, res) => {
       yearOfStudy,
       branch,
       section,
-      status: { $in: ['Absent', 'On Duty', 'Present','SuperPacc'] }
-    }).select('rollNo');
+      status: { $in: ["Absent", "On Duty", "Present", "SuperPacc"] },
+    }).select("rollNo");
 
     // Extract roll numbers from marked attendance records
-    const markedRollNumbers = markedAttendance.map(record => record.rollNo);
+    const markedRollNumbers = markedAttendance.map((record) => record.rollNo);
 
     // Filter students who are not in the marked roll numbers
-    const remainingStudents = allStudents.filter(student => 
-      !markedRollNumbers.includes(student.rollNo)
+    const remainingStudents = allStudents.filter(
+      (student) => !markedRollNumbers.includes(student.rollNo)
     );
 
     // Prepare attendance records to mark remaining students as "Present"
-    const presentRecords = remainingStudents.map(student => ({
+    const presentRecords = remainingStudents.map((student) => ({
       rollNo: student.rollNo,
       date,
-      status: 'Present',
+      status: "Present",
       yearOfStudy,
       branch,
       section,
-      locked:false
+      locked: false,
+      leaveCount: 0,
     }));
 
     // Array to track roll numbers with existing attendance
 
-
     // Insert the "Present" records for the remaining students
     await Attendance.insertMany(presentRecords);
-    
-    res.json({ message: 'Marked remaining students as Present', markedAsPresent: presentRecords.length });
+
+    res.json({
+      message: "Marked remaining students as Present",
+      markedAsPresent: presentRecords.length,
+    });
   } catch (error) {
     console.error("Error marking remaining students as Present:", error);
-    res.status(500).json({ message: 'Error marking remaining students as Present' });
+    res
+      .status(500)
+      .json({ message: "Error marking remaining students as Present" });
   }
 };
-
-
 
 // Email sending function
 const storage = multer.memoryStorage(); // Store files in memory, not on disk
@@ -234,14 +267,16 @@ exports.sendEmail = async (req, res) => {
   }
 };
 
-
 exports.markSuperPaccAttendance = async (req, res) => {
   const { yearOfStudy, branch, section, date } = req.body;
 
   try {
     // Validate input
     if (!yearOfStudy || !branch || !section || !date) {
-      return res.status(400).json({ message: 'All fields are required: yearOfStudy, branch, section, and date.' });
+      return res.status(400).json({
+        message:
+          "All fields are required: yearOfStudy, branch, section, and date.",
+      });
     }
 
     // Fetch students with superPacc set to 'YES' for the specified yearOfStudy, branch, and section
@@ -249,18 +284,20 @@ exports.markSuperPaccAttendance = async (req, res) => {
       yearOfStudy,
       branch,
       section,
-      superPacc: 'YES',
-    }).select('rollNo');
+      superPacc: "YES",
+    }).select("rollNo");
 
     if (studentsWithSuperPacc.length === 0) {
-      return res.status(404).json({ message: 'No students with SuperPacc found for the given criteria.' });
+      return res.status(404).json({
+        message: "No students with SuperPacc found for the given criteria.",
+      });
     }
 
     // Prepare attendance records
-    const superPaccAttendanceRecords = studentsWithSuperPacc.map(student => ({
+    const superPaccAttendanceRecords = studentsWithSuperPacc.map((student) => ({
       rollNo: student.rollNo,
       date,
-      status: 'SuperPacc',
+      status: "SuperPacc",
       yearOfStudy,
       branch,
       section,
@@ -280,14 +317,16 @@ exports.markSuperPaccAttendance = async (req, res) => {
       // Go through each existing record and update status to 'SuperPacc' for those marked absent
       const updatedRecords = [];
       for (let student of studentsWithSuperPacc) {
-        const existingRecord = existingRecords.find(record => record.rollNo === student.rollNo);
+        const existingRecord = existingRecords.find(
+          (record) => record.rollNo === student.rollNo
+        );
 
         if (existingRecord) {
           // If the record exists but the status is not 'SuperPacc', update it
-          if (existingRecord.status !== 'SuperPacc') {
+          if (existingRecord.status !== "SuperPacc") {
             await Attendance.updateOne(
               { _id: existingRecord._id },
-              { $set: { status: 'SuperPacc' } }
+              { $set: { status: "SuperPacc" } }
             );
             updatedRecords.push(existingRecord);
           }
@@ -296,7 +335,7 @@ exports.markSuperPaccAttendance = async (req, res) => {
           await Attendance.create({
             rollNo: student.rollNo,
             date,
-            status: 'SuperPacc',
+            status: "SuperPacc",
             yearOfStudy,
             branch,
             section,
@@ -306,106 +345,33 @@ exports.markSuperPaccAttendance = async (req, res) => {
       }
 
       res.status(200).json({
-        message: 'Attendance updated successfully to SuperPacc.',
+        message: "Attendance updated successfully to SuperPacc.",
         recordsUpdated: updatedRecords.length,
         recordsAdded: superPaccAttendanceRecords.length - updatedRecords.length, // Records added
       });
-
     } else {
       // If no records exist, insert all the SuperPacc attendance records
       await Attendance.insertMany(superPaccAttendanceRecords);
 
       res.status(201).json({
-        message: 'SuperPacc attendance marked successfully.',
+        message: "SuperPacc attendance marked successfully.",
         recordsAdded: superPaccAttendanceRecords.length,
       });
     }
-
   } catch (error) {
-    console.error('Error marking SuperPacc attendance:', error);
-    res.status(500).json({ message: 'Error marking SuperPacc attendance.' });
+    console.error("Error marking SuperPacc attendance:", error);
+    res.status(500).json({ message: "Error marking SuperPacc attendance." });
   }
 };
-
-
-
 
 exports.getAttendanceStates = async (req, res) => {
   const { yearOfStudy, branch, section, date } = req.query;
 
   // Ensure all required query parameters are provided
   if (!yearOfStudy || !branch || !section || !date) {
-      return res.status(400).json({ message: "Please provide yearOfStudy, branch, section, and date" });
-  }
-
-  console.log("Query Parameters:", { yearOfStudy, branch, section, date });
-
-  try {
-      // Fetch all students in the specified year, branch, and section
-      const allStudents = await Student.find({
-          yearOfStudy,
-          branch,
-          section
-      }).select('rollNo name -_id'); // Retrieve rollNo and name fields, excluding _id
-
-      console.log("All Students Found:", allStudents);
-
-      // Fetch attendance records for the specified date
-      const attendanceRecords = await Attendance.find({
-          date,
-          yearOfStudy,
-          branch,
-          section
-      }).select('rollNo status'); // Retrieve rollNo and attendance status fields
-
-      console.log("Attendance Records Found:", attendanceRecords);
-
-      // If no attendance records are found, return a message indicating attendance has not been marked
-      if (attendanceRecords.length === 0) {
-          return res.status(404).json({ message: "Attendance has not been marked for this class on this date." });
-      }
-
-      // Map the attendance states for each student
-      const attendanceMap = attendanceRecords.reduce((acc, record) => {
-          acc[record.rollNo] = record.status; // Map rollNo to its attendance status (e.g., "Present", "Absent", "On Duty")
-          return acc;
-      }, {});
-
-      // For each student, get their attendance state from the attendance map, defaulting to "Absent" if no record exists
-      const attendanceStates = allStudents.map(student => ({
-          rollNo: student.rollNo,
-          name: student.name,
-          state: attendanceMap[student.rollNo] || 'Absent' // Default state is "Absent" if no record exists
-      }));
-
-      // Sort the attendance states by roll number (numeric part only)
-      attendanceStates.sort((a, b) => {
-          const numA = parseInt(a.rollNo.replace(/[^0-9]/g, ''), 10);
-          const numB = parseInt(b.rollNo.replace(/[^0-9]/g, ''), 10);
-          return numA - numB;
-      });
-
-      // Send the attendance states and the total count of all students
-      res.json({
-          attendanceStates, // Send the roll numbers with their mapped attendance states
-          totalStudents: allStudents.length // Send the total count of students found
-      });
-  } catch (error) {
-      console.error("Error retrieving attendance states:", error);
-      res.status(500).json({ message: "Server error" });
-  }
-};
-
-
-
-
-
-exports.getAttendanceStatusCount = async (req, res) => {
-  const { yearOfStudy, branch, section, date } = req.query;
-
-  // Ensure all required query parameters are provided
-  if (!yearOfStudy || !branch || !section || !date) {
-    return res.status(400).json({ message: "Please provide yearOfStudy, branch, section, and date" });
+    return res.status(400).json({
+      message: "Please provide yearOfStudy, branch, section, and date",
+    });
   }
 
   console.log("Query Parameters:", { yearOfStudy, branch, section, date });
@@ -416,7 +382,7 @@ exports.getAttendanceStatusCount = async (req, res) => {
       yearOfStudy,
       branch,
       section,
-    }).select('rollNo name -_id'); // Retrieve rollNo and name fields, excluding _id
+    }).select("rollNo name -_id"); // Retrieve rollNo and name fields, excluding _id
 
     console.log("All Students Found:", allStudents);
 
@@ -426,7 +392,77 @@ exports.getAttendanceStatusCount = async (req, res) => {
       yearOfStudy,
       branch,
       section,
-    }).select('rollNo status'); // Retrieve rollNo and attendance status fields
+    }).select("rollNo status"); // Retrieve rollNo and attendance status fields
+
+    console.log("Attendance Records Found:", attendanceRecords);
+
+    // If no attendance records are found, return a message indicating attendance has not been marked
+    if (attendanceRecords.length === 0) {
+      return res.status(404).json({
+        message: "Attendance has not been marked for this class on this date.",
+      });
+    }
+
+    // Map the attendance states for each student
+    const attendanceMap = attendanceRecords.reduce((acc, record) => {
+      acc[record.rollNo] = record.status; // Map rollNo to its attendance status (e.g., "Present", "Absent", "On Duty")
+      return acc;
+    }, {});
+
+    // For each student, get their attendance state from the attendance map, defaulting to "Absent" if no record exists
+    const attendanceStates = allStudents.map((student) => ({
+      rollNo: student.rollNo,
+      name: student.name,
+      state: attendanceMap[student.rollNo] || "Absent", // Default state is "Absent" if no record exists
+    }));
+
+    // Sort the attendance states by roll number (numeric part only)
+    attendanceStates.sort((a, b) => {
+      const numA = parseInt(a.rollNo.replace(/[^0-9]/g, ""), 10);
+      const numB = parseInt(b.rollNo.replace(/[^0-9]/g, ""), 10);
+      return numA - numB;
+    });
+
+    // Send the attendance states and the total count of all students
+    res.json({
+      attendanceStates, // Send the roll numbers with their mapped attendance states
+      totalStudents: allStudents.length, // Send the total count of students found
+    });
+  } catch (error) {
+    console.error("Error retrieving attendance states:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.getAttendanceStatusCount = async (req, res) => {
+  const { yearOfStudy, branch, section, date } = req.query;
+
+  // Ensure all required query parameters are provided
+  if (!yearOfStudy || !branch || !section || !date) {
+    return res.status(400).json({
+      message: "Please provide yearOfStudy, branch, section, and date",
+    });
+  }
+
+  console.log("Query Parameters:", { yearOfStudy, branch, section, date });
+
+  try {
+    // Fetch all students in the specified year, branch, and section
+    const allStudents = await Student.find({
+      yearOfStudy,
+      branch,
+      section,
+    }).select("rollNo name -_id"); // Retrieve rollNo and name fields, excluding _id
+
+    console.log("All Students Found:", allStudents);
+
+    // Fetch attendance records for the specified date
+    const attendanceRecords = await Attendance.find({
+      date,
+      yearOfStudy,
+      branch,
+      section,
+    }).select("rollNo status"); // Retrieve rollNo and attendance status fields
 
     console.log("Attendance Records Found:", attendanceRecords);
 
@@ -447,18 +483,18 @@ exports.getAttendanceStatusCount = async (req, res) => {
     }, {});
 
     // For each student, get their attendance state from the attendance map, defaulting to "Absent" if no record exists
-    const attendanceStates = allStudents.map(student => ({
+    const attendanceStates = allStudents.map((student) => ({
       rollNo: student.rollNo,
       name: student.name,
-      state: attendanceMap[student.rollNo] || 'Absent', // Default state is "Absent" if no record exists
+      state: attendanceMap[student.rollNo] || "Absent", // Default state is "Absent" if no record exists
     }));
 
     // Count students with "Absent" status and all other statuses
     let absentCount = 0;
     let otherStatusCount = 0;
 
-    attendanceStates.forEach(student => {
-      if (student.state === 'Absent') {
+    attendanceStates.forEach((student) => {
+      if (student.state === "Absent") {
         absentCount++;
       } else {
         otherStatusCount++;
@@ -478,9 +514,9 @@ exports.getAttendanceStatusCount = async (req, res) => {
   }
 };
 
-
 exports.updateAttendanceStatus = async (req, res) => {
-  const { yearOfStudy, branch, section, date, rollNumberStateMapping } = req.body;
+  const { yearOfStudy, branch, section, date, rollNumberStateMapping } =
+    req.body;
 
   // Check for missing required fields
   if (!yearOfStudy || !branch || !section || !date || !rollNumberStateMapping) {
@@ -489,33 +525,39 @@ exports.updateAttendanceStatus = async (req, res) => {
 
   try {
     // Fetch all students in the specified year, branch, and section
-    const allStudents = await Student.find({ yearOfStudy, branch, section }).select('rollNo');
+    const allStudents = await Student.find({
+      yearOfStudy,
+      branch,
+      section,
+    }).select("rollNo");
 
     // Iterate over the rollNumberStateMapping to update the state for each roll number
     for (const [rollNo, state] of Object.entries(rollNumberStateMapping)) {
       // Validate the provided state
-      if (!['Present', 'Absent', 'On Duty', 'SuperPacc'].includes(state)) {
-        return res.status(400).json({ message: `Invalid state for roll number ${rollNo}` });
+      if (!["Present", "Absent", "On Duty", "SuperPacc"].includes(state)) {
+        return res
+          .status(400)
+          .json({ message: `Invalid state for roll number ${rollNo}` });
       }
 
       // Check if the attendance record exists for the given rollNo and date
       const existingAttendance = await Attendance.findOne({
-        rollNo, 
-        yearOfStudy, 
-        branch, 
-        section, 
-        date
+        rollNo,
+        yearOfStudy,
+        branch,
+        section,
+        date,
       });
 
       if (existingAttendance) {
         // If the record exists, update the attendance status
         const updateResult = await Attendance.findOneAndUpdate(
           {
-            rollNo,      // Match roll number
+            rollNo, // Match roll number
             yearOfStudy, // Match year of study
-            branch,      // Match branch
-            section,     // Match section
-            date,        // Match date
+            branch, // Match branch
+            section, // Match section
+            date, // Match date
           },
           {
             $set: { status: state }, // Update the state
@@ -537,7 +579,9 @@ exports.updateAttendanceStatus = async (req, res) => {
         });
 
         await newAttendance.save();
-        console.log(`New attendance created for roll number ${rollNo} with state ${state}`);
+        console.log(
+          `New attendance created for roll number ${rollNo} with state ${state}`
+        );
       }
     }
 
@@ -546,6 +590,8 @@ exports.updateAttendanceStatus = async (req, res) => {
   } catch (error) {
     // Handle any errors that occur during the process
     console.error("Error updating attendance status:", error);
-    res.status(500).json({ message: "Server error while updating attendance." });
+    res
+      .status(500)
+      .json({ message: "Server error while updating attendance." });
   }
 };
