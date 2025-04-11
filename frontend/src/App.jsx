@@ -27,6 +27,7 @@ import ClassInfo from "./components/ClassInfo";
 import Update from "./update/Update";
 import UpdateStudentData from "./update/UpdateStudentData";
 import AddStudent from "./update/AddStudent";
+import ChangePasswordForm from "./update/ChangePasswordForm";
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -135,6 +136,8 @@ function App() {
               <Route path="/hostelreport" element={<Hostelreport />} />
               <Route path="/classinfo" element={<ClassInfo />} />
               <Route path="/generateReport" element={<GenerateReport />} />
+
+              <Route path="/change-password" element={<ChangePasswordForm />} />
               <Route path="/update" element={<Update />} />
             </Route>
 

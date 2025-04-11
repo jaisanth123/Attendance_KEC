@@ -37,7 +37,7 @@ function Update() {
           />
           <ActionCard
             label="Update Password"
-            onClick={() => navigate("/update-data")}
+            onClick={() => navigate("/change-password")}
           />
           {/* Update Password Card */}
           <ActionCard
