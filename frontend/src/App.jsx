@@ -28,6 +28,7 @@ import Update from "./update/Update";
 import UpdateStudentData from "./update/UpdateStudentData";
 import AddStudent from "./update/AddStudent";
 import ChangePasswordForm from "./update/ChangePasswordForm";
+import LeaveCountPage from "./components/LeaveCountPage";
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -126,6 +127,7 @@ function App() {
               <Route path="/viewattendance" element={<ViewAttendance />} />
               <Route path="/update-attendance" element={<UpdateAttendace />} />
               <Route path="/update-data" element={<UpdateStudentData />} />
+              <Route path="/leave-count" element={<LeaveCountPage  />} />
               <Route
                 path="/generateMessage"
                 element={<GenerateMessage toggleSidebar={toggleSidebar} />}
