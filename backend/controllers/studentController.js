@@ -356,3 +356,59 @@ exports.updateStudentData = async (req, res) => {
     });
   }
 };
+
+exports.getStudentsWithLeaveCount = async (req, res) => {
+  try {
+    const { date, yearOfStudy, branch, section } = req.query;
+
+    // Validate required parameters
+    if (!date || !yearOfStudy || !branch || !section) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Missing required parameters: date, yearOfStudy, branch, section",
+      });
+    }
+
+    // Use aggregation pipeline to find students with leaveCount > 0
+    const studentsWithLeaveCount = await Attendance.aggregate([
+      {
+        $match: {
+          date: date,
+          yearOfStudy: yearOfStudy,
+          branch: branch,
+          section: section,
+          status: "Absent",
+          leaveCount: { $gt: 0 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          rollNo: 1,
+          leaveCount: 1,
+        },
+      },
+      {
+        $sort: { leaveCount: -1 },
+      },
+    ]);
+
+    res.status(200).json({
+      success: true,
+      date: date,
+      yearOfStudy: yearOfStudy,
+      branch: branch,
+      section: section,
+      count: studentsWithLeaveCount.length,
+      data: studentsWithLeaveCount,
+    });
+  } catch (error) {
+    console.error("Error fetching students with leave count:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch students with leave count",
+      error: error.message,
+    });
+  }
+};
