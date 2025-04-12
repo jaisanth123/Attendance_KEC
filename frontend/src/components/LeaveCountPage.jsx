@@ -215,6 +215,8 @@ const LeaveCountPage = () => {
                     {studentsData.map((student, index) => (
                       <tr key={index} className="hover:bg-gray-50">
                         <td className="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
+                          {student.name}
+                          <br />
                           {student.rollNo}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">

@@ -394,14 +394,34 @@ exports.getStudentsWithLeaveCount = async (req, res) => {
       },
     ]);
 
+    // Extract roll numbers for the next query
+    const rollNumbers = studentsWithLeaveCount.map((student) => student.rollNo);
+
+    // Fetch student names based on roll numbers
+    const studentsDetails = await Student.find({
+      rollNo: { $in: rollNumbers },
+    }).select("rollNo name -_id");
+
+    // Combine leave count with student names
+    const result = studentsWithLeaveCount.map((student) => {
+      const studentDetail = studentsDetails.find(
+        (detail) => detail.rollNo === student.rollNo
+      );
+      return {
+        rollNo: student.rollNo,
+        leaveCount: student.leaveCount,
+        name: studentDetail ? studentDetail.name : null, // Include name if found
+      };
+    });
+
     res.status(200).json({
       success: true,
       date: date,
       yearOfStudy: yearOfStudy,
       branch: branch,
       section: section,
-      count: studentsWithLeaveCount.length,
-      data: studentsWithLeaveCount,
+      count: result.length,
+      data: result,
     });
   } catch (error) {
     console.error("Error fetching students with leave count:", error);
