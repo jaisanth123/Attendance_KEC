@@ -1,6 +1,6 @@
-// LeaveCountPage.jsx
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { Calendar, Filter } from "lucide-react";
 
 const LeaveCountPage = () => {
   const [studentsData, setStudentsData] = useState([]);
@@ -49,133 +49,143 @@ const LeaveCountPage = () => {
     fetchStudentsWithLeaveCount();
   };
 
-  // Function to determine color based on leaveCount
-  const getLeaveCountColor = (count) => {
-    if (count >= 4) return "bg-red-100 text-red-800 border-red-300"; // High risk
-    if (count >= 2) return "bg-yellow-100 text-yellow-800 border-yellow-300"; // Medium risk
-    return "bg-green-100 text-green-800 border-green-300"; // Low risk
-  };
+  // Group students by leave count for visual separation
+  const highRiskStudents = studentsData.filter(
+    (student) => student.leaveCount >= 4
+  );
+  const mediumRiskStudents = studentsData.filter(
+    (student) => student.leaveCount >= 2 && student.leaveCount < 4
+  );
+  const lowRiskStudents = studentsData.filter(
+    (student) => student.leaveCount < 2
+  );
 
   return (
-    <div className="p-6 mx-auto max-w-6xl">
-      <h1 className="mb-6 text-2xl font-bold">Student Leave Count</h1>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header section */}
+      <div className="px-4 py-6 mx-4 mt-4 mb-10 w-auto max-w-4xl text-white rounded-2xl sm:mx-6 md:mx-auto bg-slate-800">
+        <div className="mx-auto w-full">
+          <h1 className="mb-8 text-2xl font-bold text-center md:text-3xl">
+            ON DUTY
+          </h1>
 
-      <form
-        onSubmit={handleSubmit}
-        className="p-6 mb-8 bg-white rounded-lg shadow-md"
-      >
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <div>
-            <label
-              htmlFor="date"
-              className="block mb-1 text-sm font-medium text-gray-700"
-            >
-              Date
-            </label>
-            <input
-              type="date"
-              id="date"
-              name="date"
-              value={filters.date}
-              onChange={handleInputChange}
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="w-full">
+            <div className="grid grid-cols-1 gap-4 mb-6 sm:gap-6 sm:grid-cols-2 md:grid-cols-3">
+              <div className="w-full">
+                <label
+                  htmlFor="yearOfStudy"
+                  className="block mb-2 text-base md:text-lg"
+                >
+                  Year:
+                </label>
+                <select
+                  id="yearOfStudy"
+                  name="yearOfStudy"
+                  value={filters.yearOfStudy}
+                  onChange={handleInputChange}
+                  className="p-2 w-full text-gray-800 bg-white rounded-md border-0 md:p-3 focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="I">I</option>
+                  <option value="II">II</option>
+                  <option value="III">III</option>
+                  <option value="IV">IV</option>
+                </select>
+              </div>
 
-          <div>
-            <label
-              htmlFor="yearOfStudy"
-              className="block mb-1 text-sm font-medium text-gray-700"
-            >
-              Year of Study
-            </label>
-            <select
-              id="yearOfStudy"
-              name="yearOfStudy"
-              value={filters.yearOfStudy}
-              onChange={handleInputChange}
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            >
-              <option value="I">I</option>
-              <option value="II">II</option>
-              <option value="III">III</option>
-              <option value="IV">IV</option>
-            </select>
-          </div>
+              <div className="w-full">
+                <label
+                  htmlFor="branch"
+                  className="block mb-2 text-base md:text-lg"
+                >
+                  Branch:
+                </label>
+                <select
+                  id="branch"
+                  name="branch"
+                  value={filters.branch}
+                  onChange={handleInputChange}
+                  className="p-2 w-full text-gray-800 bg-white rounded-md border-0 md:p-3 focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="AIDS">AI & DS</option>
+                  <option value="AIML">AI & ML</option>
+                </select>
+              </div>
 
-          <div>
-            <label
-              htmlFor="branch"
-              className="block mb-1 text-sm font-medium text-gray-700"
-            >
-              Branch
-            </label>
-            <select
-              id="branch"
-              name="branch"
-              value={filters.branch}
-              onChange={handleInputChange}
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            >
-              <option value="AIDS">AIDS</option>
-              <option value="AIML">AI & ML</option>
-            </select>
-          </div>
+              <div className="w-full">
+                <label
+                  htmlFor="section"
+                  className="block mb-2 text-base md:text-lg"
+                >
+                  Section:
+                </label>
+                <select
+                  id="section"
+                  name="section"
+                  value={filters.section}
+                  onChange={handleInputChange}
+                  className="p-2 w-full text-gray-800 bg-white rounded-md border-0 md:p-3 focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                  <option value="D">D</option>
+                </select>
+              </div>
+            </div>
 
-          <div>
-            <label
-              htmlFor="section"
-              className="block mb-1 text-sm font-medium text-gray-700"
-            >
-              Section
-            </label>
-            <select
-              id="section"
-              name="section"
-              value={filters.section}
-              onChange={handleInputChange}
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            >
-              <option value="A">A</option>
-              <option value="B">B</option>
-              <option value="C">C</option>
-              <option value="D">D</option>
-            </select>
-          </div>
+            <div className="mb-6 w-full">
+              <label
+                htmlFor="date"
+                className="block mb-2 text-base text-center md:text-lg"
+              >
+                Select Date:
+              </label>
+              <div className="flex items-center mx-auto max-w-md">
+                <input
+                  type="date"
+                  id="date"
+                  name="date"
+                  value={filters.date}
+                  onChange={handleInputChange}
+                  className="p-2 w-full text-gray-800 bg-white rounded-md border-0 md:p-3 focus:ring-2 focus:ring-blue-500"
+                />
+                <Calendar className="ml-2 text-white" size={24} />
+              </div>
+            </div>
+
+            <div className="flex justify-center mt-6">
+              <button
+                type="submit"
+                className="flex justify-center items-center px-4 py-2 text-sm text-white bg-blue-600 rounded-md shadow transition duration-200 md:px-6 md:py-3 md:text-base hover:bg-blue-700"
+              >
+                <Filter className="mr-2" size={18} />
+                Apply Filters
+              </button>
+            </div>
+          </form>
         </div>
-
-        <div className="mt-4">
-          <button
-            type="submit"
-            className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md border border-transparent shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      </div>
+      {/* Content section */}
+      <div className="p-6 mx-auto max-w-7xl">
+        {loading ? (
+          <div className="flex justify-center my-8">
+            <div className="w-12 h-12 rounded-full border-t-4 border-b-4 border-blue-600 animate-spin"></div>
+          </div>
+        ) : error ? (
+          <div
+            className="relative px-4 py-3 mb-6 text-red-700 bg-red-100 rounded-lg border border-red-400"
+            role="alert"
           >
-            Apply Filters
-          </button>
-        </div>
-      </form>
-
-      {loading ? (
-        <div className="flex justify-center my-8">
-          <div className="w-12 h-12 rounded-full border-t-2 border-b-2 border-indigo-500 animate-spin"></div>
-        </div>
-      ) : error ? (
-        <div
-          className="relative px-4 py-3 text-red-700 bg-red-100 rounded border border-red-400"
-          role="alert"
-        >
-          <strong className="font-bold">Error: </strong>
-          <span className="block sm:inline">{error}</span>
-        </div>
-      ) : (
-        <>
-          <div className="overflow-hidden bg-white rounded-lg shadow">
-            <div className="flex justify-between items-center px-6 py-4 border-b">
-              <h2 className="text-lg font-semibold text-gray-800">
-                Students with Leave Count
-                {filters.date &&
-                  ` for ${new Date(filters.date).toLocaleDateString()}`}
+            <strong className="font-bold">Error: </strong>
+            <span className="block sm:inline">{error}</span>
+          </div>
+        ) : (
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-gray-800">
+                Attendance for {new Date(filters.date).toLocaleDateString()}
               </h2>
-              <div className="text-sm text-gray-600">
+              <div className="px-4 py-2 text-sm text-gray-600 bg-white rounded-lg shadow">
                 Total:{" "}
                 <span className="font-semibold">{studentsData.length}</span>{" "}
                 students
@@ -183,63 +193,102 @@ const LeaveCountPage = () => {
             </div>
 
             {studentsData.length === 0 ? (
-              <div className="p-6 text-center text-gray-500">
+              <div className="p-6 text-center text-gray-500 bg-white rounded-lg shadow">
                 No students with leave count found for the selected filters.
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
-                      >
-                        Roll Number
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
-                      >
-                        Leave Count
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
-                      >
-                        Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {studentsData.map((student, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
-                          {student.name}
-                          <br />
-                          {student.rollNo}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium ${getLeaveCountColor(
-                              student.leaveCount
-                            )}`}
-                          >
-                            {student.leaveCount}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                          {student.status}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="space-y-8">
+                {/* High risk students */}
+                {highRiskStudents.length > 0 && (
+                  <div>
+                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                      {highRiskStudents.map((student, index) => (
+                        <div
+                          key={index}
+                          className="p-4 bg-red-50 rounded-lg border border-red-200 shadow-sm transition-shadow hover:shadow-md"
+                        >
+                          <div className="mb-1 text-lg font-semibold text-gray-800">
+                            {student.name}
+                          </div>
+                          <div className="mb-2 text-sm text-gray-600">
+                            {student.rollNo}
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs text-gray-500">
+                              Leave Count:
+                            </span>
+                            <span className="px-3 py-1 text-sm font-medium text-red-800 bg-red-100 rounded-full">
+                              {student.leaveCount}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Medium risk students */}
+                {mediumRiskStudents.length > 0 && (
+                  <div>
+                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                      {mediumRiskStudents.map((student, index) => (
+                        <div
+                          key={index}
+                          className="p-4 bg-yellow-50 rounded-lg border border-yellow-200 shadow-sm transition-shadow hover:shadow-md"
+                        >
+                          <div className="mb-1 text-lg font-semibold text-gray-800">
+                            {student.name}
+                          </div>
+                          <div className="mb-2 text-sm text-gray-600">
+                            {student.rollNo}
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs text-gray-500">
+                              Leave Count:
+                            </span>
+                            <span className="px-3 py-1 text-sm font-medium text-yellow-800 bg-yellow-100 rounded-full">
+                              {student.leaveCount}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Low risk students */}
+                {lowRiskStudents.length > 0 && (
+                  <div>
+                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                      {lowRiskStudents.map((student, index) => (
+                        <div
+                          key={index}
+                          className="p-4 bg-green-50 rounded-lg border border-green-200 shadow-sm transition-shadow hover:shadow-md"
+                        >
+                          <div className="mb-1 text-lg font-semibold text-gray-800">
+                            {student.name}
+                          </div>
+                          <div className="mb-2 text-sm text-gray-600">
+                            {student.rollNo}
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs text-gray-500">
+                              Leave Count:
+                            </span>
+                            <span className="px-3 py-1 text-sm font-medium text-green-800 bg-green-100 rounded-full">
+                              {student.leaveCount}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 };
