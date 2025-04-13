@@ -44,7 +44,7 @@ export default function UpdateStudentData() {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://localhost:5000/api/students/search?name=${encodeURIComponent(
+        `http://localhost:5000/api/students/search/name?name=${encodeURIComponent(
           name
         )}`
       );
@@ -73,7 +73,9 @@ export default function UpdateStudentData() {
       setIsLoading(true);
       console.log(`Fetching student with roll number: ${rollNo}`);
       const response = await fetch(
-        `http://localhost:5000/api/students/${encodeURIComponent(upperCase)}`
+        `http://localhost:5000/api/students/search/${encodeURIComponent(
+          upperCase
+        )}`
       );
       const data = await response.json();
 
