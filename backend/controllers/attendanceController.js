@@ -200,6 +200,7 @@ exports.markRemainingPresent = async (req, res) => {
       section,
       locked: false,
       leaveCount: 0,
+      infoStatus: "NA",
     }));
 
     // Array to track roll numbers with existing attendance
@@ -593,5 +594,118 @@ exports.updateAttendanceStatus = async (req, res) => {
     res
       .status(500)
       .json({ message: "Server error while updating attendance." });
+  }
+};
+
+// Controller to update infoStatus (Informed/NotInformed) for attendance records
+exports.updateInfoStatus = async (req, res) => {
+  const { rollNo, date, infoStatus } = req.body;
+
+  // Validate required fields
+  if (!rollNo || !date || !infoStatus) {
+    return res.status(400).json({
+      success: false,
+      message: "Roll number, date, and infoStatus are required",
+    });
+  }
+
+  // Validate infoStatus value
+  if (!["Informed", "NotInformed"].includes(infoStatus)) {
+    return res.status(400).json({
+      success: false,
+      message: "infoStatus must be either 'Informed' or 'NotInformed'",
+    });
+  }
+
+  try {
+    // Find and update the attendance record
+    const updatedAttendance = await Attendance.findOneAndUpdate(
+      { rollNo, date },
+      { $set: { infoStatus } },
+      { new: true }
+    );
+
+    // Check if record exists
+    if (!updatedAttendance) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "Attendance record not found for the given roll number and date",
+      });
+    }
+
+    // Return success response
+    res.status(200).json({
+      success: true,
+      message: `infoStatus updated to '${infoStatus}' successfully`,
+      data: updatedAttendance,
+    });
+  } catch (error) {
+    console.error("Error updating infoStatus:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while updating infoStatus",
+      error: error.message,
+    });
+  }
+};
+
+// Controller to get students with NotInformed status
+exports.getNotInformedStudents = async (req, res) => {
+  const { yearOfStudy, branch, section, date } = req.query;
+
+  // Validate required parameters
+  if (!yearOfStudy || !branch || !section || !date) {
+    return res.status(400).json({
+      success: false,
+      message: "Please provide yearOfStudy, branch, section, and date",
+    });
+  }
+
+  try {
+    // Find attendance records that are "Absent" and "NotInformed"
+    const notInformedRecords = await Attendance.find({
+      yearOfStudy,
+      branch,
+      section,
+      date,
+      status: "Absent",
+      infoStatus: "NotInformed",
+    }).select("rollNo");
+
+    // Get roll numbers from attendance records
+    const rollNumbers = notInformedRecords.map((record) => record.rollNo);
+
+    // Get student details for these roll numbers
+    const studentDetails = await Student.find({
+      rollNo: { $in: rollNumbers },
+    }).select("rollNo name -_id");
+
+    // Sort students by roll number
+    studentDetails.sort((a, b) => {
+      const numA = parseInt(a.rollNo.replace(/[^0-9]/g, ""), 10);
+      const numB = parseInt(b.rollNo.replace(/[^0-9]/g, ""), 10);
+      return numA - numB;
+    });
+
+    if (studentDetails.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No students found with NotInformed status",
+        students: [],
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      students: studentDetails,
+    });
+  } catch (error) {
+    console.error("Error fetching not informed students:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching not informed students",
+      error: error.message,
+    });
   }
 };

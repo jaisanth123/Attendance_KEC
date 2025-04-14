@@ -13,6 +13,12 @@ const attendanceSchema = new mongoose.Schema({
   section: { type: String, required: true },
   locked: { type: Boolean, default: false }, // New field to lock attendance for a year/branch/section
   leaveCount: { type: Number, default: 0 },
+  infoStatus: {
+    type: String,
+    enum: ["NA", "Informed", "NotInformed"],
+    required: true,
+    default: "NotInformed",
+  },
 });
 
 module.exports = mongoose.model("Attendance", attendanceSchema);

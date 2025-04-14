@@ -29,6 +29,7 @@ import UpdateStudentData from "./update/UpdateStudentData";
 import AddStudent from "./update/AddStudent";
 import ChangePasswordForm from "./update/ChangePasswordForm";
 import LeaveCountPage from "./components/LeaveCountPage";
+import InfoStatusPage from "./components/InfoStatusPage";
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -132,6 +133,7 @@ function App() {
                 path="/generateMessage"
                 element={<GenerateMessage toggleSidebar={toggleSidebar} />}
               />
+              <Route path="info-status" element={<InfoStatusPage/>}/>
               <Route path="/generateExcel" element={<GenerateExcel />} />
               <Route path="/add-student" element={<AddStudent />} />
               <Route path="/send-email" element={<SendEmail />} />
