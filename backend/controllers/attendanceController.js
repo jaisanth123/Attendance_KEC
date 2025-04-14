@@ -709,3 +709,145 @@ exports.getNotInformedStudents = async (req, res) => {
     });
   }
 };
+
+// Update controller to get all absent students with their info status
+exports.getAbsentStudentsWithInfoStatus = async (req, res) => {
+  const { yearOfStudy, branch, section, date } = req.query;
+
+  // Validate required parameters
+  if (!yearOfStudy || !branch || !section || !date) {
+    return res.status(400).json({
+      success: false,
+      message: "Please provide yearOfStudy, branch, section, and date",
+    });
+  }
+
+  try {
+    // Find all attendance records that are "Absent" (both Informed and NotInformed)
+    const absentRecords = await Attendance.find({
+      yearOfStudy,
+      branch,
+      section,
+      date,
+      status: "Absent",
+    }).select("rollNo infoStatus");
+
+    // Get roll numbers from attendance records
+    const rollNumbers = absentRecords.map((record) => record.rollNo);
+
+    // Get student details for these roll numbers
+    const studentDetails = await Student.find({
+      rollNo: { $in: rollNumbers },
+    }).select("rollNo name -_id");
+
+    // Create combined data with student details and their info status
+    const studentsWithStatus = studentDetails.map((student) => {
+      const record = absentRecords.find((r) => r.rollNo === student.rollNo);
+      return {
+        rollNo: student.rollNo,
+        name: student.name,
+        infoStatus: record ? record.infoStatus : "NotInformed", // Default if not found
+      };
+    });
+
+    // Sort students by roll number
+    studentsWithStatus.sort((a, b) => {
+      const numA = parseInt(a.rollNo.replace(/[^0-9]/g, ""), 10);
+      const numB = parseInt(b.rollNo.replace(/[^0-9]/g, ""), 10);
+      return numA - numB;
+    });
+
+    if (studentsWithStatus.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No absent students found for the specified criteria",
+        students: [],
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      students: studentsWithStatus,
+    });
+  } catch (error) {
+    console.error("Error fetching absent students:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching absent students",
+      error: error.message,
+    });
+  }
+};
+
+// Bulk update info status for multiple students
+exports.bulkUpdateInfoStatus = async (req, res) => {
+  const { updates, date } = req.body;
+
+  // Validate required fields
+  if (!updates || !Array.isArray(updates) || !date) {
+    return res.status(400).json({
+      success: false,
+      message: "Please provide an array of updates and a date",
+    });
+  }
+
+  try {
+    const updateResults = [];
+    const errors = [];
+
+    // Process each update
+    for (const update of updates) {
+      const { rollNo, infoStatus } = update;
+
+      // Validate each update
+      if (!rollNo || !infoStatus) {
+        errors.push(
+          `Missing data for student update: ${JSON.stringify(update)}`
+        );
+        continue;
+      }
+
+      // Validate infoStatus value
+      if (!["Informed", "NotInformed"].includes(infoStatus)) {
+        errors.push(`Invalid infoStatus for ${rollNo}: ${infoStatus}`);
+        continue;
+      }
+
+      try {
+        // Find and update the attendance record
+        const updatedAttendance = await Attendance.findOneAndUpdate(
+          { rollNo, date },
+          { $set: { infoStatus } },
+          { new: true }
+        );
+
+        if (updatedAttendance) {
+          updateResults.push({
+            rollNo,
+            success: true,
+            infoStatus,
+          });
+        } else {
+          errors.push(`Attendance record not found for ${rollNo}`);
+        }
+      } catch (err) {
+        errors.push(`Error updating ${rollNo}: ${err.message}`);
+      }
+    }
+
+    // Return the results
+    res.status(200).json({
+      success: true,
+      message: `Updated ${updateResults.length} students' information status`,
+      updated: updateResults,
+      errors: errors.length > 0 ? errors : undefined,
+    });
+  } catch (error) {
+    console.error("Error in bulk update:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while updating information status",
+      error: error.message,
+    });
+  }
+};

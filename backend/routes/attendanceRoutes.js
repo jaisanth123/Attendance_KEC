@@ -58,4 +58,16 @@ router.get(
   attendanceController.getNotInformedStudents
 );
 
+// Get all absent students with their info status
+router.get(
+  "/absent-students-info",
+  attendanceController.getAbsentStudentsWithInfoStatus
+);
+
+// Bulk update info status for multiple students
+router.post(
+  "/bulk-update-info-status",
+  attendanceController.bulkUpdateInfoStatus
+);
+
 module.exports = router;
