@@ -112,14 +112,15 @@ function Absentees() {
     }
   };
 
-  const RollNumberCard = ({ rollNumber, isSelected, onClick }) => (
+  const RollNumberCard = ({ rollNumber, isSelected, onClick, name }) => (
     <div
       onClick={onClick}
-      className={`flex items-center justify-center p-6 text-white text-xl font-semibold rounded-lg cursor-pointer shadow-md transition-transform transform ${
+      className={`flex flex-col items-center justify-between p-3 text-white rounded-lg cursor-pointer shadow-md transition-transform transform ${
         isSelected ? "bg-red-600" : "bg-gray-700"
-      } hover:scale-110`}
+      } hover:scale-105 h-24 overflow-hidden`}
     >
-      {rollNumber}
+      <div className="text-lg font-bold">{rollNumber}</div>
+      <div className="text-xs text-center mt-1 w-full truncate">{name}</div>
     </div>
   );
 
@@ -150,13 +151,15 @@ function Absentees() {
 
     if (numSelected === 0) {
       // Case 1: No roll numbers selected
-      setPopupMessage("No one marked absent. Click confirm to proceed.");
+      setPopupMessage(
+        "No students are marked absent. Click confirm to proceed."
+      );
       setPopupColor("bg-red-600"); // Red for confirmation popup
       setShowConfirmationPopup(true); // Show confirmation popup
     } else {
       // Case 2: Roll numbers are selected
       setPopupMessage(
-        `${numSelected} students marked as absent. Click confirm to proceed.`
+        `${numSelected} students will be marked as absent. Click confirm to proceed.`
       );
       setPopupColor("bg-red-600");
       setShowConfirmationPopup(true);
@@ -167,7 +170,7 @@ function Absentees() {
     const numSelected = selectedRollNos.length;
 
     if (numSelected === 0) {
-      toast.info("No one marked absent.", {
+      toast.info("No students marked absent.", {
         autoClose: 800, // Increased auto-close duration for better visibility
       });
       setShowConfirmationPopup(false);
@@ -434,11 +437,12 @@ function Absentees() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-4 mt-6 w-full sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8">
+      <div className="grid grid-cols-2 gap-3 mt-6 w-full sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
         {rollNumbers.map((rollNumber, index) => (
           <RollNumberCard
             key={index}
             rollNumber={rollNumber.rollNo}
+            name={rollNumber.name}
             isSelected={rollNumber.isSelected}
             onClick={() => toggleSelection(index)}
           />
@@ -446,19 +450,25 @@ function Absentees() {
       </div>
 
       {selectedRollNos.length > 0 && (
-        <div className="p-4 mt-6 w-full text-lg text-black">
-          <h4 className="mb-10 text-3xl font-semibold text-center">
-            Selected Roll Numbers:
+        <div className="p-4 mt-6 w-full text-lg">
+          <h4 className="mb-6 text-2xl font-semibold text-center text-gray-800">
+            Selected Students:
           </h4>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {selectedRollNos.map((rollNo, index) => {
               const student = rollNumbers.find(
                 (student) => student.rollNo === rollNo
               );
               return (
-                <span key={index} className="text-xl font-bold">
-                  {student ? `${student.rollNo} - ${student.name}` : rollNo}
-                </span>
+                <div
+                  key={index}
+                  className="p-3 bg-red-100 rounded-lg shadow-sm"
+                >
+                  <div className="font-bold text-red-800">
+                    {student?.rollNo}
+                  </div>
+                  <div className="text-sm text-gray-700">{student?.name}</div>
+                </div>
               );
             })}
           </div>
@@ -515,9 +525,7 @@ function Absentees() {
                 : "text-white bg-green-600 hover:bg-green-700"
             }`}
           >
-            {isMarkingLoading
-              ? "Marking  Present..."
-              : "Mark Remaining Present"}
+            {isMarkingLoading ? "Marking Present..." : "Mark Remaining Present"}
           </button>
         )}
         {/*
@@ -558,7 +566,11 @@ function Absentees() {
       {/* Confirmation Pop-ups */}
       <ReusablePopup
         show={showConfirmationPopup}
-        message={`${selectedRollNos.length} students will be marked as absent.`} // Updated message to show number of students selected
+        message={
+          selectedRollNos.length === 0
+            ? "No students are marked absent. All will be marked present."
+            : `${selectedRollNos.length} students will be marked as absent.`
+        }
         color="bg-red-600" // Popup with red theme for absentees
         onConfirm={handleConfirmationPopupOk}
         onCancel={() => setShowConfirmationPopup(false)}
@@ -576,7 +588,7 @@ function Absentees() {
 
       <ReusablePopup
         show={showMarkPresentPopup}
-        message={`Are you sure mark remaining students as Present`} // Updated message to show number of students selected
+        message="Are you sure you want to mark all remaining students as Present?"
         color="bg-green-600" // Popup with green theme for mark present
         onConfirm={handleMarkPresentConfirm}
         onCancel={() => setShowMarkPresentPopup(false)}

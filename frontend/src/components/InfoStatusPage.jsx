@@ -227,18 +227,21 @@ function InfoStatusPage() {
 
       {/* Students Grid */}
       {absentStudents.length > 0 && (
-        <div className="grid grid-cols-2 gap-4 mt-6 w-full sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8">
+        <div className="grid grid-cols-2 gap-4 mt-6 w-full sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
           {absentStudents.map((student, index) => (
             <div
               key={index}
               onClick={() => toggleStatus(index)}
-              className={`flex items-center justify-center p-6 text-white transition-all transform duration-500 text-xl font-semibold rounded-lg cursor-pointer shadow-md ${
+              className={`flex flex-col items-center justify-center py-4 px-2 text-white transition-all transform duration-500 rounded-lg cursor-pointer shadow-md ${
                 student.infoStatus === "Informed"
                   ? "bg-blue-600 hover:bg-blue-700"
                   : "bg-red-600 hover:bg-red-700"
               } hover:scale-110`}
             >
-              {student.rollNo}
+              <div className="text-xl font-semibold">{student.name}</div>
+              <div className="mt-1 text-sm font-medium text-center">
+                {student.rollNo}
+              </div>
             </div>
           ))}
         </div>
