@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const attendanceController = require("../controllers/attendanceController");
-const { authenticateUser, authenticateAdmin } = require("../middleware/auth");
+const {
+  authenticateUser,
+  authenticateAdmin,
+  authenticateStaff,
+} = require("../middleware/auth");
 
 const multer = require("multer");
 //console.log('attendanceRoutes.js loaded');  // Log to confirm if file is being loaded
@@ -50,15 +54,7 @@ router.post(
   attendanceController.sendEmail
 );
 
-// Route to update infoStatus
-router.post("/update-info-status", attendanceController.updateInfoStatus);
-
-router.get(
-  "/not-informed-students",
-  attendanceController.getNotInformedStudents
-);
-
-// Get all absent students with their info status
+// Route to update infoStatu// Get all absent students with their info status
 router.get(
   "/absent-students-info",
   attendanceController.getAbsentStudentsWithInfoStatus

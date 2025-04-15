@@ -48,11 +48,9 @@ const authenticateUser = async (req, res, next) => {
 
   // Check if token is available
   if (!authToken) {
-    return res
-      .status(401)
-      .json({
-        message: "No token found. You are not authorized to access this page.",
-      });
+    return res.status(401).json({
+      message: "No token found. You are not authorized to access this page.",
+    });
   }
 
   try {
@@ -73,11 +71,9 @@ const authenticateAdmin = async (req, res, next) => {
 
   // Check if token is available
   if (!authToken) {
-    return res
-      .status(401)
-      .json({
-        message: "No token found. You are not authorized to access this page.",
-      });
+    return res.status(401).json({
+      message: "No token found. You are not authorized to access this page.",
+    });
   }
 
   try {
@@ -90,5 +86,26 @@ const authenticateAdmin = async (req, res, next) => {
       .json({ message: "Access denied for non-admin users." });
   }
 };
+const authenticateStaff = async (req, res, next) => {
+  const authToken = getTokenFromHeaders(req);
+  //console.log(authToken);
 
-module.exports = { authenticateUser, authenticateAdmin };
+  // Check if token is available
+  if (!authToken) {
+    return res.status(401).json({
+      message: "No token found. You are not authorized to access this page.",
+    });
+  }
+
+  try {
+    const admin = await verifyTokenAndRole(authToken, "staff");
+    req.admin = staff; // Attach admin info to the request
+    next();
+  } catch (error) {
+    return res
+      .status(403)
+      .json({ message: "Access denied for non-staff users." });
+  }
+};
+
+module.exports = { authenticateUser, authenticateAdmin, authenticateStaff };

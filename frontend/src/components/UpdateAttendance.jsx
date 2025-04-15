@@ -48,7 +48,7 @@ function UpdateAttendance() {
       date,
     });
     try {
-     setRollNumbers([]);
+      setRollNumbers([]);
       const response = await axios.get(
         "http://localhost:5000/api/attendance/get-attendancestatus",
         {

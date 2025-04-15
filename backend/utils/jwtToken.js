@@ -1,14 +1,15 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/userSchema');
-const Admin = require('../models/adminSchema');
+const jwt = require("jsonwebtoken");
+const User = require("../models/userSchema");
+const Admin = require("../models/adminSchema");
+const Staff = require("../models/staffSchema");
 
 const sendToken = (user, statusCode, res, message) => {
   let token;
 
-  if (user instanceof Admin || user instanceof User) {
+  if (user instanceof Admin || user instanceof User || user instanceof Staff) {
     token = user.getJWTToken();
   } else {
-    throw new Error('Unsupported user type');
+    throw new Error("Unsupported user type");
   }
 
   const options = {
@@ -24,7 +25,6 @@ const sendToken = (user, statusCode, res, message) => {
     message,
     token,
   });
-  
 };
 
 module.exports = { sendToken };

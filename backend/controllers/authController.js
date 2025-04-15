@@ -1,4 +1,5 @@
 const User = require("../models/userSchema");
+const Staff = require("../models/staffSchema");
 const Admin = require("../models/adminSchema");
 const { sendToken } = require("../utils/jwtToken");
 
@@ -20,6 +21,23 @@ const loginUser = async (req, res) => {
   sendToken(user, 200, res, "User logged in successfully");
 };
 
+const loginStaff = async (req, res) => {
+  const { username, password } = req.body;
+
+  const staff = await Staff.findOne({ username });
+
+  if (!staff) {
+    return res.status(400).json({ message: "Invalid credentials" });
+  }
+
+  const isPasswordMatch = await staff.comparePassword(password);
+
+  if (!isPasswordMatch) {
+    return res.status(400).json({ message: "Invalid credentials" });
+  }
+
+  sendToken(staff, 200, res, "Admin logged in successfully");
+};
 const loginAdmin = async (req, res) => {
   const { username, password } = req.body;
 
@@ -95,4 +113,4 @@ const changePassword = async (req, res) => {
     });
   }
 };
-module.exports = { loginUser, loginAdmin, changePassword };
+module.exports = { loginUser, loginAdmin, loginStaff, changePassword };

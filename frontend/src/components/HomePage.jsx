@@ -32,8 +32,16 @@ function HomePage({ toggleSidebar }) {
       <div className="flex justify-center items-center pt-10 h-full">
         <div className="grid grid-cols-2 gap-6 px-1 w-full max-w-5xl sm:grid-cols-3 lg:grid-cols-4 lg:gap-4">
           {/* Attendance Card */}
-          <ActionCard label="Mark Attendance" onClick={toggleSidebar} />
-
+          <ActionCard
+            label="Mark Attendance"
+            onClick={() => navigate("/absentees")}
+          />
+          {role == "staff" && (
+            <ActionCard
+              label="Information Status"
+              onClick={() => navigate("/info-status")}
+            />
+          )}
           {/* Mark On Duty Card */}
           <ActionCard label="Mark On Duty" onClick={() => navigate("/duty")} />
 
@@ -51,7 +59,7 @@ function HomePage({ toggleSidebar }) {
               <ActionCard
                 label="Leave Count"
                 onClick={() => navigate("/leave-count")}
-              />{" "}
+              />
               <ActionCard
                 label="Information Status"
                 onClick={() => navigate("/info-status")}
