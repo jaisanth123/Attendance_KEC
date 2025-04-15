@@ -115,12 +115,12 @@ function Absentees() {
   const RollNumberCard = ({ rollNumber, isSelected, onClick, name }) => (
     <div
       onClick={onClick}
-      className={`flex flex-col items-center justify-between p-3 text-white rounded-lg cursor-pointer shadow-md transition-transform transform ${
+      className={`flex flex-col items-center justify-between p-6 text-white rounded-lg cursor-pointer shadow-md transition-transform transform ${
         isSelected ? "bg-red-600" : "bg-gray-700"
-      } hover:scale-105 h-24 overflow-hidden`}
+      } hover:scale-105 h-20 overflow-hidden`}
     >
-      <div className="text-lg font-bold">{rollNumber}</div>
-      <div className="text-xs text-center mt-1 w-full truncate">{name}</div>
+      <div className="text-xl font-bold">{rollNumber}</div>
+      {/* <div className="w-full text-xs text-center truncate">{name}</div> */}
     </div>
   );
 
@@ -454,7 +454,7 @@ function Absentees() {
           <h4 className="mb-6 text-2xl font-semibold text-center text-gray-800">
             Selected Students:
           </h4>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7">
             {selectedRollNos.map((rollNo, index) => {
               const student = rollNumbers.find(
                 (student) => student.rollNo === rollNo
