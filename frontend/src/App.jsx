@@ -128,12 +128,12 @@ function App() {
               <Route path="/viewattendance" element={<ViewAttendance />} />
               <Route path="/update-attendance" element={<UpdateAttendace />} />
               <Route path="/update-data" element={<UpdateStudentData />} />
-              <Route path="/leave-count" element={<LeaveCountPage  />} />
+              <Route path="/leave-count" element={<LeaveCountPage />} />
               <Route
                 path="/generateMessage"
                 element={<GenerateMessage toggleSidebar={toggleSidebar} />}
               />
-              <Route path="info-status" element={<InfoStatusPage/>}/>
+              <Route path="info-status" element={<InfoStatusPage />} />
               <Route path="/generateExcel" element={<GenerateExcel />} />
               <Route path="/add-student" element={<AddStudent />} />
               <Route path="/send-email" element={<SendEmail />} />
