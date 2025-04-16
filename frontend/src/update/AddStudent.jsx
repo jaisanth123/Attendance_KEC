@@ -218,7 +218,6 @@ function AddStudent() {
                 {/* Branch */}
                 <div>
                   <label
-                  
                     htmlFor="branch"
                     className="block mb-2 text-sm font-medium text-slate-800"
                   >
