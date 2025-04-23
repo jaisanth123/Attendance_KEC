@@ -18,7 +18,7 @@ function HomePage({ toggleSidebar }) {
   const [role, setRole] = useState(null);
 
   useEffect(() => {
-    // Get the role fasdfasrom the token when the component mounts
+    // Get the rolewqrwrS fasdfasrom the token when the component mounts
     const userRole = RoleFromToken();
     console.log("User Role:", userRole); // Log the role to check its value
     setRole(userRole);
