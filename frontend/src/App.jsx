@@ -144,7 +144,7 @@ function App() {
               <Route path="info-status" element={<InfoStatusPage />} />
               <Route path="/generateExcel" element={<GenerateExcel />} />
               <Route path="/add-student" element={<AddStudent />} />
-              <Route path="/UploadCsv" element={<UploadCsv />} />
+              <Route path="/add-student-db" element={<UploadCsv />} />
               <Route path="/delete-student" element={<DeleteStudents />} />
               <Route path="/send-email" element={<SendEmail />} />
               <Route path="/hostelreport" element={<Hostelreport />} />
