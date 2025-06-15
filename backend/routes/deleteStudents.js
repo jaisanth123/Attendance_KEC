@@ -1,47 +1,75 @@
+// const express = require('express');
+// const router = express.Router();
+
+// // 📌 Bulk delete
+// router.delete('/students', async (req, res) => {
+//   const { yearOfStudy, branch, section } = req.body;
+//   const filter = {};
+
+//   if (yearOfStudy) filter.yearOfStudy = yearOfStudy;
+//   if (branch) filter.branch = branch;
+//   if (section) filter.section = section;
+
+//   const db = req.app.locals.db;
+//   try {
+//     const result = await db.collection('students').deleteMany(filter);
+//     res.send(`${result.deletedCount} student(s) deleted.`);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send('Error deleting students');
+//   }
+// });
+
+// // 📌 Delete by rollNo
+// router.delete('/student/:rollNo', async (req, res) => {
+//   const rollNo = req.params.rollNo;
+//   const db = req.app.locals.db;
+
+//   try {
+//     const result = await db.collection('students').deleteMany({ rollNo });
+//     if (result.deletedCount > 0) {
+//       res.send(`Deleted ${result.deletedCount} record(s) with rollNo ${rollNo}.`);
+//     } else {
+//       res.status(404).send(`No student found with rollNo ${rollNo}.`);
+//     }
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send('Error deleting student(s)');
+//   }
+// });
+
+// module.exports = router;
+
+
 const express = require('express');
-const { MongoClient } = require('mongodb');
+const Student = require('../models/Student');
 
 const router = express.Router();
 
-const uri = "mongodb+srv://krrashmika2004:nhwUubZLhWrmu7Lr@cluster0.sfj4f.mongodb.net/AI_Attendence?retryWrites=true";
-
-// 📌 Bulk delete: by yearOfStudy, branch, section
+// 📌 Bulk delete
 router.delete('/students', async (req, res) => {
   const { yearOfStudy, branch, section } = req.body;
-
   const filter = {};
+
   if (yearOfStudy) filter.yearOfStudy = yearOfStudy;
   if (branch) filter.branch = branch;
   if (section) filter.section = section;
 
-  const client = new MongoClient(uri);
   try {
-    await client.connect();
-    const result = await client
-      .db('AI_Attendence')
-      .collection('students')
-      .deleteMany(filter);
-
+    const result = await Student.deleteMany(filter);
     res.send(`${result.deletedCount} student(s) deleted.`);
   } catch (err) {
     console.error(err);
     res.status(500).send('Error deleting students');
-  } finally {
-    await client.close();
   }
 });
 
-// 📌 Delete all entries by rollNo
+// 📌 Delete by rollNo
 router.delete('/student/:rollNo', async (req, res) => {
-  const rollNo = req.params.rollNo;
+  const { rollNo } = req.params;
 
-  const client = new MongoClient(uri);
   try {
-    await client.connect();
-    const result = await client
-      .db('AI_Attendence')
-      .collection('students')
-      .deleteMany({ rollNo }); // 🔁 Delete ALL matching rollNo
+    const result = await Student.deleteMany({ rollNo });
 
     if (result.deletedCount > 0) {
       res.send(`Deleted ${result.deletedCount} record(s) with rollNo ${rollNo}.`);
@@ -51,10 +79,7 @@ router.delete('/student/:rollNo', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send('Error deleting student(s)');
-  } finally {
-    await client.close();
   }
 });
-
 
 module.exports = router;
