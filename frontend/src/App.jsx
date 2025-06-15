@@ -33,6 +33,7 @@ import LeaveCountPage from "./components/LeaveCountPage";
 import InfoStatusPage from "./components/InfoStatusPage";
 import Attendace from "./components/Attendace";
 import UploadCsv from "./update/UploadCsv"; // Import the UploadCsv component
+import DeleteStudents from "./update/DeleteStudents"; // Import the DeleteStudents component
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -144,6 +145,7 @@ function App() {
               <Route path="/generateExcel" element={<GenerateExcel />} />
               <Route path="/add-student" element={<AddStudent />} />
               <Route path="/UploadCsv" element={<UploadCsv />} />
+              <Route path="/delete-student" element={<DeleteStudents />} />
               <Route path="/send-email" element={<SendEmail />} />
               <Route path="/hostelreport" element={<Hostelreport />} />
               <Route path="/classinfo" element={<ClassInfo />} />

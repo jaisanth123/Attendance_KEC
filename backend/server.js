@@ -29,6 +29,7 @@ const attendanceRoutes = require("./routes/attendanceRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const authRoutes = require("./routes/authRoutes");
 const uploadCsvRoutes = require("./routes/uploadCsv"); // Import the CSV upload route
+const deleteStudentsRoutes = require("./routes/deleteStudents"); // Import the delete students route
  // Use the CSV upload route
 //const excelReportRoutes = require('./routes/excelReportRoutes');
 
@@ -37,6 +38,7 @@ app.use("/api/attendance", attendanceRoutes);
 app.use("/api/report", reportRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/upload", uploadCsvRoutes);
+app.use("/api/delete-students", deleteStudentsRoutes); // Use the delete students route
 //app.use('/api/excel', excelReportRoutes);
 
 // Start the server

@@ -9,7 +9,7 @@ const upload = multer({ dest: 'uploads/' });
 
 const uri = "mongodb+srv://krrashmika2004:nhwUubZLhWrmu7Lr@cluster0.sfj4f.mongodb.net/AI_Attendence?retryWrites=true";
 
-// Endpoint: POST /add-student
+// POST /add-student
 router.post('/add-student', upload.single('csvfile'), async (req, res) => {
   const results = [];
   const filePath = req.file.path;
@@ -22,14 +22,31 @@ router.post('/add-student', upload.single('csvfile'), async (req, res) => {
       try {
         await client.connect();
         const collection = client.db('AI_Attendence').collection('students');
-        await collection.insertMany(results);
-        res.send('CSV uploaded and inserted into MongoDB.');
+
+        // Fetch existing roll numbers
+        const rollNos = results.map(r => r.rollNo);
+        const existing = await collection
+          .find({ rollNo: { $in: rollNos } })
+          .project({ rollNo: 1 })
+          .toArray();
+
+        const existingRollNos = new Set(existing.map(doc => doc.rollNo));
+
+        // Filter out duplicates
+        const newEntries = results.filter(r => !existingRollNos.has(r.rollNo));
+
+        if (newEntries.length > 0) {
+          await collection.insertMany(newEntries);
+          res.send(`${newEntries.length} new student(s) inserted. Duplicates skipped.`);
+        } else {
+          res.send('No new students inserted. All roll numbers already exist.');
+        }
       } catch (err) {
         console.error(err);
         res.status(500).send('Failed to upload to MongoDB.');
       } finally {
         await client.close();
-        fs.unlinkSync(filePath); // clean up
+        fs.unlinkSync(filePath); // cleanup
       }
     });
 });
