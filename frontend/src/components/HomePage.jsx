@@ -75,18 +75,7 @@ function HomePage({ toggleSidebar }) {
                 label=" Attendance"
                 onClick={() => navigate("/attendance")}
               />
-              <ActionCard
-                label="Mark Attendance"
-                onClick={() => navigate("/absentees")}
-              />
-              <ActionCard
-                label="Mark On Duty"
-                onClick={() => navigate("/duty")}
-              />
-              <ActionCard
-                label="View Attendance"
-                onClick={() => navigate("/viewattendance")}
-              />
+
               <ActionCard
                 label="Update Data"
                 onClick={() => navigate("/update")}

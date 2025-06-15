@@ -12,6 +12,7 @@ import Sidebar from "./components/Sidebar";
 import HomePage from "./components/HomePage";
 import DutyPage from "./components/DutyPage";
 import Absentees from "./components/Absentees";
+import UpdateSuperPacc from "./components/UpdateSuperpacc";
 import MessagePage from "./components/MessagePage";
 import ViewAttendance from "./components/ViewAttendance";
 import GenerateMessage from "./components/GenerateMessage";
@@ -147,6 +148,7 @@ function App() {
               <Route path="/generateReport" element={<GenerateReport />} />
               <Route path="/change-password" element={<ChangePasswordForm />} />
               <Route path="/update" element={<Update />} />
+              <Route path="/update-superpacc" element={<UpdateSuperPacc />} />
             </Route>
 
             {/* Catch all unmatched routes */}

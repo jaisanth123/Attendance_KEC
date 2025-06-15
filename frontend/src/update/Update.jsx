@@ -16,33 +16,34 @@ function Update() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col pt-10 h-full">
+    <div className="flex flex-col h-full pt-10">
       <h1 className="text-4xl font-bold text-center text-gray-800">
         Update Options
       </h1>
-      <div className="flex justify-center items-center pt-10 h-full">
-        <div className="grid grid-cols-2 gap-6 px-1 w-full max-w-5xl sm:grid-cols-3 lg:grid-cols-4 lg:gap-4">
-          {/* <div className="flex justify-center items-center pt-10 h-full">
-        <div className="grid grid-cols-1 gap-4 w-full max-w-5xl sm:grid-cols-2 lg:grid-cols-3 lg:gap-4"> */}
+      <div className="flex items-center justify-center h-full pt-10">
+        <div className="grid w-full max-w-5xl grid-cols-2 gap-6 px-1 sm:grid-cols-3 lg:grid-cols-4 lg:gap-4">
+          {/* <div className="flex items-center justify-center h-full pt-10">
+        <div className="grid w-full max-w-5xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4"> */}
           {/* Update Attendance Card */}
-          <ActionCard
-            label="Update Attendance"
-            onClick={() => navigate("/update-attendance")}
-          />
 
           {/* Update Student Data Card */}
           <ActionCard
             label="Update Student Data"
             onClick={() => navigate("/update-data")}
           />
+
           <ActionCard
-            label="Update Password"
-            onClick={() => navigate("/change-password")}
+            label="Update SuperPacc "
+            onClick={() => navigate("/update-superpacc")}
           />
           {/* Update Password Card */}
           <ActionCard
             label="Add Student "
             onClick={() => navigate("/add-student")}
+          />
+          <ActionCard
+            label="Update Password"
+            onClick={() => navigate("/change-password")}
           />
         </div>
       </div>
