@@ -30,6 +30,7 @@ import AddStudent from "./update/AddStudent";
 import ChangePasswordForm from "./update/ChangePasswordForm";
 import LeaveCountPage from "./components/LeaveCountPage";
 import InfoStatusPage from "./components/InfoStatusPage";
+import Attendace from "./components/Attendace";
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -89,7 +90,7 @@ function App() {
         {/* Sidebar Overlay for Mobile */}
         {isSidebarOpen && (
           <div
-            className="fixed inset-0 bg-black opacity-50 transition-opacity duration-300 md:hidden"
+            className="fixed inset-0 transition-opacity duration-300 bg-black opacity-50 md:hidden"
             onClick={() => setIsSidebarOpen(false)}
             aria-label="Close Sidebar"
           ></div>
@@ -107,6 +108,10 @@ function App() {
               <Route
                 path="/homePage"
                 element={<HomePage toggleSidebar={toggleSidebar} />}
+              />
+              <Route
+                path="/attendance"
+                element={<Attendace toggleSidebar={toggleSidebar} />}
               />
               <Route
                 path="/duty"
@@ -140,7 +145,6 @@ function App() {
               <Route path="/hostelreport" element={<Hostelreport />} />
               <Route path="/classinfo" element={<ClassInfo />} />
               <Route path="/generateReport" element={<GenerateReport />} />
-
               <Route path="/change-password" element={<ChangePasswordForm />} />
               <Route path="/update" element={<Update />} />
             </Route>

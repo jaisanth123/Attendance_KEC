@@ -21,13 +21,10 @@ function ViewAttendance({ toggleSidebar }) {
         <h1 className="text-4xl font-bold text-center text-gray-800 min-h-56">
           View Attendance Page
         </h1>
-        <div className="flex flex-grow justify-center items-center">
-          <div className="grid grid-cols-2 gap-6 px-1 w-full max-w-4xl sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
+        <div className="flex items-center justify-center flex-grow">
+          <div className="grid w-full max-w-4xl grid-cols-2 gap-6 px-1 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
             {/* Classes Information Card */}
-            <ActionCard
-              label="Class wise  Information"
-              onClick={() => navigate("/ClassInfo")}
-            />
+
             <ActionCard
               label="Classes Information"
               onClick={() => navigate("/ClassInfo")}
@@ -51,16 +48,6 @@ function ViewAttendance({ toggleSidebar }) {
               onClick={() => navigate("/hostelreport")}
             /> */}
           </div>
-        </div>
-
-        {/* Home Button as a Rectangle */}
-        <div className="flex justify-center mt-0">
-          <button
-            className="py-2 mt-20 w-64 h-16 text-3xl font-bold text-white bg-gray-700 rounded-xl shadow-md transition-all duration-500 transform hover:scale-110 hover:bg-gray-800"
-            onClick={() => navigate("/homePage")}
-          >
-            Home
-          </button>
         </div>
       </div>
     </>

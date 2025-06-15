@@ -25,29 +25,64 @@ function HomePage({ toggleSidebar }) {
   }, []);
 
   return (
-    <div className="flex flex-col pt-10 h-full">
+    <div className="flex flex-col h-full pt-10">
       <h1 className="text-4xl font-bold text-center text-gray-800">
         Home Page
       </h1>
-      <div className="flex justify-center items-center pt-10 h-full">
-        <div className="grid grid-cols-2 gap-6 px-1 w-full max-w-5xl sm:grid-cols-3 lg:grid-cols-4 lg:gap-4">
+      <div className="flex items-center justify-center h-full pt-10">
+        <div className="grid w-full max-w-5xl grid-cols-2 gap-6 px-1 sm:grid-cols-3 lg:grid-cols-4 lg:gap-4">
           {/* Attendance Card */}
-          <ActionCard
-            label="Mark Attendance"
-            onClick={() => navigate("/absentees")}
-          />
+          {/* //! --------------user cards section -------------- */}
+          {role == "user" && (
+            <>
+              <ActionCard
+                label="Mark Attendance"
+                onClick={() => navigate("/absentees")}
+              />
+              <ActionCard
+                label="Mark On Duty"
+                onClick={() => navigate("/duty")}
+              />
+            </>
+          )}
+          {/* //! --------------staff cards section -------------- */}
           {role == "staff" && (
-            <ActionCard
-              label="Information Status"
-              onClick={() => navigate("/info-status")}
-            />
+            <>
+              <ActionCard
+                label="Mark Attendance"
+                onClick={() => navigate("/absentees")}
+              />
+              <ActionCard
+                label="Mark On Duty"
+                onClick={() => navigate("/duty")}
+              />
+              <ActionCard
+                label="Information Status"
+                onClick={() => navigate("/info-status")}
+              />
+              <ActionCard
+                label="Leave Count"
+                onClick={() => navigate("/leave-count")}
+              />
+            </>
           )}
           {/* Mark On Duty Card */}
-          <ActionCard label="Mark On Duty" onClick={() => navigate("/duty")} />
-
+          {/* //! --------------staff cards section -------------- */}
           {/* Conditionally render View Attendance and UpdateAttendance based on role */}
           {role === "admin" && (
             <>
+              <ActionCard
+                label=" Attendance"
+                onClick={() => navigate("/attendance")}
+              />
+              <ActionCard
+                label="Mark Attendance"
+                onClick={() => navigate("/absentees")}
+              />
+              <ActionCard
+                label="Mark On Duty"
+                onClick={() => navigate("/duty")}
+              />
               <ActionCard
                 label="View Attendance"
                 onClick={() => navigate("/viewattendance")}
