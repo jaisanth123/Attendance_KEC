@@ -28,14 +28,15 @@ const studentRoutes = require("./routes/studentRoutes");
 const attendanceRoutes = require("./routes/attendanceRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const authRoutes = require("./routes/authRoutes");
-
+const uploadCsvRoutes = require("./routes/uploadCsv"); // Import the CSV upload route
+ // Use the CSV upload route
 //const excelReportRoutes = require('./routes/excelReportRoutes');
 
 app.use("/api/students", studentRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/report", reportRoutes);
 app.use("/api/auth", authRoutes);
-
+app.use("/api/upload", uploadCsvRoutes);
 //app.use('/api/excel', excelReportRoutes);
 
 // Start the server

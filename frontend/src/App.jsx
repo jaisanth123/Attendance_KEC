@@ -32,6 +32,7 @@ import ChangePasswordForm from "./update/ChangePasswordForm";
 import LeaveCountPage from "./components/LeaveCountPage";
 import InfoStatusPage from "./components/InfoStatusPage";
 import Attendace from "./components/Attendace";
+import UploadCsv from "./update/UploadCsv"; // Import the UploadCsv component
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -142,6 +143,7 @@ function App() {
               <Route path="info-status" element={<InfoStatusPage />} />
               <Route path="/generateExcel" element={<GenerateExcel />} />
               <Route path="/add-student" element={<AddStudent />} />
+              <Route path="/UploadCsv" element={<UploadCsv />} />
               <Route path="/send-email" element={<SendEmail />} />
               <Route path="/hostelreport" element={<Hostelreport />} />
               <Route path="/classinfo" element={<ClassInfo />} />
@@ -166,7 +168,7 @@ function App() {
           />
         )}
       </div>
-
+        
       {/* ToastContainer for displaying toasts */}
       <ToastContainer />
     </Router>
