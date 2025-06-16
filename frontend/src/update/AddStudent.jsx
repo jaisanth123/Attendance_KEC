@@ -1,8 +1,16 @@
 import { useState } from "react";
 import axios from "axios";
-import { UserPlus, AlertCircle, CheckCircle, Loader } from "lucide-react";
+import {
+  UserPlus,
+  AlertCircle,
+  CheckCircle,
+  Loader,
+  Upload,
+} from "lucide-react";
+import UploadCsv from "./UploadCsv";
 
 function AddStudent() {
+  const [isIndividualForm, setIsIndividualForm] = useState(true);
   const [formData, setFormData] = useState({
     rollNo: "",
     name: "",
@@ -34,12 +42,9 @@ function AddStudent() {
     setError(null);
     setSuccess(false);
 
-    // Create a copy of the form data to modify
     const formDataToSubmit = {
       ...formData,
-      // Convert entire name to uppercase
       name: formData.name.toUpperCase(),
-      // Convert rollNo to uppercase
       rollNo: formData.rollNo.toUpperCase(),
     };
 
@@ -50,7 +55,6 @@ function AddStudent() {
       );
       if (response.data.success) {
         setSuccess(true);
-        // Reset form
         setFormData({
           rollNo: "",
           name: "",
@@ -75,271 +79,301 @@ function AddStudent() {
   };
 
   return (
-    <div className="px-4 py-8 min-h-screen bg-gray-100">
-      <div className="mx-auto max-w-3xl">
+    <div className="h-[calc(100vh-5rem)] overflow-hidden bg-slate-50">
+      <div className="h-full max-w-4xl px-4 py-4 mx-auto">
         {/* Header Section */}
-        <div className="px-6 py-6 mb-8 text-white rounded-xl shadow-lg bg-slate-800">
-          <h1 className="flex items-center text-3xl font-bold">
-            <UserPlus className="mr-3" size={30} />
-            Add New Student
-          </h1>
-          <p className="mt-2 text-slate-300">
-            Create a new student record in the database
-          </p>
+        <div className="mb-6">
+          <div className="flex items-center justify-between p-4 bg-white border rounded-lg shadow-sm border-slate-200">
+            <h1 className="flex items-center text-xl font-semibold text-slate-800">
+              <UserPlus className="w-5 h-5 mr-2 text-slate-600" />
+              Add New Student
+            </h1>
+
+            {/* Toggle Switch */}
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setIsIndividualForm(true)}
+                className={`px-3 py-1.5 rounded-md flex items-center space-x-2 text-sm transition-colors ${
+                  isIndividualForm
+                    ? "bg-slate-800 text-white shadow-sm"
+                    : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
+                }`}
+              >
+                <UserPlus size={16} />
+                <span>Individual</span>
+              </button>
+              <button
+                onClick={() => setIsIndividualForm(false)}
+                className={`px-3 py-1.5 rounded-md flex items-center space-x-2 text-sm transition-colors ${
+                  !isIndividualForm
+                    ? "bg-slate-800 text-white shadow-sm"
+                    : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
+                }`}
+              >
+                <Upload size={16} />
+                <span>CSV Upload</span>
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Main Content */}
-        <div className="overflow-hidden bg-white rounded-xl shadow-md">
-          {/* Form Section */}
-          <div className="p-6">
-            {error && (
-              <div className="flex items-center p-4 mb-6 text-red-700 bg-red-50 rounded-lg border border-red-200">
-                <AlertCircle className="flex-shrink-0 mr-2 w-5 h-5" />
-                <p>{error}</p>
-              </div>
-            )}
+        <div className="h-[calc(100%-6rem)] overflow-auto">
+          {isIndividualForm ? (
+            <div className="p-6 bg-white border rounded-lg shadow-sm border-slate-200">
+              {error && (
+                <div className="flex items-center p-3 mb-4 text-red-700 border border-red-100 rounded-md bg-red-50">
+                  <AlertCircle className="flex-shrink-0 w-4 h-4 mr-2" />
+                  <p className="text-sm">{error}</p>
+                </div>
+              )}
 
-            {success && (
-              <div className="flex items-center p-4 mb-6 text-green-700 bg-green-50 rounded-lg border border-green-200">
-                <CheckCircle className="flex-shrink-0 mr-2 w-5 h-5" />
-                <p>Student created successfully!</p>
-              </div>
-            )}
+              {success && (
+                <div className="flex items-center p-3 mb-4 text-green-700 border border-green-100 rounded-md bg-green-50">
+                  <CheckCircle className="flex-shrink-0 w-4 h-4 mr-2" />
+                  <p className="text-sm">Student created successfully!</p>
+                </div>
+              )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                {/* Roll Number */}
-                <div>
-                  <label
-                    htmlFor="rollNo"
-                    className="block mb-2 text-sm font-medium text-slate-800"
-                  >
-                    Roll Number *
-                  </label>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {/* Roll Number */}
+                  <div>
+                    <label
+                      htmlFor="rollNo"
+                      className="block mb-2 text-sm font-medium text-slate-800"
+                    >
+                      Roll Number *
+                    </label>
+                    <input
+                      type="text"
+                      id="rollNo"
+                      name="rollNo"
+                      value={formData.rollNo}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
+                      placeholder="Enter roll number"
+                    />
+                  </div>
+
+                  {/* Name */}
+                  <div>
+                    <label
+                      htmlFor="name"
+                      className="block mb-2 text-sm font-medium text-slate-800"
+                    >
+                      Name *
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
+                      placeholder="Enter full name"
+                    />
+                  </div>
+
+                  {/* Hosteller/Day Scholar */}
+                  <div>
+                    <label
+                      htmlFor="hostellerDayScholar"
+                      className="block mb-2 text-sm font-medium text-slate-800"
+                    >
+                      Hosteller/Day Scholar *
+                    </label>
+                    <select
+                      id="hostellerDayScholar"
+                      name="hostellerDayScholar"
+                      value={formData.hostellerDayScholar}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
+                      required
+                    >
+                      <option value="">Select Type</option>
+                      <option value="HOSTELLER">HOSTELLER</option>
+                      <option value="DAY SCHOLAR">DAY SCHOLAR</option>
+                    </select>
+                  </div>
+
+                  {/* Gender */}
+                  <div>
+                    <label
+                      htmlFor="gender"
+                      className="block mb-2 text-sm font-medium text-slate-800"
+                    >
+                      Gender *
+                    </label>
+                    <select
+                      id="gender"
+                      name="gender"
+                      value={formData.gender}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
+                      required
+                    >
+                      <option value="">Select Gender</option>
+                      <option value="MALE">MALE</option>
+                      <option value="FEMALE">FEMALE</option>
+                    </select>
+                  </div>
+
+                  {/* Year of Study */}
+                  <div>
+                    <label
+                      htmlFor="yearOfStudy"
+                      className="block mb-2 text-sm font-medium text-slate-800"
+                    >
+                      Year of Study *
+                    </label>
+                    <select
+                      id="yearOfStudy"
+                      name="yearOfStudy"
+                      value={formData.yearOfStudy}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
+                      required
+                    >
+                      <option value="">Select Year</option>
+                      <option value="II">II</option>
+                      <option value="III">III</option>
+                      <option value="IV">IV</option>
+                    </select>
+                  </div>
+
+                  {/* Branch */}
+                  <div>
+                    <label
+                      htmlFor="branch"
+                      className="block mb-2 text-sm font-medium text-slate-800"
+                    >
+                      Branch *
+                    </label>
+                    <select
+                      id="branch"
+                      name="branch"
+                      value={formData.branch}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
+                    >
+                      <option value="">Select Branch</option>
+                      <option value="AIDS">AI & DS</option>
+                      <option value="AIML">AI & ML</option>
+                    </select>
+                  </div>
+
+                  {/* Section */}
+                  <div>
+                    <label
+                      htmlFor="section"
+                      className="block mb-2 text-sm font-medium text-slate-800"
+                    >
+                      Section *
+                    </label>
+                    <select
+                      id="section"
+                      name="section"
+                      value={formData.section}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
+                      required
+                    >
+                      <option value="">Select Section</option>
+                      <option value="A">A</option>
+                      <option value="B">B</option>
+                      <option value="C">C</option>
+                      <option value="D">D</option>
+                    </select>
+                  </div>
+
+                  {/* Parent Mobile Number */}
+                  <div>
+                    <label
+                      htmlFor="parentMobileNo"
+                      className="block mb-2 text-sm font-medium text-slate-800"
+                    >
+                      Parent Mobile Number
+                    </label>
+                    <input
+                      type="tel"
+                      id="parentMobileNo"
+                      name="parentMobileNo"
+                      value={formData.parentMobileNo}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
+                      placeholder="Enter parent's mobile number"
+                    />
+                  </div>
+
+                  {/* Student Mobile Number */}
+                  <div>
+                    <label
+                      htmlFor="studentMobileNo"
+                      className="block mb-2 text-sm font-medium text-slate-800"
+                    >
+                      Student Mobile Number
+                    </label>
+                    <input
+                      type="tel"
+                      id="studentMobileNo"
+                      name="studentMobileNo"
+                      value={formData.studentMobileNo}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
+                      placeholder="Enter student's mobile number"
+                    />
+                  </div>
+                </div>
+
+                {/* SuperPACC Checkbox */}
+                <div className="flex items-center pt-2 border-t border-slate-100">
                   <input
-                    type="text"
-                    id="rollNo"
-                    name="rollNo"
-                    value={formData.rollNo}
+                    type="checkbox"
+                    id="superPacc"
+                    name="superPacc"
+                    checked={formData.superPacc}
                     onChange={handleChange}
-                    required
-                    className="px-4 py-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
-                    placeholder="Enter roll number"
+                    className="w-4 h-4 border-gray-300 rounded text-slate-800 focus:ring-slate-500"
                   />
-                </div>
-
-                {/* Name */}
-                <div>
                   <label
-                    htmlFor="name"
-                    className="block mb-2 text-sm font-medium text-slate-800"
+                    htmlFor="superPacc"
+                    className="ml-2 text-sm text-gray-700"
                   >
-                    Name *
+                    Super PACC
                   </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="px-4 py-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
-                    placeholder="Enter full name"
-                  />
                 </div>
 
-                {/* Hosteller/Day Scholar */}
-                <div>
-                  <label
-                    htmlFor="hostellerDayScholar"
-                    className="block mb-2 text-sm font-medium text-slate-800"
+                {/* Submit Button */}
+                <div className="flex justify-end pt-4">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex items-center px-4 py-2 text-sm text-white transition-colors rounded-md shadow-sm bg-slate-800 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 disabled:bg-slate-400"
                   >
-                    Hosteller/Day Scholar *
-                  </label>
-                  <select
-                    id="hostellerDayScholar"
-                    name="hostellerDayScholar"
-                    value={formData.hostellerDayScholar}
-                    onChange={handleChange}
-                    className="px-4 py-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
-                    required
-                  >
-                    <option value="">Select Type</option>
-                    <option value="HOSTELLER">HOSTELLER</option>
-                    <option value="DAY SCHOLAR">DAY SCHOLAR</option>
-                  </select>
+                    {loading ? (
+                      <>
+                        <Loader className="w-4 h-4 mr-2 animate-spin" />
+                        Creating...
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className="w-4 h-4 mr-2" />
+                        Add Student
+                      </>
+                    )}
+                  </button>
                 </div>
-
-                {/* Gender */}
-                <div>
-                  <label
-                    htmlFor="gender"
-                    className="block mb-2 text-sm font-medium text-slate-800"
-                  >
-                    Gender *
-                  </label>
-                  <select
-                    id="gender"
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleChange}
-                    className="px-4 py-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
-                    required
-                  >
-                    <option value="">Select Gender</option>
-                    <option value="MALE">MALE</option>
-                    <option value="FEMALE">FEMALE</option>
-                  </select>
-                </div>
-
-                {/* Year of Study */}
-                <div>
-                  <label
-                    htmlFor="yearOfStudy"
-                    className="block mb-2 text-sm font-medium text-slate-800"
-                  >
-                    Year of Study *
-                  </label>
-                  <select
-                    id="yearOfStudy"
-                    name="yearOfStudy"
-                    value={formData.yearOfStudy}
-                    onChange={handleChange}
-                    className="px-4 py-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
-                    required
-                  >
-                    <option value="">Select Year</option>
-                    <option value="II">II</option>
-                    <option value="III">III</option>
-                    <option value="IV">IV</option>
-                  </select>
-                </div>
-
-                {/* Branch */}
-                <div>
-                  <label
-                    htmlFor="branch"
-                    className="block mb-2 text-sm font-medium text-slate-800"
-                  >
-                    Branch *
-                  </label>
-                  <select
-                    id="branch"
-                    name="branch"
-                    value={formData.branch}
-                    onChange={handleChange}
-                    required
-                    className="px-4 py-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
-                  >
-                    <option value="">Select Branch</option>
-                    <option value="AIDS">AI & DS</option>
-                    <option value="AIML">AI & ML</option>
-                  </select>
-                </div>
-
-                {/* Section */}
-                <div>
-                  <label
-                    htmlFor="section"
-                    className="block mb-2 text-sm font-medium text-slate-800"
-                  >
-                    Section *
-                  </label>
-                  <select
-                    id="section"
-                    name="section"
-                    value={formData.section}
-                    onChange={handleChange}
-                    className="px-4 py-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
-                    required
-                  >
-                    <option value="">Select Section</option>
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                    <option value="D">D</option>
-                  </select>
-                </div>
-
-                {/* Parent Mobile Number */}
-                <div>
-                  <label
-                    htmlFor="parentMobileNo"
-                    className="block mb-2 text-sm font-medium text-slate-800"
-                  >
-                    Parent Mobile Number
-                  </label>
-                  <input
-                    type="tel"
-                    id="parentMobileNo"
-                    name="parentMobileNo"
-                    value={formData.parentMobileNo}
-                    onChange={handleChange}
-                    className="px-4 py-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
-                    placeholder="Enter parent's mobile number"
-                  />
-                </div>
-
-                {/* Student Mobile Number */}
-                <div>
-                  <label
-                    htmlFor="studentMobileNo"
-                    className="block mb-2 text-sm font-medium text-slate-800"
-                  >
-                    Student Mobile Number
-                  </label>
-                  <input
-                    type="tel"
-                    id="studentMobileNo"
-                    name="studentMobileNo"
-                    value={formData.studentMobileNo}
-                    onChange={handleChange}
-                    className="px-4 py-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
-                    placeholder="Enter student's mobile number"
-                  />
-                </div>
-              </div>
-
-              {/* SuperPACC Checkbox */}
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="superPacc"
-                  name="superPacc"
-                  checked={formData.superPacc}
-                  onChange={handleChange}
-                  className="w-5 h-5 rounded border-gray-300 text-slate-800 focus:ring-slate-500"
-                />
-                <label
-                  htmlFor="superPacc"
-                  className="ml-3 text-base text-gray-700"
-                >
-                  Super PACC
-                </label>
-              </div>
-
-              {/* Submit Button */}
-              <div className="flex justify-end pt-4 border-t border-gray-100">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex items-center px-6 py-3 text-white rounded-lg transition-colors bg-slate-800 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 disabled:bg-slate-400"
-                >
-                  {loading ? (
-                    <>
-                      <Loader className="mr-2 w-5 h-5 animate-spin" />
-                      Creating...
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus className="mr-2 w-5 h-5" />
-                      Add Student
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
+              </form>
+            </div>
+          ) : (
+            <div className="p-6 bg-white border rounded-lg shadow-sm border-slate-200">
+              <UploadCsv />
+            </div>
+          )}
         </div>
       </div>
     </div>

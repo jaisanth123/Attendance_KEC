@@ -1,19 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { Upload, AlertCircle, CheckCircle } from "lucide-react";
 
 function UploadCsv() {
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState(""); // 'success' or 'error'
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
+    setMessage(""); // Clear message when new file is selected
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
     const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile && droppedFile.type === 'text/csv') {
+    if (droppedFile && droppedFile.type === "text/csv") {
       setFile(droppedFile);
+      setMessage(""); // Clear message when new file is dropped
     }
   };
 
@@ -23,17 +27,19 @@ function UploadCsv() {
 
     setIsUploading(true);
     const formData = new FormData();
-    formData.append('csvfile', file);
+    formData.append("csvfile", file);
 
     try {
-      const res = await fetch('http://localhost:5000/api/upload/add-student', {
-        method: 'POST',
+      const res = await fetch("http://localhost:5000/api/upload/add-student", {
+        method: "POST",
         body: formData,
       });
       const text = await res.text();
       setMessage(text);
+      setMessageType("success");
     } catch (err) {
-      setMessage('Upload failed.');
+      setMessage("Upload failed.");
+      setMessageType("error");
     } finally {
       setIsUploading(false);
       setFile(null);
@@ -41,16 +47,17 @@ function UploadCsv() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white text-black p-6">
-      <h1 className="text-2xl font-bold mb-4">CSV Upload</h1>
-
+    <div className="flex flex-col">
       <div
-        className="w-80 h-40 border-2 border-dashed border-black flex items-center justify-center cursor-pointer mb-4"
+        className="flex items-center justify-center w-full h-32 transition-colors border-2 border-dashed rounded-lg cursor-pointer border-slate-300 hover:border-slate-400 bg-slate-50 group"
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
       >
-        <label className="text-center cursor-pointer">
-          {file ? file.name : 'Drag & Drop CSV or Click to Select'}
+        <label className="flex flex-col items-center justify-center w-full h-full transition-colors cursor-pointer group-hover:bg-slate-100">
+          <Upload className="w-8 h-8 mb-2 text-slate-400 group-hover:text-slate-500" />
+          <span className="text-sm text-slate-600">
+            {file ? file.name : "Drag & Drop CSV or Click to Select"}
+          </span>
           <input
             type="file"
             accept=".csv"
@@ -63,14 +70,31 @@ function UploadCsv() {
       <button
         onClick={handleSubmit}
         disabled={!file || isUploading}
-        className={`px-4 py-2 rounded text-white ${
-          !file || isUploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+        className={`mt-4 px-4 py-2 rounded-md text-sm text-white transition-colors ${
+          !file || isUploading
+            ? "bg-slate-400 cursor-not-allowed"
+            : "bg-slate-800 hover:bg-slate-700 shadow-sm"
         }`}
       >
-        {isUploading ? 'Uploading...' : 'Upload CSV'}
+        {isUploading ? "Uploading..." : "Upload CSV"}
       </button>
 
-      {message && <p className="mt-4">{message}</p>}
+      {message && (
+        <div
+          className={`mt-4 p-3 rounded-md flex items-center ${
+            messageType === "success"
+              ? "bg-green-50 text-green-700 border border-green-100"
+              : "bg-red-50 text-red-700 border border-red-100"
+          }`}
+        >
+          {messageType === "success" ? (
+            <CheckCircle className="w-4 h-4 mr-2" />
+          ) : (
+            <AlertCircle className="w-4 h-4 mr-2" />
+          )}
+          <p className="text-sm">{message}</p>
+        </div>
+      )}
     </div>
   );
 }

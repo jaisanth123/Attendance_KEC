@@ -66,9 +66,7 @@ function HomePage({ toggleSidebar }) {
               />
             </>
           )}
-          {/* Mark On Duty Card */}
           {/* //! --------------staff cards section -------------- */}
-          {/* Conditionally render View Attendance and UpdateAttendance based on role */}
           {role === "admin" && (
             <>
               <ActionCard
