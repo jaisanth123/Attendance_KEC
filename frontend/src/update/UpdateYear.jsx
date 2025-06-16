@@ -20,12 +20,18 @@ function UpdateYear() {
     }
 
     try {
-      const res = await fetch(`${apiBase}/api/update-year`, {
+      const res = await fetch(`${apiBase}/api/students/update-year`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fromYear, toYear }),
       });
+
       const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to update year");
+      }
+
       setMessage({
         text: data.message || "Year updated successfully",
         type: "success",
@@ -34,7 +40,10 @@ function UpdateYear() {
       setFromYear("");
       setToYear("");
     } catch (err) {
-      setMessage({ text: "Failed to update year.", type: "error" });
+      setMessage({
+        text: err.message || "Failed to update year. Please try again.",
+        type: "error",
+      });
     }
   };
 
