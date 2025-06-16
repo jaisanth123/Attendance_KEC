@@ -19,12 +19,14 @@ export default function UpdateStudentData() {
   const [searchType, setSearchType] = useState("rollNo");
   const [searchTerm, setSearchTerm] = useState("");
   const [nameSearchResults, setNameSearchResults] = useState([]);
+  const [rollNoSearchResults, setRollNoSearchResults] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [updatedData, setUpdatedData] = useState({});
   const [message, setMessage] = useState({ text: "", type: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [showNameDropdown, setShowNameDropdown] = useState(false);
+  const [showRollNoDropdown, setShowRollNoDropdown] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
@@ -66,6 +68,39 @@ export default function UpdateStudentData() {
       console.error("Error searching by name:", error);
       setNameSearchResults([]);
       setShowNameDropdown(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Function to search students by roll number for suggestions
+  const searchStudentsByRollNo = async (rollNo) => {
+    if (!rollNo.trim()) {
+      setRollNoSearchResults([]);
+      setShowRollNoDropdown(false);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await fetch(
+        `http://localhost:5000/api/students/search/rollno?rollNo=${encodeURIComponent(
+          rollNo
+        )}`
+      );
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        setRollNoSearchResults(data.data);
+        setShowRollNoDropdown(true);
+      } else {
+        setRollNoSearchResults([]);
+        setShowRollNoDropdown(false);
+      }
+    } catch (error) {
+      console.error("Error searching by roll number:", error);
+      setRollNoSearchResults([]);
+      setShowRollNoDropdown(false);
     } finally {
       setIsLoading(false);
     }
@@ -134,6 +169,13 @@ export default function UpdateStudentData() {
       }, 300);
 
       return () => clearTimeout(debounceTimeout);
+    } else {
+      // Debounce implementation for roll number search
+      const debounceTimeout = setTimeout(() => {
+        searchStudentsByRollNo(value);
+      }, 300);
+
+      return () => clearTimeout(debounceTimeout);
     }
   };
 
@@ -144,6 +186,15 @@ export default function UpdateStudentData() {
     setUpdatedData(student);
     setShowNameDropdown(false);
     setNameSearchResults([]);
+  };
+
+  // Handle selecting a student from roll number search results
+  const handleSelectRollNoStudent = (student) => {
+    setSearchTerm(student.rollNo);
+    setSelectedStudent(student);
+    setUpdatedData(student);
+    setShowRollNoDropdown(false);
+    setRollNoSearchResults([]);
   };
 
   // Handle input change in the edit form
@@ -304,7 +355,9 @@ export default function UpdateStudentData() {
                     setSearchType("rollNo");
                     setSearchTerm("");
                     setNameSearchResults([]);
+                    setRollNoSearchResults([]);
                     setShowNameDropdown(false);
+                    setShowRollNoDropdown(false);
                   }}
                   className={`px-4 py-2 ${
                     searchType === "rollNo"
@@ -320,7 +373,9 @@ export default function UpdateStudentData() {
                     setSearchType("name");
                     setSearchTerm("");
                     setNameSearchResults([]);
+                    setRollNoSearchResults([]);
                     setShowNameDropdown(false);
+                    setShowRollNoDropdown(false);
                   }}
                   className={`px-4 py-2 ${
                     searchType === "name"
@@ -367,6 +422,34 @@ export default function UpdateStudentData() {
                               <div className="font-medium">{student.name}</div>
                               <div className="text-sm text-gray-600">
                                 {student.rollNo}
+                              </div>
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {student.yearOfStudy}-{student.branch}-
+                              {student.section}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                  {/* Roll number search dropdown */}
+                  {searchType === "rollNo" &&
+                    showRollNoDropdown &&
+                    rollNoSearchResults.length > 0 && (
+                      <div className="absolute z-10 w-full mt-1 overflow-y-auto bg-white border border-gray-300 rounded-lg shadow-lg max-h-60">
+                        {rollNoSearchResults.map((student, index) => (
+                          <div
+                            key={index}
+                            className="flex justify-between p-3 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
+                            onClick={() => handleSelectRollNoStudent(student)}
+                          >
+                            <div>
+                              <div className="font-medium">
+                                {student.rollNo}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                {student.name}
                               </div>
                             </div>
                             <div className="text-sm text-gray-500">

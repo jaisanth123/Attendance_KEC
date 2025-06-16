@@ -6,6 +6,7 @@ import {
   AlertCircle,
   Database,
   Calendar,
+  Loader,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -17,8 +18,64 @@ function DeleteStudents() {
   const [section, setSection] = useState("");
   const [rollNo, setRollNo] = useState("");
   const [message, setMessage] = useState({ text: "", type: "" });
+  const [isLoading, setIsLoading] = useState(false);
+  const [rollNoSearchResults, setRollNoSearchResults] = useState([]);
+  const [showRollNoDropdown, setShowRollNoDropdown] = useState(false);
 
   const apiBase = "http://localhost:5000";
+
+  // Function to search students by roll number for suggestions
+  const searchStudentsByRollNo = async (rollNo) => {
+    if (!rollNo.trim()) {
+      setRollNoSearchResults([]);
+      setShowRollNoDropdown(false);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await fetch(
+        `${apiBase}/api/students/search/rollno?rollNo=${encodeURIComponent(
+          rollNo
+        )}`
+      );
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        setRollNoSearchResults(data.data);
+        setShowRollNoDropdown(true);
+      } else {
+        setRollNoSearchResults([]);
+        setShowRollNoDropdown(false);
+      }
+    } catch (error) {
+      console.error("Error searching by roll number:", error);
+      setRollNoSearchResults([]);
+      setShowRollNoDropdown(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle roll number input change
+  const handleRollNoChange = (e) => {
+    const value = e.target.value.toUpperCase();
+    setRollNo(value);
+
+    // Debounce implementation for roll number search
+    const debounceTimeout = setTimeout(() => {
+      searchStudentsByRollNo(value);
+    }, 300);
+
+    return () => clearTimeout(debounceTimeout);
+  };
+
+  // Handle selecting a student from roll number search results
+  const handleSelectRollNoStudent = (student) => {
+    setRollNo(student.rollNo);
+    setShowRollNoDropdown(false);
+    setRollNoSearchResults([]);
+  };
 
   const handleBulkDelete = async () => {
     if (!yearOfStudy || !branch || !section) {
@@ -66,6 +123,8 @@ function DeleteStudents() {
       setMessage({ text, type: "success" });
       // Clear form
       setRollNo("");
+      setRollNoSearchResults([]);
+      setShowRollNoDropdown(false);
     } catch (err) {
       setMessage({ text: "Single delete failed.", type: "error" });
     }
@@ -113,7 +172,7 @@ function DeleteStudents() {
         </div>
 
         {/* Main Content */}
-        <div className="overflow-hidden bg-white shadow-md rounded-xl">
+        <div className=" bg-white shadow-md rounded-xl min-h-[400px]">
           {/* Toggle Controls */}
           <div className="px-6 py-6 border-b border-gray-200">
             <div className="flex flex-wrap items-center gap-4 mb-6">
@@ -124,6 +183,8 @@ function DeleteStudents() {
                   onClick={() => {
                     setIsBulkMode(true);
                     setMessage({ text: "", type: "" });
+                    setRollNoSearchResults([]);
+                    setShowRollNoDropdown(false);
                   }}
                   className={`px-4 py-2 ${
                     isBulkMode
@@ -139,6 +200,8 @@ function DeleteStudents() {
                   onClick={() => {
                     setIsBulkMode(false);
                     setMessage({ text: "", type: "" });
+                    setRollNoSearchResults([]);
+                    setShowRollNoDropdown(false);
                   }}
                   className={`px-4 py-2 ${
                     !isBulkMode
@@ -240,7 +303,7 @@ function DeleteStudents() {
                 </div>
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="relative space-y-6">
                 <div>
                   <label className="block mb-1 text-sm font-medium text-gray-700">
                     Roll Number
@@ -248,11 +311,36 @@ function DeleteStudents() {
                   <input
                     type="text"
                     value={rollNo}
-                    onChange={(e) => setRollNo(e.target.value.toUpperCase())}
+                    onChange={handleRollNoChange}
                     placeholder="Enter Roll Number"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
                   />
                 </div>
+                {/* Roll number search dropdown - full width of card */}
+                {showRollNoDropdown && rollNoSearchResults.length > 0 && (
+                  <div className="absolute left-0 right-0 z-10 mt-1 overflow-y-auto bg-white border border-gray-300 rounded-lg shadow-lg max-h-[300px] w-full">
+                    {rollNoSearchResults.map((student, index) => (
+                      <div
+                        key={index}
+                        className="flex justify-between p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-100"
+                        onClick={() => handleSelectRollNoStudent(student)}
+                      >
+                        <div>
+                          <div className="text-base font-medium">
+                            {student.rollNo}
+                          </div>
+                          <div className="mt-1 text-sm text-gray-600">
+                            {student.name}
+                          </div>
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {student.yearOfStudy}-{student.branch}-
+                          {student.section}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <div className="flex justify-end">
                   <button

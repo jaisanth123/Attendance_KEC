@@ -11,7 +11,8 @@ router.get("/test", (req, res) => {
 router.get("/remaining", studentController.fetchRemainingStudents);
 //! update studnets data
 router.get("/search/name", studentController.searchStudentsByName); // search by name
-router.get("/search/:rollNo", studentController.getStudentByRollNo); // setch by rollno
+router.get("/search/rollno", studentController.searchStudentsByRollNo); // search by rollno for suggestions
+router.get("/search/:rollNo", studentController.getStudentByRollNo); // fetch by rollno
 router.put("/update-student-data/:rollNo", studentController.updateStudentData); // update by roll no
 router.post("/create", studentController.createStudent);
 router.delete("/delete/:rollNo", studentController.deleteStudentByRollNo);

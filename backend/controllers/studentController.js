@@ -637,3 +637,52 @@ exports.updateStudentYear = async (req, res) => {
     });
   }
 };
+
+//! <======= Search students by roll number for suggestions ============>
+exports.searchStudentsByRollNo = async (req, res) => {
+  const { rollNo } = req.query;
+
+  try {
+    // Validate search term
+    if (!rollNo || rollNo.trim() === "") {
+      return res.status(400).json({
+        success: false,
+        message: "Roll number search term is required",
+      });
+    }
+
+    // Create a case-insensitive regex pattern for partial roll number matching
+    const rollNoRegex = new RegExp(rollNo, "i");
+
+    // Find students whose roll numbers match the search pattern
+    const students = await Student.find({ rollNo: rollNoRegex })
+      .select(
+        "rollNo name hostellerDayScholar gender yearOfStudy branch section parentMobileNo studentMobileNo superPacc"
+      )
+      .sort("rollNo")
+      .limit(10); // Limit to 10 results for better performance
+
+    // Check if any students were found
+    if (students.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No students found matching the roll number",
+        data: [],
+      });
+    }
+
+    // Return the matching students
+    res.status(200).json({
+      success: true,
+      count: students.length,
+      data: students,
+    });
+  } catch (error) {
+    console.error("Error searching students by roll number:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error searching for students",
+      error: error.message,
+    });
+  }
+};
