@@ -34,6 +34,8 @@ import InfoStatusPage from "./components/InfoStatusPage";
 import Attendace from "./components/Attendace";
 import UploadCsv from "./update/UploadCsv"; // Import the UploadCsv component
 import DeleteStudents from "./update/DeleteStudents"; // Import the DeleteStudents component
+import UpdateYear from "./update/UpdateYear";
+
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -153,6 +155,7 @@ function App() {
               <Route path="/change-password" element={<ChangePasswordForm />} />
               <Route path="/update" element={<Update />} />
               <Route path="/update-superpacc" element={<UpdateSuperPacc />} />
+              <Route path="/update-year" element={<UpdateYear />} />
             </Route>
 
             {/* Catch all unmatched routes */}

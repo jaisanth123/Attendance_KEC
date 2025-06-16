@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Trash2, Users, User, AlertCircle, Database } from "lucide-react";
+import {
+  Trash2,
+  Users,
+  User,
+  AlertCircle,
+  Database,
+  Calendar,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 function DeleteStudents() {
@@ -83,6 +90,13 @@ function DeleteStudents() {
             >
               <Trash2 size={16} />
               <span>Delete Students</span>
+            </button>
+            <button
+              onClick={() => navigate("/update-year")}
+              className="px-3 py-1.5 rounded-md flex items-center space-x-2 text-sm transition-colors bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
+            >
+              <Calendar size={16} />
+              <span>Update Year</span>
             </button>
           </div>
         </div>
