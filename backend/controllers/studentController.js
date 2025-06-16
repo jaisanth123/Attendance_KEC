@@ -581,3 +581,59 @@ exports.batchUpdateSuperPacc = async (req, res) => {
     });
   }
 };
+
+//! <======= Batch Update Student Year ============>
+exports.updateStudentYear = async (req, res) => {
+  try {
+    const { fromYear, toYear } = req.body;
+
+    // Validate required parameters
+    if (!fromYear || !toYear) {
+      return res.status(400).json({
+        success: false,
+        message: "Both fromYear and toYear are required",
+      });
+    }
+
+    // Validate year values
+    const validYears = ["I", "II", "III", "IV"];
+    if (!validYears.includes(fromYear) || !validYears.includes(toYear)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid year values. Years must be I, II, III, or IV",
+      });
+    }
+
+    // Update all students with the specified fromYear
+    const result = await Student.updateMany(
+      { yearOfStudy: fromYear },
+      { $set: { yearOfStudy: toYear } }
+    );
+
+    // Check if any students were updated
+    if (result.matchedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `No students found with year ${fromYear}`,
+      });
+    }
+
+    // Return success response
+    return res.status(200).json({
+      success: true,
+      message: `Successfully updated ${result.modifiedCount} students from year ${fromYear} to ${toYear}`,
+      data: {
+        fromYear,
+        toYear,
+        updatedCount: result.modifiedCount,
+      },
+    });
+  } catch (error) {
+    console.error("Error in updateStudentYear:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error updating student years",
+      error: error.message,
+    });
+  }
+};

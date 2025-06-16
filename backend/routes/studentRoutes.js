@@ -27,4 +27,7 @@ router.put(
 // Add the batch update route
 router.post("/superpacc/batch-update", studentController.batchUpdateSuperPacc);
 
+// Add the year update route
+router.put("/update-year", studentController.updateStudentYear);
+
 module.exports = router;
