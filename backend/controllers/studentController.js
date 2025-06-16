@@ -432,3 +432,152 @@ exports.getStudentsWithLeaveCount = async (req, res) => {
     });
   }
 };
+
+//! <======= Get students by SuperPacc status ============>
+exports.getStudentsBySuperPacc = async (req, res) => {
+  try {
+    const { yearOfStudy, branch, section } = req.query;
+
+    // Validate required parameters
+    if (!yearOfStudy || !branch || !section) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required parameters: yearOfStudy, branch, section",
+      });
+    }
+
+    // Find students matching the criteria
+    const students = await Student.find({
+      yearOfStudy,
+      branch,
+      section,
+    })
+      .select("rollNo name superPacc")
+      .sort("rollNo");
+
+    // Check if any students were found
+    if (!students || students.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No students found for the selected criteria",
+        data: [],
+      });
+    }
+
+    // Return the students data
+    return res.status(200).json({
+      success: true,
+      count: students.length,
+      data: students,
+    });
+  } catch (error) {
+    console.error("Error in getStudentsBySuperPacc:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching students data",
+      error: error.message,
+    });
+  }
+};
+
+//! <======= Update SuperPacc status ============>
+exports.updateSuperPaccStatus = async (req, res) => {
+  try {
+    const { rollNo } = req.params;
+    const { superPacc } = req.body;
+
+    // Validate roll number and superPacc status
+    if (!rollNo) {
+      return res.status(400).json({
+        success: false,
+        message: "Roll number is required",
+      });
+    }
+
+    if (superPacc === undefined || superPacc === null) {
+      return res.status(400).json({
+        success: false,
+        message: "SuperPacc status is required",
+      });
+    }
+
+    // Convert superPacc to uppercase string if it's a boolean
+    const superPaccValue = superPacc ? "YES" : "NO";
+
+    // Find and update the student's SuperPacc status
+    const updatedStudent = await Student.findOneAndUpdate(
+      { rollNo },
+      { $set: { superPacc: superPaccValue } },
+      { new: true }
+    );
+
+    // Check if student exists
+    if (!updatedStudent) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found with the provided roll number",
+      });
+    }
+
+    // Return success response with updated student data
+    return res.status(200).json({
+      success: true,
+      message: "SuperPacc status updated successfully",
+      data: updatedStudent,
+    });
+  } catch (error) {
+    console.error("Error in updateSuperPaccStatus:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error updating SuperPacc status",
+      error: error.message,
+    });
+  }
+};
+
+//! <======= Batch Update SuperPacc status ============>
+exports.batchUpdateSuperPacc = async (req, res) => {
+  try {
+    const { yearOfStudy, branch, section, rollNumberStateMapping } = req.body;
+
+    // Validate required parameters
+    if (!yearOfStudy || !branch || !section || !rollNumberStateMapping) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Missing required parameters: yearOfStudy, branch, section, or rollNumberStateMapping",
+      });
+    }
+
+    // Update all students in parallel
+    const updatePromises = Object.entries(rollNumberStateMapping).map(
+      ([rollNo, superPacc]) => {
+        return Student.findOneAndUpdate(
+          { rollNo },
+          { $set: { superPacc: superPacc ? "YES" : "NO" } },
+          { new: true }
+        );
+      }
+    );
+
+    const updatedStudents = await Promise.all(updatePromises);
+
+    // Filter out any null results (students not found)
+    const successfulUpdates = updatedStudents.filter(
+      (student) => student !== null
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: `Successfully updated ${successfulUpdates.length} students`,
+      data: successfulUpdates,
+    });
+  } catch (error) {
+    console.error("Error in batchUpdateSuperPacc:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error updating SuperPacc status",
+      error: error.message,
+    });
+  }
+};

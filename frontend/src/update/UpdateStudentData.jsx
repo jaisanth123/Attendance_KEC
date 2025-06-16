@@ -9,9 +9,12 @@ import {
   Trash2,
   AlertTriangle,
   Users,
+  Database,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function UpdateStudentData() {
+  const navigate = useNavigate();
   const [searchType, setSearchType] = useState("rollNo");
   const [searchTerm, setSearchTerm] = useState("");
   const [nameSearchResults, setNameSearchResults] = useState([]);
@@ -246,10 +249,30 @@ export default function UpdateStudentData() {
   };
 
   return (
-    <div className="px-4 py-8 min-h-screen bg-gray-100">
-      <div className="mx-auto max-w-5xl">
+    <div className="min-h-screen px-4 py-8 bg-gray-100">
+      <div className="max-w-5xl mx-auto">
+        {/* Navigation Toggle */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => navigate("/update-data")}
+              className="px-3 py-1.5 rounded-md flex items-center space-x-2 text-sm transition-colors bg-slate-800 text-white shadow-sm"
+            >
+              <Database size={16} />
+              <span>Update Data</span>
+            </button>
+            <button
+              onClick={() => navigate("/delete-student")}
+              className="px-3 py-1.5 rounded-md flex items-center space-x-2 text-sm transition-colors bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
+            >
+              <Trash2 size={16} />
+              <span>Delete Students</span>
+            </button>
+          </div>
+        </div>
+
         {/* Header Section */}
-        <div className="px-6 py-6 mb-8 text-white rounded-xl shadow-lg bg-slate-800">
+        <div className="px-6 py-6 mb-8 text-white shadow-lg rounded-xl bg-slate-800">
           <h1 className="flex items-center text-3xl font-bold">
             <Users className="mr-3" size={30} />
             Student Management
@@ -260,13 +283,13 @@ export default function UpdateStudentData() {
         </div>
 
         {/* Main Content */}
-        <div className="overflow-hidden bg-white rounded-xl shadow-md">
+        <div className="overflow-hidden bg-white shadow-md rounded-xl">
           {/* Search Controls */}
           <div className="px-6 py-6 border-b border-gray-200">
             {/* Search Type Toggle */}
-            <div className="flex flex-wrap gap-4 items-center mb-6">
+            <div className="flex flex-wrap items-center gap-4 mb-6">
               <span className="font-medium text-gray-700">Search by:</span>
-              <div className="flex overflow-hidden rounded-md border border-gray-300">
+              <div className="flex overflow-hidden border border-gray-300 rounded-md">
                 <button
                   type="button"
                   onClick={() => {
@@ -313,7 +336,7 @@ export default function UpdateStudentData() {
                     placeholder={`Enter student ${
                       searchType === "name" ? "name" : "roll number"
                     }...`}
-                    className="px-4 py-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
                   />
                   {isLoading && (
                     <div className="absolute top-3 right-3">
@@ -325,7 +348,7 @@ export default function UpdateStudentData() {
                   {searchType === "name" &&
                     showNameDropdown &&
                     nameSearchResults.length > 0 && (
-                      <div className="overflow-y-auto absolute z-10 mt-1 w-full max-h-60 bg-white rounded-lg border border-gray-300 shadow-lg">
+                      <div className="absolute z-10 w-full mt-1 overflow-y-auto bg-white border border-gray-300 rounded-lg shadow-lg max-h-60">
                         {nameSearchResults.map((student, index) => (
                           <div
                             key={index}
@@ -350,9 +373,9 @@ export default function UpdateStudentData() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex justify-center items-center px-6 py-3 text-white rounded-lg transition-colors bg-slate-800 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                  className="flex items-center justify-center px-6 py-3 text-white transition-colors rounded-lg bg-slate-800 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500"
                 >
-                  <Search className="mr-2 w-5 h-5" />
+                  <Search className="w-5 h-5 mr-2" />
                   Search
                 </button>
               </div>
@@ -377,7 +400,7 @@ export default function UpdateStudentData() {
           {/* Student Profile/Edit Form */}
           {selectedStudent && (
             <div className="p-6">
-              <div className="flex flex-wrap gap-4 justify-between items-center mb-6">
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                 <h2 className="text-xl font-semibold text-gray-800">
                   {editMode ? "Edit Student Information" : "Student Profile"}
                 </h2>
@@ -387,17 +410,17 @@ export default function UpdateStudentData() {
                       <button
                         type="button"
                         onClick={() => setEditMode(true)}
-                        className="flex items-center px-4 py-2 text-white rounded-lg transition-colors bg-slate-800 hover:bg-slate-700"
+                        className="flex items-center px-4 py-2 text-white transition-colors rounded-lg bg-slate-800 hover:bg-slate-700"
                       >
-                        <Edit className="mr-2 w-4 h-4" />
+                        <Edit className="w-4 h-4 mr-2" />
                         Edit
                       </button>
                       <button
                         type="button"
                         onClick={() => setShowDeleteConfirm(true)}
-                        className="flex items-center px-4 py-2 text-white bg-red-600 rounded-lg transition-colors hover:bg-red-700"
+                        className="flex items-center px-4 py-2 text-white transition-colors bg-red-600 rounded-lg hover:bg-red-700"
                       >
-                        <Trash2 className="mr-2 w-4 h-4" />
+                        <Trash2 className="w-4 h-4 mr-2" />
                         Delete
                       </button>
                     </>
@@ -405,9 +428,9 @@ export default function UpdateStudentData() {
                     <button
                       type="button"
                       onClick={handleCancelEdit}
-                      className="flex items-center px-4 py-2 text-white bg-gray-600 rounded-lg transition-colors hover:bg-gray-700"
+                      className="flex items-center px-4 py-2 text-white transition-colors bg-gray-600 rounded-lg hover:bg-gray-700"
                     >
-                      <X className="mr-2 w-4 h-4" />
+                      <X className="w-4 h-4 mr-2" />
                       Cancel
                     </button>
                   )}
@@ -426,7 +449,7 @@ export default function UpdateStudentData() {
                         type="text"
                         value={updatedData.rollNo || ""}
                         disabled
-                        className="p-3 w-full bg-gray-100 rounded-lg border border-gray-300"
+                        className="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg"
                       />
                     </div>
 
@@ -440,7 +463,7 @@ export default function UpdateStudentData() {
                         name="name"
                         value={updatedData.name || ""}
                         onChange={handleInputChange}
-                        className="p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
                       />
                     </div>
 
@@ -453,7 +476,7 @@ export default function UpdateStudentData() {
                         name="hostellerDayScholar"
                         value={updatedData.hostellerDayScholar || ""}
                         onChange={handleInputChange}
-                        className="p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
                       >
                         <option value="">Select Type</option>
                         <option value="HOSTELLER">HOSTELLER</option>
@@ -470,7 +493,7 @@ export default function UpdateStudentData() {
                         name="gender"
                         value={updatedData.gender || ""}
                         onChange={handleInputChange}
-                        className="p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
                       >
                         <option value="">Select Gender</option>
                         <option value="MALE">MALE</option>
@@ -488,7 +511,7 @@ export default function UpdateStudentData() {
                         name="yearOfStudy"
                         value={updatedData.yearOfStudy || ""}
                         onChange={handleInputChange}
-                        className="p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
                       >
                         <option value="">Select Year</option>
                         <option value="I">I</option>
@@ -507,7 +530,7 @@ export default function UpdateStudentData() {
                         name="branch"
                         value={updatedData.branch || ""}
                         onChange={handleInputChange}
-                        className="p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
                       >
                         <option value="">Select Branch</option>
                         <option value="AIDS">AI & DS</option>
@@ -524,7 +547,7 @@ export default function UpdateStudentData() {
                         name="section"
                         value={updatedData.section || ""}
                         onChange={handleInputChange}
-                        className="p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
                       >
                         <option value="">Select Section</option>
                         <option value="A">A</option>
@@ -544,7 +567,7 @@ export default function UpdateStudentData() {
                         name="parentMobileNo"
                         value={updatedData.parentMobileNo || ""}
                         onChange={handleInputChange}
-                        className="p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
                       />
                     </div>
 
@@ -558,7 +581,7 @@ export default function UpdateStudentData() {
                         name="studentMobileNo"
                         value={updatedData.studentMobileNo || ""}
                         onChange={handleInputChange}
-                        className="p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
                       />
                     </div>
 
@@ -571,7 +594,7 @@ export default function UpdateStudentData() {
                         name="superPacc"
                         value={updatedData.superPacc || ""}
                         onChange={handleInputChange}
-                        className="p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
                       >
                         <option value="">Select Option</option>
                         <option value="YES">YES</option>
@@ -584,12 +607,12 @@ export default function UpdateStudentData() {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="flex items-center px-6 py-3 text-white rounded-lg transition-colors bg-slate-800 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                      className="flex items-center px-6 py-3 text-white transition-colors rounded-lg bg-slate-800 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500"
                     >
                       {isLoading ? (
-                        <Loader className="mr-2 w-5 h-5 animate-spin" />
+                        <Loader className="w-5 h-5 mr-2 animate-spin" />
                       ) : (
-                        <Save className="mr-2 w-5 h-5" />
+                        <Save className="w-5 h-5 mr-2" />
                       )}
                       Save Changes
                     </button>
@@ -597,7 +620,7 @@ export default function UpdateStudentData() {
                 </form>
               ) : (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  <div className="p-4 bg-white rounded-lg border border-gray-200 transition-shadow hover:shadow-md">
+                  <div className="p-4 transition-shadow bg-white border border-gray-200 rounded-lg hover:shadow-md">
                     <div className="mb-1 text-sm font-medium text-slate-800">
                       Roll Number
                     </div>
@@ -606,7 +629,7 @@ export default function UpdateStudentData() {
                     </div>
                   </div>
 
-                  <div className="p-4 bg-white rounded-lg border border-gray-200 transition-shadow hover:shadow-md">
+                  <div className="p-4 transition-shadow bg-white border border-gray-200 rounded-lg hover:shadow-md">
                     <div className="mb-1 text-sm font-medium text-slate-800">
                       Name
                     </div>
@@ -615,7 +638,7 @@ export default function UpdateStudentData() {
                     </div>
                   </div>
 
-                  <div className="p-4 bg-white rounded-lg border border-gray-200 transition-shadow hover:shadow-md">
+                  <div className="p-4 transition-shadow bg-white border border-gray-200 rounded-lg hover:shadow-md">
                     <div className="mb-1 text-sm font-medium text-slate-800">
                       Student Type
                     </div>
@@ -624,7 +647,7 @@ export default function UpdateStudentData() {
                     </div>
                   </div>
 
-                  <div className="p-4 bg-white rounded-lg border border-gray-200 transition-shadow hover:shadow-md">
+                  <div className="p-4 transition-shadow bg-white border border-gray-200 rounded-lg hover:shadow-md">
                     <div className="mb-1 text-sm font-medium text-slate-800">
                       Gender
                     </div>
@@ -633,7 +656,7 @@ export default function UpdateStudentData() {
                     </div>
                   </div>
 
-                  <div className="p-4 bg-white rounded-lg border border-gray-200 transition-shadow hover:shadow-md">
+                  <div className="p-4 transition-shadow bg-white border border-gray-200 rounded-lg hover:shadow-md">
                     <div className="mb-1 text-sm font-medium text-slate-800">
                       Year of Study
                     </div>
@@ -642,7 +665,7 @@ export default function UpdateStudentData() {
                     </div>
                   </div>
 
-                  <div className="p-4 bg-white rounded-lg border border-gray-200 transition-shadow hover:shadow-md">
+                  <div className="p-4 transition-shadow bg-white border border-gray-200 rounded-lg hover:shadow-md">
                     <div className="mb-1 text-sm font-medium text-slate-800">
                       Branch
                     </div>
@@ -651,7 +674,7 @@ export default function UpdateStudentData() {
                     </div>
                   </div>
 
-                  <div className="p-4 bg-white rounded-lg border border-gray-200 transition-shadow hover:shadow-md">
+                  <div className="p-4 transition-shadow bg-white border border-gray-200 rounded-lg hover:shadow-md">
                     <div className="mb-1 text-sm font-medium text-slate-800">
                       Section
                     </div>
@@ -660,7 +683,7 @@ export default function UpdateStudentData() {
                     </div>
                   </div>
 
-                  <div className="p-4 bg-white rounded-lg border border-gray-200 transition-shadow hover:shadow-md">
+                  <div className="p-4 transition-shadow bg-white border border-gray-200 rounded-lg hover:shadow-md">
                     <div className="mb-1 text-sm font-medium text-slate-800">
                       Parent Mobile Number
                     </div>
@@ -669,7 +692,7 @@ export default function UpdateStudentData() {
                     </div>
                   </div>
 
-                  <div className="p-4 bg-white rounded-lg border border-gray-200 transition-shadow hover:shadow-md">
+                  <div className="p-4 transition-shadow bg-white border border-gray-200 rounded-lg hover:shadow-md">
                     <div className="mb-1 text-sm font-medium text-slate-800">
                       Student Mobile Number
                     </div>
@@ -678,7 +701,7 @@ export default function UpdateStudentData() {
                     </div>
                   </div>
 
-                  <div className="p-4 bg-white rounded-lg border border-gray-200 transition-shadow hover:shadow-md">
+                  <div className="p-4 transition-shadow bg-white border border-gray-200 rounded-lg hover:shadow-md">
                     <div className="mb-1 text-sm font-medium text-slate-800">
                       Super PACC
                     </div>
@@ -693,7 +716,7 @@ export default function UpdateStudentData() {
 
           {/* When no student is selected */}
           {!selectedStudent && !message.text && (
-            <div className="flex flex-col justify-center items-center p-12 text-center">
+            <div className="flex flex-col items-center justify-center p-12 text-center">
               <User size={48} className="mb-4 text-slate-300" />
               <h3 className="mb-2 text-xl font-medium text-gray-700">
                 No Student Selected
@@ -709,9 +732,9 @@ export default function UpdateStudentData() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="flex fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-50">
-          <div className="p-6 mx-4 w-full max-w-md bg-white rounded-xl shadow-xl">
-            <div className="flex justify-center items-center mx-auto mb-4 w-12 h-12 bg-red-100 rounded-full">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-md p-6 mx-4 bg-white shadow-xl rounded-xl">
+            <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full">
               <AlertTriangle className="w-6 h-6 text-red-600" />
             </div>
             <h3 className="mb-4 text-lg font-medium text-center text-gray-900">
@@ -725,20 +748,20 @@ export default function UpdateStudentData() {
             <div className="flex justify-center space-x-4">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg transition-colors hover:bg-gray-200 focus:outline-none"
+                className="px-4 py-2 text-gray-700 transition-colors bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none"
               >
                 Cancel
               </button>
               <button
                 onClick={deleteStudent}
                 disabled={deleteLoading}
-                className="flex justify-center items-center px-4 py-2 text-white bg-red-600 rounded-lg transition-colors hover:bg-red-700 focus:outline-none"
+                className="flex items-center justify-center px-4 py-2 text-white transition-colors bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none"
               >
                 {deleteLoading ? (
                   <Loader className="w-5 h-5 animate-spin" />
                 ) : (
                   <>
-                    <Trash2 className="mr-2 w-5 h-5" />
+                    <Trash2 className="w-5 h-5 mr-2" />
                     Delete
                   </>
                 )}
