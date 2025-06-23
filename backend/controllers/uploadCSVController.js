@@ -44,17 +44,12 @@
 // });
 
 // module.exports = router;
-const express = require('express');
-const multer = require('multer');
-const csv = require('csv-parser');
+
 const fs = require('fs');
-const Student = require('../models/Student'); // Mongoose model
+const csv = require('csv-parser'); // make sure it's installed
+const Student = require('../models/Student'); // adjust the path if needed
 
-const router = express.Router();
-const upload = multer({ dest: 'uploads/' });
-
-// POST /add-student
-router.post('/add-student', upload.single('csvfile'), async (req, res) => {
+exports.addStudent = async (req, res) => {
   const results = [];
   const filePath = req.file.path;
 
@@ -81,6 +76,4 @@ router.post('/add-student', upload.single('csvfile'), async (req, res) => {
         fs.unlinkSync(filePath); // cleanup temp file
       }
     });
-});
-
-module.exports = router;
+};

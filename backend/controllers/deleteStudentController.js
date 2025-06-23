@@ -44,10 +44,9 @@
 const express = require('express');
 const Student = require('../models/Student');
 
-const router = express.Router();
 
 // 📌 Bulk delete
-router.delete('/students', async (req, res) => {
+exports.bulkDelete =async (req, res) => {
   const { yearOfStudy, branch, section } = req.body;
   const filter = {};
 
@@ -62,10 +61,10 @@ router.delete('/students', async (req, res) => {
     console.error(err);
     res.status(500).send('Error deleting students');
   }
-});
+};
 
 // 📌 Delete by rollNo
-router.delete('/student/:rollNo', async (req, res) => {
+exports.deleteByRollNo =async (req, res) => {
   const { rollNo } = req.params;
 
   try {
@@ -80,6 +79,5 @@ router.delete('/student/:rollNo', async (req, res) => {
     console.error(err);
     res.status(500).send('Error deleting student(s)');
   }
-});
+};
 
-module.exports = router;
