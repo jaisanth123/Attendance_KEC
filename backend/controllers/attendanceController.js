@@ -738,3 +738,4 @@ exports.bulkUpdateInfoStatus = async (req, res) => {
     });
   }
 };
+

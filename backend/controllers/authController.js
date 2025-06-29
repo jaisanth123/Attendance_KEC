@@ -53,6 +53,7 @@ const loginAdmin = async (req, res) => {
     return res.status(400).json({ message: "Invalid credentials" });
   }
 
+  
   sendToken(admin, 200, res, "Admin logged in successfully");
 };
 
