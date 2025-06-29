@@ -4,6 +4,8 @@ import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
+const backendURL = import.meta.env.VITE_BACKEND_URL; 
+
 function UpdateAttendance() {
   const [yearOfStudy, setYearOfStudy] = useState("nan");
   const [branch, setBranch] = useState("nan");
@@ -50,7 +52,7 @@ function UpdateAttendance() {
     try {
       setRollNumbers([]);
       const response = await axios.get(
-        "http://localhost:5000/api/attendance/get-attendancestatus",
+        `${backendURL}/api/attendance/get-attendancestatus`,
         {
           headers: {
             Authorization: `Bearer ${authToken}`, // Add the token to the header
@@ -111,7 +113,7 @@ function UpdateAttendance() {
       }, {});
 
       const response = await axios.post(
-        "http://localhost:5000/api/attendance/mark-updatestatus",
+        `${backendURL}/api/attendance/mark-updatestatus`,
         {
           yearOfStudy,
           branch,
@@ -417,3 +419,5 @@ function Dropdown({ label, value, options, onChange }) {
 }
 
 export default UpdateAttendance;
+
+

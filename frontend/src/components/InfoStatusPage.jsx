@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+const backendURL = import.meta.env.VITE_BACKEND_URL; 
 
 function InfoStatusPage() {
   const location = useLocation();
@@ -44,7 +45,7 @@ function InfoStatusPage() {
   ) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/attendance/absent-students-info`,
+        `${backendURL}/api/attendance/absent-students-info`,
         {
           params: {
             yearOfStudy,
@@ -128,7 +129,7 @@ function InfoStatusPage() {
 
       // Send bulk update request
       const response = await axios.post(
-        "http://localhost:5000/api/attendance/bulk-update-info-status",
+        `${backendURL}/api/attendance/bulk-update-info-status`,
         {
           updates,
           date,
@@ -364,3 +365,5 @@ function Dropdown({ label, value, options, onChange }) {
 }
 
 export default InfoStatusPage;
+
+

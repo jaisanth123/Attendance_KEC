@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Calendar, Filter } from "lucide-react";
+const backendURL = import.meta.env.VITE_BACKEND_URL; 
 
 const LeaveCountPage = () => {
   const [studentsData, setStudentsData] = useState([]);
@@ -18,7 +19,7 @@ const LeaveCountPage = () => {
     setError(null);
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/students/leaves",
+        `${backendURL}/api/students/leaves`,
         {
           params: filters,
         }
@@ -294,3 +295,5 @@ const LeaveCountPage = () => {
 };
 
 export default LeaveCountPage;
+
+

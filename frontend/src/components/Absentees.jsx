@@ -23,7 +23,7 @@ function Absentees() {
   const [rollNumbers, setRollNumbers] = useState([]);
   const [showConfirmationPopup, setShowConfirmationPopup] = useState(false); // For Confirm button confirmation popup
   const [showMarkPresentPopup, setShowMarkPresentPopup] = useState(false); // For Mark Present button confirmation popup
-  const [showMarkSuperPaccPopup, setShowMarkSuperPaccPopup] = useState(false); // For Mark Present button confirmation popup
+  const [showMarkSuperPaccPopup , setShowMarkSuperPaccPopup] = useState(false); // For Mark Present button confirmation popup
   const [popupMessage, setPopupMessage] = useState(""); // To dynamically update popup messages
   const [popupColor, setPopupColor] = useState(""); // To dynamically update popup colors
   const [selectedRollNos, setSelectedRollNos] = useState([]); // To keep track of selected roll numbers
@@ -49,6 +49,8 @@ function Absentees() {
     setMarkPresentVisible(false);
     setmarksuperpacc(false);
     setMarkabsentButton(false);
+
+
     setErrorMessage("");
 
     if (
@@ -69,10 +71,12 @@ function Absentees() {
     }
   }, [yearOfStudy, branch, section, date]);
 
+  const backendURL = import.meta.env.VITE_BACKEND_URL; 
+
   // Fetch roll numbers when parameters change
   const fetchRollNumbers = async (year, branch, section, selectedDate) => {
     // Use exact parameter names that match the controller's expectations
-    const url = `http://localhost:5000/api/attendance/rollnumbers?yearOfStudy=${year}&branch=${branch}&section=${section}&date=${selectedDate}`;
+    const url = `${backendURL}/api/attendance/rollnumbers?yearOfStudy=${year}&branch=${branch}&section=${section}&date=${selectedDate}`;
 
     try {
       const response = await axios.get(url);
@@ -87,7 +91,7 @@ function Absentees() {
           setErrorMessage(data.message);
           setRollNumbers([]);
           setMarkPresentVisible(true);
-          setmarksuperpacc(year === "III");
+          setmarksuperpacc(year === "III" ||year=== "IV");
           return;
         }
 
@@ -175,15 +179,16 @@ function Absentees() {
       });
       setShowConfirmationPopup(false);
       setMarkPresentVisible(true);
-      setmarksuperpacc(yearOfStudy === "III");
+      setmarksuperpacc(yearOfStudy === "III" ||yearOfStudy==="IV");
 
-      return; // Early return to prevent further execution
+      return; // Early return to p
+      // revent further execution
     }
 
     try {
       // Make sure the server endpoint and data are correct
       const response = await axios.post(
-        "http://localhost:5000/api/attendance/absent",
+        `${backendURL}/api/attendance/absent`,
         {
           rollNumbers: selectedRollNos,
           date,
@@ -206,7 +211,7 @@ function Absentees() {
       setSelectedRollNos([]);
       await fetchRollNumbers(yearOfStudy, branch, section, date);
       setMarkPresentVisible(true);
-      setmarksuperpacc(yearOfStudy === "III");
+      setmarksuperpacc(yearOfStudy === "III" ||yearOfStudy==="IV" );
     } catch (error) {
       console.error("Error marking absentees:", error);
 
@@ -226,7 +231,7 @@ function Absentees() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/attendance/mark-remaining-present",
+        `${backendURL}/api/attendance/mark-remaining-present`,
         data
       );
 
@@ -266,7 +271,7 @@ function Absentees() {
     try {
       // Make the POST request to the backend API
       const response = await axios.post(
-        "http://localhost:5000/api/attendance/mark-SuperPacc",
+        `${backendURL}/api/attendance/mark-SuperPacc`,
         data
       );
 
@@ -492,7 +497,7 @@ function Absentees() {
           </button>
         )}
 
-        {yearOfStudy === "III" && markPresentVisible && marksuperpacc && (
+        {(yearOfStudy === "III" || yearOfStudy==="IV") && markPresentVisible && marksuperpacc && (
           <button
             onClick={() => {
               setShowMarkSuperPaccPopup(true);
@@ -598,3 +603,4 @@ function Absentees() {
 }
 
 export default Absentees;
+

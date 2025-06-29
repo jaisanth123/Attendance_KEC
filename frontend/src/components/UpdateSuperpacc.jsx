@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Database, AlertCircle, CheckCircle } from "lucide-react";
+const backendURL = import.meta.env.VITE_BACKEND_URL; 
 
 function UpdateSuperpacc() {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ function UpdateSuperpacc() {
     setErrorMessage("");
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/students/superpacc/status",
+        `${backendURL}/api/students/superpacc/status`,
         {
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -126,7 +127,7 @@ function UpdateSuperpacc() {
       }, {});
 
       const response = await axios.post(
-        "http://localhost:5000/api/students/superpacc/batch-update",
+        `${backendURL}/api/students/superpacc/batch-update`,
         {
           yearOfStudy,
           branch,
@@ -383,3 +384,4 @@ function UpdateSuperpacc() {
 }
 
 export default UpdateSuperpacc;
+

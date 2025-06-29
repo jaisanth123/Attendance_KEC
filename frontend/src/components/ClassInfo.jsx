@@ -31,8 +31,10 @@ const ClassInfo = () => {
     { yearOfStudy: "III", branch: "AIDS", section: "B" },
     { yearOfStudy: "III", branch: "AIML", section: "A" },
     { yearOfStudy: "III", branch: "AIML", section: "B" },
-    { yearOfStudy: "IV", branch: "AIDS", section: "-" },
-    { yearOfStudy: "IV", branch: "AIML", section: "-" },
+    { yearOfStudy: "IV", branch: "AIDS", section: "A" },
+    { yearOfStudy: "IV", branch: "AIDS", section: "B" },
+    { yearOfStudy: "IV", branch: "AIML", section: "A" },
+    { yearOfStudy: "IV", branch: "AIML", section: "B" },
   ];
 
   const fetchAttendanceData = async (course, date) => {
@@ -40,8 +42,9 @@ const ClassInfo = () => {
     setError("");
 
     try {
+      const backendURL = import.meta.env.VITE_BACKEND_URL; 
       const response = await axios.get(
-        `http://localhost:5000/api/attendance/getAttendanceStatusCount`,
+        `${backendURL}/api/attendance/getAttendanceStatusCount`,
         {
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -121,8 +124,8 @@ const ClassInfo = () => {
 
   return (
     <div className="container p-4 mx-auto">
-      <div className="flex justify-center items-center">
-        <div className="p-6 w-full max-w-sm text-white bg-gray-800 rounded-md shadow-lg">
+      <div className="flex items-center justify-center">
+        <div className="w-full max-w-sm p-6 text-white bg-gray-800 rounded-md shadow-lg">
           <form onSubmit={handleSubmit}>
             <div>
               <h2 className="mb-4 text-2xl font-semibold text-center">
@@ -139,21 +142,21 @@ const ClassInfo = () => {
                 id="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="block px-4 py-3 mt-1 w-full text-white bg-gray-700 rounded-md border-gray-600 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg"
+                className="block w-full px-4 py-3 mt-1 text-white bg-gray-700 border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg"
                 required
               />
             </div>
 
             <button
               type="submit"
-              className="px-4 py-2 mt-4 w-full text-white bg-blue-500 rounded-md duration-500 hover:scale-110 hover:bg-blue-600"
+              className="w-full px-4 py-2 mt-4 text-white duration-500 bg-blue-500 rounded-md hover:scale-110 hover:bg-blue-600"
               disabled={loading}
             >
               {loading ? "Loading..." : "Fetch Attendance Data"}
             </button>
             <button
               onClick={() => navigate("/homePage")}
-              className="px-4 py-2 mt-4 w-full font-bold text-white bg-gray-600 rounded-md shadow transition duration-500 hover:scale-105 hover:bg-gray-700"
+              className="w-full px-4 py-2 mt-4 font-bold text-white transition duration-500 bg-gray-600 rounded-md shadow hover:scale-105 hover:bg-gray-700"
             >
               Back
             </button>
@@ -164,7 +167,7 @@ const ClassInfo = () => {
       </div>
 
       {attendanceData.length > 0 && (
-        <div className="overflow-x-auto mt-6">
+        <div className="mt-6 overflow-x-auto">
           <table className="min-w-full text-sm text-left">
             <thead className="text-xl text-white uppercase bg-gray-800">
               <tr>
@@ -203,3 +206,4 @@ const ClassInfo = () => {
 };
 
 export default ClassInfo;
+

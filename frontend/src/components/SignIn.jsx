@@ -4,6 +4,7 @@ import axios from "axios"; // Import axios for API requests
 import { ToastContainer, toast } from "react-toastify"; // Import toastify
 import "react-toastify/dist/ReactToastify.css"; // Import toastify CSS
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
+const backendURL = import.meta.env.VITE_BACKEND_URL; 
 
 function SignIn() {
   const navigate = useNavigate();
@@ -29,17 +30,17 @@ function SignIn() {
       let response;
       if (role === "user") {
         response = await axios.post(
-          "http://localhost:5000/api/auth/login/user",
+          `${backendURL}/api/auth/login/user`,
           payload
         );
       } else if (role === "staff") {
         response = await axios.post(
-          "http://localhost:5000/api/auth/login/staff",
+          `${backendURL}/api/auth/login/staff`,
           payload
         );
       } else {
         response = await axios.post(
-          "http://localhost:5000/api/auth/login/admin",
+          `${backendURL}/api/auth/login/admin`,
           payload
         );
       }
@@ -178,5 +179,6 @@ function SignIn() {
     </div>
   );
 }
+
 
 export default SignIn;
