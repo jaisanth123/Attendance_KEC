@@ -28,3 +28,4 @@ const sendToken = (user, statusCode, res, message) => {
 };
 
 module.exports = { sendToken };
+

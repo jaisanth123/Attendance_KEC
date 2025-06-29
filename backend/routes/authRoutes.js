@@ -16,3 +16,4 @@ router.post("/login/staff", loginStaff);
 router.put("/admin/change-password", authenticateAdmin, changePassword);
 router.put("/user/change-password", authenticateUser, changePassword);
 module.exports = router;
+

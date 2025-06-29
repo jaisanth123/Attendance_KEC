@@ -6,3 +6,4 @@ const studentController = require('../controllers/uploadCSVController');
 router.post('/add-student', upload.single('csvfile'), studentController.addStudent);
 
 module.exports = router;
+

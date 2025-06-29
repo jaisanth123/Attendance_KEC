@@ -27,12 +27,12 @@ router.post(
 router.post("/mark-SuperPacc", attendanceController.markSuperPaccAttendance);
 router.post(
   "/mark-updatestatus",
-  authenticateAdmin,
+  
   attendanceController.updateAttendanceStatus
 );
 router.get(
   "/get-attendancestatus",
-  authenticateAdmin,
+  
   attendanceController.getAttendanceStates
 );
 router.get(
@@ -67,3 +67,4 @@ router.post(
 );
 
 module.exports = router;
+

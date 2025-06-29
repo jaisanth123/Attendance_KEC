@@ -17,7 +17,7 @@ const router = express.Router();
 router.get('/absentStudents', generateAbsentStudentsMessage);
 
 // Apply authenticateAdmin to all subsequent routes
-router.use(authenticateAdmin);
+// router.use(authenticateAdmin);
 
 // Route to generate custom absent students' message
 router.get('/absentStudentsCustom', handleCustomAbsentMessage);
@@ -36,3 +36,4 @@ router.get('/downloadreport/female', (req, res) => {
 router.get('/download-absent-report', handleCustomDownloadAbsentReport);
 
 module.exports = router;
+
