@@ -55,3 +55,4 @@ staffSchema.methods.getJWTToken = function () {
 };
 
 module.exports = mongoose.model("staff", staffSchema);
+
