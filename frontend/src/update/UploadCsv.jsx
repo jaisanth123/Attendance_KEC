@@ -6,6 +6,7 @@ function UploadCsv() {
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState(""); // 'success' or 'error'
+  const backendURL = import.meta.env.VITE_BACKEND_URL; 
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -30,7 +31,7 @@ function UploadCsv() {
     formData.append("csvfile", file);
 
     try {
-      const res = await fetch("http://localhost:5000/api/upload/add-student", {
+      const res = await fetch(`${backendURL}/api/upload/add-student`, {
         method: "POST",
         body: formData,
       });
@@ -100,3 +101,5 @@ function UploadCsv() {
 }
 
 export default UploadCsv;
+
+

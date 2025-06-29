@@ -13,6 +13,8 @@ import {
   Calendar,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+const backendURL = import.meta.env.VITE_BACKEND_URL; 
+
 
 export default function UpdateStudentData() {
   const navigate = useNavigate();
@@ -51,7 +53,7 @@ export default function UpdateStudentData() {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://localhost:5000/api/students/search/name?name=${encodeURIComponent(
+        `${backendURL}/api/students/search/name?name=${encodeURIComponent(
           name
         )}`
       );
@@ -84,7 +86,7 @@ export default function UpdateStudentData() {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://localhost:5000/api/students/search/rollno?rollNo=${encodeURIComponent(
+        `${backendURL}/api/students/search/rollno?rollNo=${encodeURIComponent(
           rollNo
         )}`
       );
@@ -112,7 +114,7 @@ export default function UpdateStudentData() {
       const upperCase = rollNo.toUpperCase();
       setIsLoading(true);
       const response = await fetch(
-        `http://localhost:5000/api/students/search/${encodeURIComponent(
+        `${backendURL}/api/students/search/${encodeURIComponent(
           upperCase
         )}`
       );
@@ -209,7 +211,7 @@ export default function UpdateStudentData() {
 
     try {
       setIsLoading(true);
-      const url = `http://localhost:5000/api/students/update-student-data/${encodeURIComponent(
+      const url = `${backendURL}/api/students/update-student-data/${encodeURIComponent(
         selectedStudent.rollNo
       )}`;
 
@@ -267,7 +269,7 @@ export default function UpdateStudentData() {
     try {
       setDeleteLoading(true);
       const response = await fetch(
-        `http://localhost:5000/api/students/delete/${encodeURIComponent(
+        `${backendURL}/api/students/delete/${encodeURIComponent(
           selectedStudent.rollNo
         )}`,
         {
@@ -864,3 +866,5 @@ export default function UpdateStudentData() {
     </div>
   );
 }
+
+

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Calendar, Users, Database, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+const backendURL = import.meta.env.VITE_BACKEND_URL; 
+
 
 function UpdateYear() {
   const navigate = useNavigate();
@@ -20,7 +22,7 @@ function UpdateYear() {
     }
 
     try {
-      const res = await fetch(`${apiBase}/api/students/update-year`, {
+      const res = await fetch(`${backendURL}/api/students/update-year`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fromYear, toYear }),
@@ -165,3 +167,5 @@ function UpdateYear() {
 }
 
 export default UpdateYear;
+
+

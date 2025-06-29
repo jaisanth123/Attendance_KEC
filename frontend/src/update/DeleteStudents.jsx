@@ -9,6 +9,7 @@ import {
   Loader,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+const backendURL = import.meta.env.VITE_BACKEND_URL; 
 
 function DeleteStudents() {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ function DeleteStudents() {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `${apiBase}/api/students/search/rollno?rollNo=${encodeURIComponent(
+        `${backendURL}/api/students/search/rollno?rollNo=${encodeURIComponent(
           rollNo
         )}`
       );
@@ -87,7 +88,7 @@ function DeleteStudents() {
     }
 
     try {
-      const res = await fetch(`${apiBase}/api/delete-students/students`, {
+      const res = await fetch(`${backendURL}/api/delete-students/students`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ yearOfStudy, branch, section }),
@@ -114,7 +115,7 @@ function DeleteStudents() {
 
     try {
       const res = await fetch(
-        `${apiBase}/api/delete-students/student/${rollNo}`,
+        `${backendURL}/api/delete-students/student/${rollNo}`,
         {
           method: "DELETE",
         }
@@ -366,3 +367,5 @@ function DeleteStudents() {
 }
 
 export default DeleteStudents;
+
+

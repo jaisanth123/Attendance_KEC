@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+const backendURL = import.meta.env.VITE_BACKEND_URL; 
 
 // Reusing the same ActionCard component
 const ActionCard = ({ label, onClick }) => (
@@ -52,3 +53,4 @@ function Update() {
 }
 
 export default Update;
+

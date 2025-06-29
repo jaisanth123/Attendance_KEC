@@ -8,6 +8,7 @@ import {
   Upload,
 } from "lucide-react";
 import UploadCsv from "./UploadCsv";
+const backendURL = import.meta.env.VITE_BACKEND_URL; 
 
 function AddStudent() {
   const [isIndividualForm, setIsIndividualForm] = useState(true);
@@ -50,7 +51,7 @@ function AddStudent() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/students/create",
+        `${backendURL}/api/students/create`,
         formDataToSubmit
       );
       if (response.data.success) {
@@ -381,3 +382,4 @@ function AddStudent() {
 }
 
 export default AddStudent;
+

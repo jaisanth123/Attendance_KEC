@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+const backendURL = import.meta.env.VITE_BACKEND_URL; 
 
 const ChangePasswordForm = () => {
   const userType = "user";
@@ -60,8 +61,8 @@ const ChangePasswordForm = () => {
       // Set the endpoint based on the user type
       const endpoint =
         userType === "admin"
-          ? "http://localhost:5000/api/auth/admin/change-password"
-          : "http://localhost:5000/api/auth/user/change-password";
+          ? `${backendURL}/api/auth/admin/change-password`
+          : `${backendURL}/api/auth/user/change-password`;
 
       // Get token from localStorage
       const token = sessionStorage.getItem("authToken");
@@ -313,3 +314,5 @@ const EyeOffIcon = ({ className }) => (
 );
 
 export default ChangePasswordForm;
+
+
