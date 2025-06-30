@@ -71,7 +71,7 @@ function Absentees() {
     }
   }, [yearOfStudy, branch, section, date]);
 
-  const backendURL = import.meta.env.VITE_BACKEND_URL; 
+  const backendURL = import.meta.env.VITE_BACKEND_URL;
 
   // Fetch roll numbers when parameters change
   const fetchRollNumbers = async (year, branch, section, selectedDate) => {

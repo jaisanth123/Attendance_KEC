@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/userSchema");
-const Admin = require("../models/adminSchema");
+const User = require("./models/userSchema");
+const Admin = require("./models/adminSchema");
 
 // Common function to check token and user role
 const verifyTokenAndRole = async (authToken, roleType) => {
@@ -109,3 +109,4 @@ const authenticateStaff = async (req, res, next) => {
 };
 
 module.exports = { authenticateUser, authenticateAdmin, authenticateStaff };
+

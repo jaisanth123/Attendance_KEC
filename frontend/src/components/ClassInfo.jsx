@@ -5,7 +5,9 @@ import { useNavigate } from "react-router-dom";
 
 const ClassInfo = () => {
   const [attendanceData, setAttendanceData] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [classesLoading, setClassesLoading] = useState(true);
   const [error, setError] = useState("");
 
   const authToken = sessionStorage.getItem("authToken");
@@ -21,28 +23,41 @@ const ClassInfo = () => {
     return null;
   }
 
-  const courses = [
-    { yearOfStudy: "II", branch: "AIDS", section: "A" },
-    { yearOfStudy: "II", branch: "AIDS", section: "B" },
-    { yearOfStudy: "II", branch: "AIDS", section: "C" },
-    { yearOfStudy: "II", branch: "AIML", section: "A" },
-    { yearOfStudy: "II", branch: "AIML", section: "B" },
-    { yearOfStudy: "III", branch: "AIDS", section: "A" },
-    { yearOfStudy: "III", branch: "AIDS", section: "B" },
-    { yearOfStudy: "III", branch: "AIML", section: "A" },
-    { yearOfStudy: "III", branch: "AIML", section: "B" },
-    { yearOfStudy: "IV", branch: "AIDS", section: "A" },
-    { yearOfStudy: "IV", branch: "AIDS", section: "B" },
-    { yearOfStudy: "IV", branch: "AIML", section: "A" },
-    { yearOfStudy: "IV", branch: "AIML", section: "B" },
-  ];
+  // Fetch distinct classes from backend
+  const fetchDistinctClasses = async () => {
+    setClassesLoading(true);
+    try {
+      const backendURL = import.meta.env.VITE_BACKEND_URL;
+      const response = await axios.get(
+        `${backendURL}/api/attendance/distinct-classes`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        setCourses(response.data.classes);
+        console.log("Fetched distinct classes:", response.data.classes);
+      } else {
+        setError("Failed to fetch class information");
+      }
+    } catch (err) {
+      console.error("Error fetching distinct classes:", err);
+      setError("Error fetching class information");
+      toast.error("Failed to load class information", { autoClose: 800 });
+    } finally {
+      setClassesLoading(false);
+    }
+  };
 
   const fetchAttendanceData = async (course, date) => {
     setLoading(true);
     setError("");
 
     try {
-      const backendURL = import.meta.env.VITE_BACKEND_URL; 
+      const backendURL = import.meta.env.VITE_BACKEND_URL;
       const response = await axios.get(
         `${backendURL}/api/attendance/getAttendanceStatusCount`,
         {
@@ -60,7 +75,9 @@ const ClassInfo = () => {
       return response.data;
     } catch (err) {
       setError(
-        `Error fetching attendance data: ${err.response?.data?.message || err.message}`
+        `Error fetching attendance data: ${
+          err.response?.data?.message || err.message
+        }`
       );
       console.error("API Error: ", err);
       return null;
@@ -71,22 +88,28 @@ const ClassInfo = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (date) {
-      setAttendanceData([]);
-      setLoading(true);
-
-      try {
-        const allAttendanceData = await Promise.all(
-          courses.map((course) => fetchAttendanceData(course, date))
-        );
-        setAttendanceData(allAttendanceData.filter((data) => data !== null));
-      } catch (err) {
-        setError("Error fetching attendance data for some classes.");
-      } finally {
-        setLoading(false);
-      }
-    } else {
+    if (!date) {
       setError("Please select a date.");
+      return;
+    }
+
+    if (courses.length === 0) {
+      setError("Class information is not loaded yet. Please wait.");
+      return;
+    }
+
+    setAttendanceData([]);
+    setLoading(true);
+
+    try {
+      const allAttendanceData = await Promise.all(
+        courses.map((course) => fetchAttendanceData(course, date))
+      );
+      setAttendanceData(allAttendanceData.filter((data) => data !== null));
+    } catch (err) {
+      setError("Error fetching attendance data for some classes.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -107,8 +130,15 @@ const ClassInfo = () => {
   };
 
   useEffect(() => {
-    fetchData(date);
+    fetchDistinctClasses();
   }, []);
+
+  // Fetch attendance data when courses are loaded
+  useEffect(() => {
+    if (courses.length > 0) {
+      fetchData(date);
+    }
+  }, [courses]);
 
   const navigate = useNavigate();
 
@@ -124,8 +154,8 @@ const ClassInfo = () => {
 
   return (
     <div className="container p-4 mx-auto">
-      <div className="flex items-center justify-center">
-        <div className="w-full max-w-sm p-6 text-white bg-gray-800 rounded-md shadow-lg">
+      <div className="flex justify-center items-center">
+        <div className="p-6 w-full max-w-sm text-white bg-gray-800 rounded-md shadow-lg">
           <form onSubmit={handleSubmit}>
             <div>
               <h2 className="mb-4 text-2xl font-semibold text-center">
@@ -142,21 +172,25 @@ const ClassInfo = () => {
                 id="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="block w-full px-4 py-3 mt-1 text-white bg-gray-700 border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg"
+                className="block px-4 py-3 mt-1 w-full text-white bg-gray-700 rounded-md border-gray-600 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg"
                 required
               />
             </div>
 
             <button
               type="submit"
-              className="w-full px-4 py-2 mt-4 text-white duration-500 bg-blue-500 rounded-md hover:scale-110 hover:bg-blue-600"
-              disabled={loading}
+              className="px-4 py-2 mt-4 w-full text-white bg-blue-500 rounded-md duration-500 hover:scale-110 hover:bg-blue-600"
+              disabled={loading || classesLoading}
             >
-              {loading ? "Loading..." : "Fetch Attendance Data"}
+              {classesLoading
+                ? "Loading Classes..."
+                : loading
+                ? "Loading..."
+                : "Fetch Attendance Data"}
             </button>
             <button
               onClick={() => navigate("/homePage")}
-              className="w-full px-4 py-2 mt-4 font-bold text-white transition duration-500 bg-gray-600 rounded-md shadow hover:scale-105 hover:bg-gray-700"
+              className="px-4 py-2 mt-4 w-full font-bold text-white bg-gray-600 rounded-md shadow transition duration-500 hover:scale-105 hover:bg-gray-700"
             >
               Back
             </button>
@@ -167,7 +201,7 @@ const ClassInfo = () => {
       </div>
 
       {attendanceData.length > 0 && (
-        <div className="mt-6 overflow-x-auto">
+        <div className="overflow-x-auto mt-6">
           <table className="min-w-full text-sm text-left">
             <thead className="text-xl text-white uppercase bg-gray-800">
               <tr>
@@ -206,4 +240,3 @@ const ClassInfo = () => {
 };
 
 export default ClassInfo;
-
