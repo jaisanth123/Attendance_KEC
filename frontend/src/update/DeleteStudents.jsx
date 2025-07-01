@@ -9,7 +9,7 @@ import {
   Loader,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-const backendURL = import.meta.env.VITE_BACKEND_URL; 
+const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 function DeleteStudents() {
   const navigate = useNavigate();
@@ -132,10 +132,10 @@ function DeleteStudents() {
   };
 
   return (
-    <div className="min-h-screen px-4 py-8 bg-gray-100">
-      <div className="max-w-5xl mx-auto">
+    <div className="px-4 py-8 min-h-screen bg-gray-100">
+      <div className="mx-auto max-w-5xl">
         {/* Navigation Toggle */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex justify-between items-center mb-6">
           <div className="flex items-center space-x-2">
             <button
               onClick={() => navigate("/update-data")}
@@ -162,23 +162,21 @@ function DeleteStudents() {
         </div>
 
         {/* Header Section */}
-        <div className="px-6 py-6 mb-8 text-white shadow-lg rounded-xl bg-slate-800">
-          <h1 className="flex items-center text-3xl font-bold">
-            <Trash2 className="mr-3" size={30} />
-            Delete Students
+        <div className="px-4 py-4 mb-6 text-white rounded-xl shadow-lg sm:px-6 sm:py-6 sm:mb-8 bg-slate-800">
+          <h1 className="flex items-center text-xl font-bold sm:text-2xl md:text-3xl lg:text-4xl">
+            <Trash2 className="mr-2 sm:mr-3" size={24} />
+            <span className="sm:hidden">Delete Students</span>
+            <span className="hidden sm:inline">Delete Students</span>
           </h1>
-          <p className="mt-2 text-slate-300">
-            Remove individual students or bulk delete by class
-          </p>
         </div>
 
         {/* Main Content */}
         <div className=" bg-white shadow-md rounded-xl min-h-[400px]">
           {/* Toggle Controls */}
           <div className="px-6 py-6 border-b border-gray-200">
-            <div className="flex flex-wrap items-center gap-4 mb-6">
+            <div className="flex flex-wrap gap-4 items-center mb-6">
               <span className="font-medium text-gray-700">Delete Mode:</span>
-              <div className="flex overflow-hidden border border-gray-300 rounded-md">
+              <div className="flex overflow-hidden rounded-md border border-gray-300">
                 <button
                   type="button"
                   onClick={() => {
@@ -189,11 +187,11 @@ function DeleteStudents() {
                   }}
                   className={`px-4 py-2 ${
                     isBulkMode
-                      ? "bg-slate-800 text-white"
-                      : "bg-white text-gray-700 hover:bg-gray-50"
+                      ? "text-white bg-slate-800"
+                      : "text-gray-700 bg-white hover:bg-gray-50"
                   }`}
                 >
-                  <Users className="inline-block w-4 h-4 mr-2" />
+                  <Users className="inline-block mr-2 w-4 h-4" />
                   Bulk Delete
                 </button>
                 <button
@@ -206,11 +204,11 @@ function DeleteStudents() {
                   }}
                   className={`px-4 py-2 ${
                     !isBulkMode
-                      ? "bg-slate-800 text-white"
-                      : "bg-white text-gray-700 hover:bg-gray-50"
+                      ? "text-white bg-slate-800"
+                      : "text-gray-700 bg-white hover:bg-gray-50"
                   }`}
                 >
-                  <User className="inline-block w-4 h-4 mr-2" />
+                  <User className="inline-block mr-2 w-4 h-4" />
                   Single Delete
                 </button>
               </div>
@@ -227,7 +225,7 @@ function DeleteStudents() {
               }`}
             >
               <div className="flex items-center">
-                <AlertCircle className="w-5 h-5 mr-2" />
+                <AlertCircle className="mr-2 w-5 h-5" />
                 <p>{message.text}</p>
               </div>
             </div>
@@ -245,7 +243,7 @@ function DeleteStudents() {
                     <select
                       value={yearOfStudy}
                       onChange={(e) => setYearOfStudy(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
+                      className="px-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
                     >
                       <option value="">Select Year</option>
                       <option value="I">I</option>
@@ -262,7 +260,7 @@ function DeleteStudents() {
                     <select
                       value={branch}
                       onChange={(e) => setBranch(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
+                      className="px-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
                     >
                       <option value="">Select Branch</option>
                       <option value="AIDS">AI & DS</option>
@@ -277,7 +275,7 @@ function DeleteStudents() {
                     <select
                       value={section}
                       onChange={(e) => setSection(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
+                      className="px-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
                     >
                       <option value="">Select Section</option>
                       <option value="A">A</option>
@@ -298,7 +296,7 @@ function DeleteStudents() {
                         : "bg-red-600 hover:bg-red-700"
                     }`}
                   >
-                    <Trash2 className="inline-block w-4 h-4 mr-2" />
+                    <Trash2 className="inline-block mr-2 w-4 h-4" />
                     Delete Students
                   </button>
                 </div>
@@ -314,7 +312,7 @@ function DeleteStudents() {
                     value={rollNo}
                     onChange={handleRollNoChange}
                     placeholder="Enter Roll Number"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
+                    className="px-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
                   />
                 </div>
                 {/* Roll number search dropdown - full width of card */}
@@ -353,7 +351,7 @@ function DeleteStudents() {
                         : "bg-red-600 hover:bg-red-700"
                     }`}
                   >
-                    <Trash2 className="inline-block w-4 h-4 mr-2" />
+                    <Trash2 className="inline-block mr-2 w-4 h-4" />
                     Delete Student
                   </button>
                 </div>
@@ -367,5 +365,3 @@ function DeleteStudents() {
 }
 
 export default DeleteStudents;
-
-

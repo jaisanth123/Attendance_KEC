@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Calendar, Users, Database, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-const backendURL = import.meta.env.VITE_BACKEND_URL; 
-
+const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 function UpdateYear() {
   const navigate = useNavigate();
@@ -50,10 +49,10 @@ function UpdateYear() {
   };
 
   return (
-    <div className="min-h-screen px-4 py-8 bg-gray-100">
-      <div className="max-w-5xl mx-auto">
+    <div className="px-4 py-8 min-h-screen bg-gray-100">
+      <div className="mx-auto max-w-5xl">
         {/* Navigation Toggle */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex justify-between items-center mb-6">
           <div className="flex items-center space-x-2">
             <button
               onClick={() => navigate("/update-data")}
@@ -80,18 +79,16 @@ function UpdateYear() {
         </div>
 
         {/* Header Section */}
-        <div className="px-6 py-6 mb-8 text-white shadow-lg rounded-xl bg-slate-800">
-          <h1 className="flex items-center text-3xl font-bold">
-            <Calendar className="mr-3" size={30} />
-            Update Student Year
+        <div className="px-6 py-6 mb-8 text-white rounded-xl shadow-lg bg-slate-800">
+          <h1 className="flex items-center text-xl font-bold sm:text-2xl md:text-3xl lg:text-4xl">
+            <Calendar className="mr-2 sm:mr-3" size={24} />
+            <span className="sm:hidden">Update Year</span>
+            <span className="hidden sm:inline">Update Year</span>
           </h1>
-          <p className="mt-2 text-slate-300">
-            Update student year of study for a batch of students
-          </p>
         </div>
 
         {/* Main Content */}
-        <div className="overflow-hidden bg-white shadow-md rounded-xl">
+        <div className="overflow-hidden bg-white rounded-xl shadow-md">
           {/* Form Section */}
           <div className="p-6">
             <div className="space-y-6">
@@ -103,7 +100,7 @@ function UpdateYear() {
                   <select
                     value={fromYear}
                     onChange={(e) => setFromYear(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
+                    className="px-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
                   >
                     <option value="">Select Year</option>
                     <option value="I">I</option>
@@ -120,7 +117,7 @@ function UpdateYear() {
                   <select
                     value={toYear}
                     onChange={(e) => setToYear(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
+                    className="px-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
                   >
                     <option value="">Select Year</option>
                     <option value="I">I</option>
@@ -154,7 +151,7 @@ function UpdateYear() {
                       : "bg-slate-800 hover:bg-slate-700"
                   }`}
                 >
-                  <Calendar className="inline-block w-4 h-4 mr-2" />
+                  <Calendar className="inline-block mr-2 w-4 h-4" />
                   Update Year
                 </button>
               </div>
@@ -167,5 +164,3 @@ function UpdateYear() {
 }
 
 export default UpdateYear;
-
-
