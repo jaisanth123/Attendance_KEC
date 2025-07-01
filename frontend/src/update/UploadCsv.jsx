@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Upload, AlertCircle, CheckCircle } from "lucide-react";
+import { Upload, AlertCircle, CheckCircle, Download } from "lucide-react";
 
 function UploadCsv() {
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState(""); // 'success' or 'error'
-  const backendURL = import.meta.env.VITE_BACKEND_URL; 
+  const backendURL = import.meta.env.VITE_BACKEND_URL;
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -47,15 +47,32 @@ function UploadCsv() {
     }
   };
 
+  const handleDownloadMockData = () => {
+    // Create a mock CSV data
+    const mockData =
+      "rollNo,name,yearOfStudy,branch,section\n21PA1A0501,John Doe,II,AIDS,A\n21PA1A0502,Jane Smith,II,AIDS,A\n21PA1A0503,Bob Johnson,II,AIDS,A";
+
+    // Create blob and download
+    const blob = new Blob([mockData], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "mock_student_data.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="flex flex-col">
       <div
-        className="flex items-center justify-center w-full h-32 transition-colors border-2 border-dashed rounded-lg cursor-pointer border-slate-300 hover:border-slate-400 bg-slate-50 group"
+        className="flex justify-center items-center w-full h-32 rounded-lg border-2 border-dashed transition-colors cursor-pointer border-slate-300 hover:border-slate-400 bg-slate-50 group"
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
       >
-        <label className="flex flex-col items-center justify-center w-full h-full transition-colors cursor-pointer group-hover:bg-slate-100">
-          <Upload className="w-8 h-8 mb-2 text-slate-400 group-hover:text-slate-500" />
+        <label className="flex flex-col justify-center items-center w-full h-full transition-colors cursor-pointer group-hover:bg-slate-100">
+          <Upload className="mb-2 w-8 h-8 text-slate-400 group-hover:text-slate-500" />
           <span className="text-sm text-slate-600">
             {file ? file.name : "Drag & Drop CSV or Click to Select"}
           </span>
@@ -68,17 +85,27 @@ function UploadCsv() {
         </label>
       </div>
 
-      <button
-        onClick={handleSubmit}
-        disabled={!file || isUploading}
-        className={`mt-4 px-4 py-2 rounded-md text-sm text-white transition-colors ${
-          !file || isUploading
-            ? "bg-slate-400 cursor-not-allowed"
-            : "bg-slate-800 hover:bg-slate-700 shadow-sm"
-        }`}
-      >
-        {isUploading ? "Uploading..." : "Upload CSV"}
-      </button>
+      <div className="flex gap-3 mt-4">
+        <button
+          onClick={handleSubmit}
+          disabled={!file || isUploading}
+          className={`flex-1 px-4 py-2 rounded-md text-sm text-white transition-colors ${
+            !file || isUploading
+              ? "bg-slate-400 cursor-not-allowed"
+              : "bg-slate-800 hover:bg-slate-700 shadow-sm"
+          }`}
+        >
+          {isUploading ? "Uploading..." : "Upload CSV"}
+        </button>
+
+        <button
+          onClick={handleDownloadMockData}
+          className="flex items-center px-4 py-2 text-sm text-white rounded-md transition-colors bg-slate-600 hover:bg-slate-500"
+        >
+          <Download className="mr-2 w-4 h-4" />
+          Mock Data
+        </button>
+      </div>
 
       {message && (
         <div
@@ -89,9 +116,9 @@ function UploadCsv() {
           }`}
         >
           {messageType === "success" ? (
-            <CheckCircle className="w-4 h-4 mr-2" />
+            <CheckCircle className="mr-2 w-4 h-4" />
           ) : (
-            <AlertCircle className="w-4 h-4 mr-2" />
+            <AlertCircle className="mr-2 w-4 h-4" />
           )}
           <p className="text-sm">{message}</p>
         </div>
@@ -101,5 +128,3 @@ function UploadCsv() {
 }
 
 export default UploadCsv;
-
-
