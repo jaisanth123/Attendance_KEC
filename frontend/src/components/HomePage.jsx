@@ -86,6 +86,10 @@ function HomePage({ toggleSidebar }) {
                 label="Information Status"
                 onClick={() => navigate("/info-status")}
               />
+              <ActionCard
+                label="HodInfo"
+                onClick={() => navigate("/hodinfo")}
+              />
             </>
           )}
         </div>

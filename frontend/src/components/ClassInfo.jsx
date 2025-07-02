@@ -29,7 +29,7 @@ const ClassInfo = () => {
     try {
       const backendURL = import.meta.env.VITE_BACKEND_URL;
       const response = await axios.get(
-        `${backendURL}/api/attendance/distinct-classes`,
+        `${backendURL}/api/students/distinct-classes`,
         {
           headers: {
             Authorization: `Bearer ${authToken}`,

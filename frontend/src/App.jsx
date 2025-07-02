@@ -35,6 +35,7 @@ import Attendace from "./components/Attendace";
 import UploadCsv from "./update/UploadCsv"; // Import the UploadCsv component
 import DeleteStudents from "./update/DeleteStudents"; // Import the DeleteStudents component
 import UpdateYear from "./update/UpdateYear";
+import Hodinfo from "./components/Hodinfo";
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -95,7 +96,7 @@ function App() {
         {/* Sidebar Overlay for Mobile */}
         {isSidebarOpen && (
           <div
-            className="fixed inset-0 transition-opacity duration-300 bg-black opacity-50 md:hidden"
+            className="fixed inset-0 bg-black opacity-50 transition-opacity duration-300 md:hidden"
             onClick={() => setIsSidebarOpen(false)}
             aria-label="Close Sidebar"
           ></div>
@@ -156,6 +157,7 @@ function App() {
               <Route path="/update" element={<Update />} />
               <Route path="/update-superpacc" element={<UpdateSuperPacc />} />
               <Route path="/update-year" element={<UpdateYear />} />
+              <Route path="/hodinfo" element={<Hodinfo />} />
             </Route>
 
             {/* Catch all unmatched routes */}
@@ -181,5 +183,3 @@ function App() {
 }
 
 export default App;
-
-

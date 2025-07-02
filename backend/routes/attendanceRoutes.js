@@ -11,7 +11,6 @@ const multer = require("multer");
 //console.log('attendanceRoutes.js loaded');  // Log to confirm if file is being loaded
 
 // Route to get distinct classes (yearOfStudy, branch, section combinations)
-router.get("/distinct-classes", attendanceController.getDistinctClasses);
 
 // Route to mark students as "On Duty"
 router.post("/onDuty", attendanceController.markOnDuty);

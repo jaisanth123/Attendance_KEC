@@ -23,8 +23,10 @@ router.get("/superpacc/status", studentController.getStudentsBySuperPacc);
 router.put(
   "/superpacc/update/:rollNo",
   studentController.updateSuperPaccStatus
+
 );
 
+router.get("/distinct-classes", studentController.getDistinctClasses);
 // Add the batch update route
 router.post("/superpacc/batch-update", studentController.batchUpdateSuperPacc);
 

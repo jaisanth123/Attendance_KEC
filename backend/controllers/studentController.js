@@ -686,4 +686,82 @@ exports.searchStudentsByRollNo = async (req, res) => {
     });
   }
 };
-  
+  exports.getDistinctClasses = async (req, res) => {
+  try {
+    // Use MongoDB aggregation to get distinct combinations of yearOfStudy, branch, and section
+    const distinctClasses = await Student.aggregate([
+      {
+        // Filter out placeholder values and null/undefined values
+        $match: {
+          yearOfStudy: {
+            $exists: true,
+            $ne: null,
+            $ne: "",
+            $ne: "yearOfStudy", // Filter out placeholder value
+          },
+          branch: {
+            $exists: true,
+            $ne: null,
+            $ne: "",
+            $ne: "branch", // Filter out placeholder value
+          },
+          section: {
+            $exists: true,
+            $ne: null,
+            $ne: "",
+            $ne: "section", // Filter out placeholder value
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            yearOfStudy: "$yearOfStudy",
+            branch: "$branch",
+            section: "$section",
+          },
+          count: { $sum: 1 }, // Count of students in each class
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          yearOfStudy: "$_id.yearOfStudy",
+          branch: "$_id.branch",
+          section: "$_id.section",
+          studentCount: "$count",
+        },
+      },
+      {
+        $sort: {
+          yearOfStudy: 1,
+          branch: 1,
+          section: 1,
+        },
+      },
+    ]);
+
+    console.log("Distinct Classes Found:", distinctClasses);
+
+    if (distinctClasses.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No classes found in the database",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Distinct classes retrieved successfully",
+      classes: distinctClasses,
+      totalClasses: distinctClasses.length,
+    });
+  } catch (error) {
+    console.error("Error retrieving distinct classes:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while retrieving distinct classes",
+      error: error.message,
+    });
+  }
+};
