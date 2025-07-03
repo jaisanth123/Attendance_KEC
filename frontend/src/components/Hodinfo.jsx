@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BsChevronDown, BsChevronUp } from "react-icons/bs";
 import { toast } from "react-toastify";
+import StudentDetailCard from "./StudentDetailCard";
 
 const Hodinfo = () => {
   const [courses, setCourses] = useState([]); // Distinct classes
@@ -11,6 +12,8 @@ const Hodinfo = () => {
   const [classesLoading, setClassesLoading] = useState(true);
   const [error, setError] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // Add date state
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [isDetailCardOpen, setIsDetailCardOpen] = useState(false);
 
   const authToken = sessionStorage.getItem("authToken");
 
@@ -135,6 +138,21 @@ const Hodinfo = () => {
     }
   };
 
+  const handleStudentClick = (student, course) => {
+    setSelectedStudent({
+      ...student,
+      yearOfStudy: course.yearOfStudy,
+      branch: course.branch,
+      section: course.section,
+    });
+    setIsDetailCardOpen(true);
+  };
+
+  const closeDetailCard = () => {
+    setIsDetailCardOpen(false);
+    setSelectedStudent(null);
+  };
+
   return (
     <div className="flex flex-col items-center p-4 min-h-screen bg-gray-50">
       {/* Main HOD Information Box */}
@@ -207,7 +225,10 @@ const Hodinfo = () => {
                           {absentees[idx].map((student, i) => (
                             <div
                               key={i}
-                              className="flex justify-center items-center p-2 text-lg font-semibold text-white bg-red-600 rounded-lg shadow-md transition-all duration-500 transform hover:scale-110"
+                              onClick={() =>
+                                handleStudentClick(student, course)
+                              }
+                              className="flex justify-center items-center p-2 text-lg font-semibold text-white bg-red-600 rounded-lg shadow-md transition-all duration-500 transform cursor-pointer hover:scale-110"
                             >
                               <div className="text-center">
                                 <div className="font-bold">
@@ -232,6 +253,13 @@ const Hodinfo = () => {
         </div>
         {error && <p className="mt-4 text-center text-red-500">{error}</p>}
       </div>
+
+      {/* Student Detail Card */}
+      <StudentDetailCard
+        student={selectedStudent}
+        isOpen={isDetailCardOpen}
+        onClose={closeDetailCard}
+      />
     </div>
   );
 };
