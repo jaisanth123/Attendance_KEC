@@ -234,12 +234,24 @@ const Hodinfo = () => {
                   <div className="text-lg font-semibold text-gray-800">
                     {course.yearOfStudy} - {course.branch} - {course.section}
                   </div>
-                  <div className="ml-4">
-                    {expandedIndex === idx ? (
-                      <BsChevronUp className="w-6 h-6 text-gray-600" />
-                    ) : (
-                      <BsChevronDown className="w-6 h-6 text-gray-600" />
+                  <div className="flex gap-3 items-center">
+                    {absentees[idx] && (
+                      <div className="flex gap-1 items-center">
+                        <span className="text-sm font-medium text-gray-600">
+                          Absentees:
+                        </span>
+                        <span className="px-2 py-1 text-sm font-bold text-white bg-red-600 rounded-full min-w-[24px] text-center">
+                          {absentees[idx].length}
+                        </span>
+                      </div>
                     )}
+                    <div>
+                      {expandedIndex === idx ? (
+                        <BsChevronUp className="w-6 h-6 text-gray-600" />
+                      ) : (
+                        <BsChevronDown className="w-6 h-6 text-gray-600" />
+                      )}
+                    </div>
                   </div>
                 </div>
                 {expandedIndex === idx && (
