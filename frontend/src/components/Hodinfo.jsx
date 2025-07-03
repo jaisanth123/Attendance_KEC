@@ -10,6 +10,7 @@ const Hodinfo = () => {
   const [loadingAbsentees, setLoadingAbsentees] = useState({}); // {index: boolean}
   const [classesLoading, setClassesLoading] = useState(true);
   const [error, setError] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // Add date state
 
   const authToken = sessionStorage.getItem("authToken");
 
@@ -19,6 +20,14 @@ const Hodinfo = () => {
     });
     return null;
   }
+
+  const formatDate = (dateString) => {
+    const dateObj = new Date(dateString);
+    const day = String(dateObj.getDate()).padStart(2, "0");
+    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const year = dateObj.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
 
   // Fetch distinct classes from backend
   const fetchDistinctClasses = async () => {
@@ -48,27 +57,54 @@ const Hodinfo = () => {
     }
   };
 
-  // Fetch absentees for a class
+  // Fetch absentees for a class using the same endpoint as DutyPage
   const fetchAbsentees = async (course, idx) => {
     setLoadingAbsentees((prev) => ({ ...prev, [idx]: true }));
     try {
       const backendURL = import.meta.env.VITE_BACKEND_URL;
-      const response = await axios.get(
-        `${backendURL}/api/attendance/absentees-by-class`,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-          params: {
-            yearOfStudy: course.yearOfStudy,
-            branch: course.branch,
-            section: course.section,
-          },
-        }
-      );
+      const url = `${backendURL}/api/students/remaining?yearOfStudy=${course.yearOfStudy}&branch=${course.branch}&section=${course.section}&date=${date}`;
+
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      const { students, totalStudents } = response.data;
+      const formattedDate = formatDate(date);
+
+      if (totalStudents === 0) {
+        setAbsentees((prev) => ({
+          ...prev,
+          [idx]: [],
+        }));
+        toast.info(
+          `No record found for ${course.yearOfStudy} - ${course.branch} - ${course.section}.`,
+          {
+            autoClose: 800,
+          }
+        );
+        return;
+      }
+
+      if (students.length === 0) {
+        setAbsentees((prev) => ({
+          ...prev,
+          [idx]: [],
+        }));
+        toast.info(
+          `For ${course.yearOfStudy} - ${course.branch} - ${course.section}, students attendance for ${formattedDate} has already been marked.`,
+          { autoClose: 800 }
+        );
+        return;
+      }
+
       setAbsentees((prev) => ({
         ...prev,
-        [idx]: response.data.absentees || [],
+        [idx]: students.map((student) => ({
+          rollNo: student.rollNo,
+          name: student.name,
+        })),
       }));
     } catch (err) {
       setAbsentees((prev) => ({ ...prev, [idx]: [] }));
@@ -81,6 +117,12 @@ const Hodinfo = () => {
   useEffect(() => {
     fetchDistinctClasses();
   }, []);
+
+  // Clear absentees when date changes
+  useEffect(() => {
+    setAbsentees({});
+    setExpandedIndex(null);
+  }, [date]);
 
   const handleExpand = (idx, course) => {
     if (expandedIndex === idx) {
@@ -99,6 +141,26 @@ const Hodinfo = () => {
         <h1 className="mb-6 text-3xl font-bold text-center text-white">
           HOD Information
         </h1>
+
+        {/* Date Selection */}
+        <div className="flex justify-center items-center pb-5 mb-6">
+          <div className="w-full max-w-sm">
+            <label
+              htmlFor="date"
+              className="block mb-2 text-lg font-medium text-center text-white"
+            >
+              Select Date:
+            </label>
+            <input
+              type="date"
+              id="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="px-4 py-2 w-full text-black bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-gray-600"
+            />
+          </div>
+        </div>
+
         <div className="bg-white rounded-lg divide-y divide-gray-200 shadow">
           {classesLoading ? (
             <div className="p-8 text-lg text-center text-gray-600">
@@ -135,7 +197,7 @@ const Hodinfo = () => {
                     ) : absentees[idx] && absentees[idx].length > 0 ? (
                       <div>
                         <h4 className="mb-2 text-lg font-bold text-gray-700">
-                          Absentees:
+                          Absentees for {formatDate(date)}:
                         </h4>
                         <ul className="pl-6 list-disc text-gray-700">
                           {absentees[idx].map((student, i) => (
@@ -147,7 +209,7 @@ const Hodinfo = () => {
                       </div>
                     ) : (
                       <div className="py-4 text-center text-gray-500">
-                        No absentees found for this class.
+                        No absentees found for this class on {formatDate(date)}.
                       </div>
                     )}
                   </div>
