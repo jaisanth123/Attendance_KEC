@@ -136,14 +136,15 @@ const Hodinfo = () => {
   };
 
   return (
-    <div className="flex justify-center items-center p-4 min-h-screen bg-gray-50">
-      <div className="p-8 w-full max-w-2xl bg-gray-800 rounded-lg shadow-lg">
+    <div className="flex flex-col items-center p-4 min-h-screen bg-gray-50">
+      {/* Main HOD Information Box */}
+      <div className="p-8 mb-6 w-full max-w-2xl bg-gray-800 rounded-lg shadow-lg">
         <h1 className="mb-6 text-3xl font-bold text-center text-white">
           HOD Information
         </h1>
 
         {/* Date Selection */}
-        <div className="flex justify-center items-center pb-5 mb-6">
+        <div className="flex justify-center items-center pb-5">
           <div className="w-full max-w-sm">
             <label
               htmlFor="date"
@@ -160,7 +161,10 @@ const Hodinfo = () => {
             />
           </div>
         </div>
+      </div>
 
+      {/* Classes Dropdown - Outside the main box */}
+      <div className="w-full max-w-4xl">
         <div className="bg-white rounded-lg divide-y divide-gray-200 shadow">
           {classesLoading ? (
             <div className="p-8 text-lg text-center text-gray-600">
@@ -196,20 +200,28 @@ const Hodinfo = () => {
                       </div>
                     ) : absentees[idx] && absentees[idx].length > 0 ? (
                       <div>
-                        <h4 className="mb-2 text-lg font-bold text-gray-700">
-                          Absentees for {formatDate(date)}:
+                        <h4 className="mb-4 text-lg font-bold text-gray-700">
+                          Absentees:
                         </h4>
-                        <ul className="pl-6 list-disc text-gray-700">
+                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
                           {absentees[idx].map((student, i) => (
-                            <li key={i} className="py-1">
-                              {student.rollNo} - {student.name}
-                            </li>
+                            <div
+                              key={i}
+                              className="flex justify-center items-center p-2 text-lg font-semibold text-white bg-red-600 rounded-lg shadow-md transition-all duration-500 transform hover:scale-110"
+                            >
+                              <div className="text-center">
+                                <div className="font-bold">
+                                  {student.rollNo}
+                                </div>
+                                <div className="text-xs">{student.name}</div>
+                              </div>
+                            </div>
                           ))}
-                        </ul>
+                        </div>
                       </div>
                     ) : (
                       <div className="py-4 text-center text-gray-500">
-                        No absentees found for this class on {formatDate(date)}.
+                        No absentees found for this class.
                       </div>
                     )}
                   </div>
