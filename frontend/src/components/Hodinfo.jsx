@@ -149,13 +149,58 @@ const Hodinfo = () => {
     }
   };
 
+  // Fetch absentee counts for all classes upfront
+  const fetchAllAbsenteeCounts = async () => {
+    if (!courses || courses.length === 0) return;
+
+    const promises = courses.map(async (course, idx) => {
+      try {
+        const backendURL = import.meta.env.VITE_BACKEND_URL;
+        const url = `${backendURL}/api/students/remaining?yearOfStudy=${course.yearOfStudy}&branch=${course.branch}&section=${course.section}&date=${date}`;
+
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+
+        const { students } = response.data;
+        return { idx, students: students || [] };
+      } catch (err) {
+        return { idx, students: [] };
+      }
+    });
+
+    try {
+      const results = await Promise.all(promises);
+      const newAbsentees = {};
+
+      results.forEach(({ idx, students }) => {
+        newAbsentees[idx] = students.map((student) => ({
+          rollNo: student.rollNo,
+          name: student.name,
+        }));
+      });
+
+      setAbsentees(newAbsentees);
+    } catch (err) {
+      console.error("Error fetching all absentee counts:", err);
+    }
+  };
+
   useEffect(() => {
     fetchDistinctClasses();
   }, []);
 
-  // Clear absentees when date changes
+  // Fetch all absentee counts when courses are loaded
   useEffect(() => {
-    setAbsentees({});
+    if (courses.length > 0) {
+      fetchAllAbsenteeCounts();
+    }
+  }, [courses, date]);
+
+  // Clear absentees when date changes (will be refetched by above useEffect)
+  useEffect(() => {
     setExpandedIndex(null);
   }, [date]);
 
@@ -164,8 +209,12 @@ const Hodinfo = () => {
       setExpandedIndex(null);
     } else {
       setExpandedIndex(idx);
+      // If for some reason data is missing, fetch it
       if (!absentees[idx]) {
         fetchAbsentees(course, idx);
+      } else if (absentees[idx].length > 0) {
+        // Fetch leave counts for already loaded absentees
+        fetchLeaveCounts(absentees[idx], course);
       }
     }
   };
@@ -238,9 +287,9 @@ const Hodinfo = () => {
                     {absentees[idx] && (
                       <div className="flex gap-1 items-center">
                         <span className="text-sm font-medium text-gray-600">
-                          Absentees:
+                          Count:
                         </span>
-                        <span className="px-2 py-1 text-sm font-bold text-white bg-red-600 rounded-full min-w-[24px] text-center">
+                        <span className="text-lg font-semibold text-gray-800">
                           {absentees[idx].length}
                         </span>
                       </div>
