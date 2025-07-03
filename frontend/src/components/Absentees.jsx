@@ -23,7 +23,7 @@ function Absentees() {
   const [rollNumbers, setRollNumbers] = useState([]);
   const [showConfirmationPopup, setShowConfirmationPopup] = useState(false); // For Confirm button confirmation popup
   const [showMarkPresentPopup, setShowMarkPresentPopup] = useState(false); // For Mark Present button confirmation popup
-  const [showMarkSuperPaccPopup , setShowMarkSuperPaccPopup] = useState(false); // For Mark Present button confirmation popup
+  const [showMarkSuperPaccPopup, setShowMarkSuperPaccPopup] = useState(false); // For Mark Present button confirmation popup
   const [popupMessage, setPopupMessage] = useState(""); // To dynamically update popup messages
   const [popupColor, setPopupColor] = useState(""); // To dynamically update popup colors
   const [selectedRollNos, setSelectedRollNos] = useState([]); // To keep track of selected roll numbers
@@ -49,7 +49,6 @@ function Absentees() {
     setMarkPresentVisible(false);
     setmarksuperpacc(false);
     setMarkabsentButton(false);
-
 
     setErrorMessage("");
 
@@ -91,7 +90,7 @@ function Absentees() {
           setErrorMessage(data.message);
           setRollNumbers([]);
           setMarkPresentVisible(true);
-          setmarksuperpacc(year === "III" ||year=== "IV");
+          setmarksuperpacc(year === "III" || year === "IV");
           return;
         }
 
@@ -179,7 +178,7 @@ function Absentees() {
       });
       setShowConfirmationPopup(false);
       setMarkPresentVisible(true);
-      setmarksuperpacc(yearOfStudy === "III" ||yearOfStudy==="IV");
+      setmarksuperpacc(yearOfStudy === "III" || yearOfStudy === "IV");
 
       return; // Early return to p
       // revent further execution
@@ -187,16 +186,13 @@ function Absentees() {
 
     try {
       // Make sure the server endpoint and data are correct
-      const response = await axios.post(
-        `${backendURL}/api/attendance/absent`,
-        {
-          rollNumbers: selectedRollNos,
-          date,
-          yearOfStudy,
-          branch,
-          section,
-        }
-      );
+      const response = await axios.post(`${backendURL}/api/attendance/absent`, {
+        rollNumbers: selectedRollNos,
+        date,
+        yearOfStudy,
+        branch,
+        section,
+      });
 
       // Check the response status or data to ensure success
       if (response.status === 200) {
@@ -211,7 +207,7 @@ function Absentees() {
       setSelectedRollNos([]);
       await fetchRollNumbers(yearOfStudy, branch, section, date);
       setMarkPresentVisible(true);
-      setmarksuperpacc(yearOfStudy === "III" ||yearOfStudy==="IV" );
+      setmarksuperpacc(yearOfStudy === "III" || yearOfStudy === "IV");
     } catch (error) {
       console.error("Error marking absentees:", error);
 
@@ -497,26 +493,28 @@ function Absentees() {
           </button>
         )}
 
-        {(yearOfStudy === "III" || yearOfStudy==="IV") && markPresentVisible && marksuperpacc && (
-          <button
-            onClick={() => {
-              setShowMarkSuperPaccPopup(true);
-              setPopupMessage(
-                "Are you sure you want to mark SuperPacc students as OnDuty?"
-              );
-            }}
-            disabled={isSuperMarkingLoading}
-            className={`w-full px-8 py-4 text-xl duration-500 hover:scale-110 font-semibold rounded-lg transition-all ${
-              isSuperMarkingLoading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "text-white bg-blue-600 hover:bg-blue-800"
-            }`}
-          >
-            {isSuperMarkingLoading
-              ? "Marking SuperPacc OD..."
-              : "Mark SuperPacc OD"}
-          </button>
-        )}
+        {(yearOfStudy === "III" || yearOfStudy === "IV") &&
+          markPresentVisible &&
+          marksuperpacc && (
+            <button
+              onClick={() => {
+                setShowMarkSuperPaccPopup(true);
+                setPopupMessage(
+                  "Are you sure you want to mark SuperPacc students as OnDuty?"
+                );
+              }}
+              disabled={isSuperMarkingLoading}
+              className={`w-full px-8 py-4 text-xl duration-500 hover:scale-110 font-semibold rounded-lg transition-all ${
+                isSuperMarkingLoading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "text-white bg-blue-600 hover:bg-blue-800"
+              }`}
+            >
+              {isSuperMarkingLoading
+                ? "Marking SuperPacc OD..."
+                : "Mark SuperPacc OD"}
+            </button>
+          )}
 
         {markPresentVisible && (
           <button
@@ -603,4 +601,3 @@ function Absentees() {
 }
 
 export default Absentees;
-

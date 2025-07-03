@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-const backendURL = import.meta.env.VITE_BACKEND_URL; 
+const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 function InfoStatusPage() {
   const location = useLocation();
@@ -365,5 +365,3 @@ function Dropdown({ label, value, options, onChange }) {
 }
 
 export default InfoStatusPage;
-
-

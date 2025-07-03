@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Database, AlertCircle, CheckCircle } from "lucide-react";
-const backendURL = import.meta.env.VITE_BACKEND_URL; 
+const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 function UpdateSuperpacc() {
   const navigate = useNavigate();
@@ -185,14 +185,14 @@ function UpdateSuperpacc() {
   };
 
   return (
-    <div className="flex flex-col items-center flex-1 p-6 md:p-8 lg:p-12">
-      <div className="w-full max-w-4xl p-6 bg-gray-800 rounded-lg shadow-lg">
+    <div className="flex flex-col flex-1 items-center p-6 md:p-8 lg:p-12">
+      <div className="p-6 w-full max-w-4xl bg-gray-800 rounded-lg shadow-lg">
         <h1 className="text-4xl font-semibold text-center text-white">
           Update SuperPacc Status
         </h1>
 
         {/* Dropdowns Row */}
-        <div className="flex flex-wrap justify-center w-full mt-4 gap-x-4 gap-y-4">
+        <div className="flex flex-wrap gap-x-4 gap-y-4 justify-center mt-4 w-full">
           <div className="flex-1 min-w-[100px] max-w-[150px]">
             <label
               htmlFor="yearOfStudy"
@@ -204,7 +204,7 @@ function UpdateSuperpacc() {
               id="yearOfStudy"
               value={yearOfStudy}
               onChange={(e) => setYearOfStudy(e.target.value)}
-              className="w-full px-4 py-2 text-black bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-gray-600"
+              className="px-4 py-2 w-full text-black bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-gray-600"
             >
               <option value="nan">Year</option>
               <option value="IV">IV</option>
@@ -224,7 +224,7 @@ function UpdateSuperpacc() {
               id="branch"
               value={branch}
               onChange={(e) => setBranch(e.target.value)}
-              className="w-full px-4 py-2 text-black bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-gray-600"
+              className="px-4 py-2 w-full text-black bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-gray-600"
             >
               <option value="nan">Branch</option>
               <option value="AIDS">AIDS</option>
@@ -243,7 +243,7 @@ function UpdateSuperpacc() {
               id="section"
               value={section}
               onChange={(e) => setSection(e.target.value)}
-              className="w-full px-4 py-2 text-black bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-gray-600"
+              className="px-4 py-2 w-full text-black bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-gray-600"
             >
               <option value="nan">Section</option>
               <option value="A">A</option>
@@ -255,12 +255,12 @@ function UpdateSuperpacc() {
       </div>
 
       {/* Legend */}
-      <div className="flex justify-center gap-4 my-6">
-        <div className="flex items-center gap-2">
+      <div className="flex gap-4 justify-center my-6">
+        <div className="flex gap-2 items-center">
           <div className="w-4 h-4 bg-green-600 rounded"></div>
           <span className="text-gray-800">SuperPacc</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex gap-2 items-center">
           <div className="w-4 h-4 bg-red-600 rounded"></div>
           <span className="text-gray-800">Not SuperPacc</span>
         </div>
@@ -275,14 +275,14 @@ function UpdateSuperpacc() {
 
       {/* Loading State */}
       {isLoading && (
-        <div className="flex items-center justify-center w-full p-4">
-          <div className="w-8 h-8 border-4 border-gray-800 rounded-full border-t-transparent animate-spin"></div>
+        <div className="flex justify-center items-center p-4 w-full">
+          <div className="w-8 h-8 rounded-full border-4 border-gray-800 animate-spin border-t-transparent"></div>
         </div>
       )}
 
       {/* Students Grid */}
       {!isLoading && (
-        <div className="grid w-full grid-cols-2 gap-3 mt-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
+        <div className="grid grid-cols-2 gap-3 mt-6 w-full sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
           {students.map((student) => (
             <StudentCard key={student.rollNo} student={student} />
           ))}
@@ -291,7 +291,7 @@ function UpdateSuperpacc() {
 
       {/* Changed Students Display */}
       {changedStudents.length > 0 && (
-        <div className="w-full max-w-3xl p-6 mt-8 rounded-lg shadow-lg">
+        <div className="p-6 mt-8 w-full max-w-3xl rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold text-center">
             SuperPacc Change Logs
           </h2>
@@ -329,16 +329,16 @@ function UpdateSuperpacc() {
       {/* Home Button */}
       <button
         onClick={() => navigate("/homePage")}
-        className="w-full px-8 py-4 mt-8 text-xl font-semibold text-white transition-all duration-500 transform bg-gray-600 rounded-md hover:bg-gray-700 hover:scale-110 md:w-1/4 lg:w-1/5"
+        className="px-8 py-4 mt-8 w-full text-xl font-semibold text-white bg-gray-600 rounded-md transition-all duration-500 transform hover:bg-gray-700 hover:scale-110 md:w-1/4 lg:w-1/5"
       >
         Home
       </button>
 
       {/* Confirmation Popup */}
       {isConfirmed && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-md animate-fadeIn">
-          <div className="relative w-full max-w-lg p-8 border border-gray-600 shadow-lg bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800 rounded-xl">
-            <div className="absolute flex items-center justify-center w-16 h-16 transform -translate-x-1/2 bg-green-600 rounded-full shadow-md -top-6 left-1/2">
+        <div className="flex fixed inset-0 justify-center items-center bg-black bg-opacity-70 backdrop-blur-md animate-fadeIn">
+          <div className="relative p-8 w-full max-w-lg bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800 rounded-xl border border-gray-600 shadow-lg">
+            <div className="flex absolute -top-6 left-1/2 justify-center items-center w-16 h-16 bg-green-600 rounded-full shadow-md transform -translate-x-1/2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -365,13 +365,13 @@ function UpdateSuperpacc() {
             <div className="flex justify-between mt-6">
               <button
                 onClick={handleUpdateSuperPacc}
-                className="w-1/2 py-2 mr-3 font-medium text-white bg-green-500 rounded-lg shadow-md x-4 hover:bg-green-600 focus:ring-4 focus:ring-green-300"
+                className="py-2 mr-3 w-1/2 font-medium text-white bg-green-500 rounded-lg shadow-md x-4 hover:bg-green-600 focus:ring-4 focus:ring-green-300"
               >
                 Confirm
               </button>
               <button
                 onClick={() => setIsConfirmed(false)}
-                className="w-1/2 px-4 py-2 font-medium text-white bg-red-500 rounded-lg shadow-md hover:bg-red-600 focus:ring-4 focus:ring-red-300"
+                className="px-4 py-2 w-1/2 font-medium text-white bg-red-500 rounded-lg shadow-md hover:bg-red-600 focus:ring-4 focus:ring-red-300"
               >
                 Cancel
               </button>
@@ -384,4 +384,3 @@ function UpdateSuperpacc() {
 }
 
 export default UpdateSuperpacc;
-

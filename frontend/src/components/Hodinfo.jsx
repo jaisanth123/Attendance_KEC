@@ -243,30 +243,27 @@ const Hodinfo = () => {
                   </div>
                 </div>
                 {expandedIndex === idx && (
-                  <div className="px-8 pb-6 bg-gray-50">
+                  <div className="px-2 pb-6 sm:px-8">
                     {loadingAbsentees[idx] ? (
                       <div className="py-4 text-center text-gray-500">
                         Loading absentees...
                       </div>
                     ) : absentees[idx] && absentees[idx].length > 0 ? (
                       <div>
-                        <h4 className="mb-4 text-lg font-bold text-gray-700">
-                          Absentees:
-                        </h4>
-                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
+                        <div className="grid grid-cols-2 gap-4 justify-items-center sm:grid-cols-2 sm:gap-6 md:grid-cols-3 md:gap-6 lg:grid-cols-4 lg:gap-8 xl:grid-cols-6">
                           {absentees[idx].map((student, i) => (
                             <div
                               key={i}
                               onClick={() =>
                                 handleStudentClick(student, course)
                               }
-                              className="flex justify-center items-center p-2 font-semibold text-white bg-red-600 rounded-lg shadow-md transition-all duration-500 transform cursor-pointer hover:scale-110 min-w-[120px]"
+                              className="flex justify-center items-center p-3 font-semibold text-white bg-red-600 rounded-lg shadow-md transition-all duration-300 transform cursor-pointer hover:scale-105 min-w-[140px] min-h-[70px]"
                             >
                               <div className="text-center">
-                                <div className="text-xs font-bold">
+                                <div className="text-sm font-bold">
                                   {student.name}
                                 </div>
-                                <div className="text-xs">
+                                <div className="text-sm">
                                   {student.rollNo}
                                   {typeof leaveCounts[student.rollNo] !==
                                     "undefined" && (
