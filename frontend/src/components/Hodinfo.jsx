@@ -14,6 +14,7 @@ const Hodinfo = () => {
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // Add date state
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [isDetailCardOpen, setIsDetailCardOpen] = useState(false);
+  const [leaveCounts, setLeaveCounts] = useState({}); // { rollNo: leaveCount }
 
   const authToken = sessionStorage.getItem("authToken");
 
@@ -57,6 +58,35 @@ const Hodinfo = () => {
       toast.error("Failed to load class information", { autoClose: 800 });
     } finally {
       setClassesLoading(false);
+    }
+  };
+
+  // Fetch leave counts for absentees
+  const fetchLeaveCounts = async (students, course) => {
+    if (!students || students.length === 0) return;
+    try {
+      const backendURL = import.meta.env.VITE_BACKEND_URL;
+      const response = await axios.get(`${backendURL}/api/students/leaves`, {
+        params: {
+          yearOfStudy: course.yearOfStudy,
+          branch: course.branch,
+          section: course.section,
+          date: date,
+        },
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      if (response.data && response.data.data) {
+        // Map rollNo to leaveCount
+        const leaveMap = {};
+        response.data.data.forEach((student) => {
+          leaveMap[student.rollNo] = student.leaveCount;
+        });
+        setLeaveCounts((prev) => ({ ...prev, ...leaveMap }));
+      }
+    } catch (err) {
+      // Optionally handle error
     }
   };
 
@@ -109,6 +139,8 @@ const Hodinfo = () => {
           name: student.name,
         })),
       }));
+      // Fetch leave counts for these absentees
+      fetchLeaveCounts(students, course);
     } catch (err) {
       setAbsentees((prev) => ({ ...prev, [idx]: [] }));
       toast.error("Failed to fetch absentees", { autoClose: 800 });
@@ -228,13 +260,21 @@ const Hodinfo = () => {
                               onClick={() =>
                                 handleStudentClick(student, course)
                               }
-                              className="flex justify-center items-center p-2 text-lg font-semibold text-white bg-red-600 rounded-lg shadow-md transition-all duration-500 transform cursor-pointer hover:scale-110"
+                              className="flex justify-center items-center p-2 font-semibold text-white bg-red-600 rounded-lg shadow-md transition-all duration-500 transform cursor-pointer hover:scale-110 min-w-[120px]"
                             >
                               <div className="text-center">
-                                <div className="font-bold">
-                                  {student.rollNo}
+                                <div className="text-xs font-bold">
+                                  {student.name}
                                 </div>
-                                <div className="text-xs">{student.name}</div>
+                                <div className="text-xs">
+                                  {student.rollNo}
+                                  {typeof leaveCounts[student.rollNo] !==
+                                    "undefined" && (
+                                    <span className="ml-1 px-2 py-0.5 text-xs font-semibold bg-white text-red-600 rounded-full">
+                                      {leaveCounts[student.rollNo]}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           ))}
