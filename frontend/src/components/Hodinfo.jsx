@@ -239,7 +239,7 @@ const Hodinfo = () => {
       {/* Main HOD Information Box */}
       <div className="p-8 mb-6 w-full max-w-2xl bg-gray-800 rounded-lg shadow-lg">
         <h1 className="mb-6 text-3xl font-bold text-center text-white">
-          HOD Information
+          Dashboard
         </h1>
 
         {/* Date Selection */}
