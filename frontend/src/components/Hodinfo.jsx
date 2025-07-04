@@ -263,7 +263,7 @@ const Hodinfo = () => {
       </div>
 
       {/* Classes Dropdown - Outside the main box */}
-      <div className="w-full max-w-4xl">
+      <div className="w-full max-w-6xl">
         <div className="bg-white rounded-lg divide-y divide-gray-200 shadow">
           {classesLoading ? (
             <div className="p-8 text-lg text-center text-gray-600">
@@ -311,29 +311,27 @@ const Hodinfo = () => {
                       </div>
                     ) : absentees[idx] && absentees[idx].length > 0 ? (
                       <div>
-                        <div className="grid grid-cols-2 gap-4 justify-items-center sm:grid-cols-2 sm:gap-6 md:grid-cols-3 md:gap-6 lg:grid-cols-4 lg:gap-8 xl:grid-cols-6">
+                        <div className="grid grid-cols-2 gap-x-2 gap-y-2 sm:grid-cols-3 sm:gap-x-2 sm:gap-y-2 md:grid-cols-4 md:gap-x-2 md:gap-y-2 lg:grid-cols-5 lg:gap-x-2 lg:gap-y-2 xl:grid-cols-6 xl:gap-x-2 xl:gap-y-2 2xl:grid-cols-8 2xl:gap-x-2 2xl:gap-y-2">
                           {absentees[idx].map((student, i) => (
                             <div
                               key={i}
                               onClick={() =>
                                 handleStudentClick(student, course)
                               }
-                              className="flex justify-center items-center p-3 font-semibold text-white bg-red-600 rounded-lg shadow-md transition-all duration-300 transform cursor-pointer hover:scale-105 min-w-[140px] min-h-[70px]"
+                              className="relative flex justify-center items-center p-3 font-semibold text-white bg-red-600 rounded-lg shadow-md transition-all duration-300 transform cursor-pointer hover:scale-105 w-full min-h-[80px]"
                             >
                               <div className="text-center">
                                 <div className="text-sm font-bold">
                                   {student.name}
                                 </div>
-                                <div className="text-sm">
-                                  {student.rollNo}
-                                  {typeof leaveCounts[student.rollNo] !==
-                                    "undefined" && (
-                                    <span className="ml-1 px-2 py-0.5 text-xs font-semibold bg-white text-red-600 rounded-full">
-                                      {leaveCounts[student.rollNo]}
-                                    </span>
-                                  )}
-                                </div>
+                                <div className="text-sm">{student.rollNo}</div>
                               </div>
+                              {typeof leaveCounts[student.rollNo] !==
+                                "undefined" && (
+                                <span className="absolute bottom-1 right-1 px-2 py-0.5 text-xs font-semibold bg-white text-red-600 rounded-full">
+                                  {leaveCounts[student.rollNo]}
+                                </span>
+                              )}
                             </div>
                           ))}
                         </div>
