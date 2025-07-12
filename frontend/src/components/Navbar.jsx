@@ -17,9 +17,9 @@ function Navbar({ toggleSidebar }) {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-800 shadow-md">
+    <nav className="fixed top-0 right-0 left-0 z-50 bg-gray-800 shadow-md">
       {/* For large screens */}
-      <div className="items-center justify-between hidden px-4 py-4 text-white sm:flex sm:py-6">
+      <div className="hidden justify-between items-center px-4 py-4 text-white sm:flex sm:py-6">
         {/* Sidebar Toggle Button */}
         <button
           onClick={toggleSidebar}
@@ -31,13 +31,11 @@ function Navbar({ toggleSidebar }) {
 
         {/* Title centered for large screens */}
         <div className="flex-1 ml-40 text-xl font-semibold text-center whitespace-nowrap">
-          ATTENDANCE AI DEPARTMENT
+          ATTENDANCE CSE DEPARTMENT
         </div>
 
         {/* Date */}
-        <div className="text-lg sm:block lg:text-xl sm:mt-2">
-          {today}
-        </div>
+        <div className="text-lg sm:block lg:text-xl sm:mt-2">{today}</div>
       </div>
 
       {/* For small screens */}
@@ -47,7 +45,7 @@ function Navbar({ toggleSidebar }) {
           {/* Sidebar Toggle Icon (positioned in the middle of the left side) */}
           <button
             onClick={toggleSidebar}
-            className="flex items-center h-10 mr-2 text-xl sm:text-2xl"
+            className="flex items-center mr-2 h-10 text-xl sm:text-2xl"
             aria-label="Toggle sidebar"
           >
             &#9776;
@@ -55,14 +53,12 @@ function Navbar({ toggleSidebar }) {
 
           {/* Title centered in one line */}
           <div className="flex-grow text-lg font-semibold text-center">
-            ATTENDANCE AI DEPARTMENT
+            ATTENDANCE CSE DEPARTMENT
           </div>
         </div>
 
         {/* Date on a separate row below */}
-        <div className="mt-1 text-sm text-center">
-          {today}
-        </div>
+        <div className="mt-1 text-sm text-center">{today}</div>
       </div>
     </nav>
   );
