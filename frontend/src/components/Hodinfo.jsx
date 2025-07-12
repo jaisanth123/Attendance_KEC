@@ -379,10 +379,10 @@ const Hodinfo = () => {
                               className="relative flex justify-center items-center p-3 font-semibold text-white bg-red-600 rounded-lg shadow-md transition-all duration-300 transform cursor-pointer hover:scale-105 w-full min-h-[80px]"
                             >
                               <div className="text-center">
-                                <div className="text-sm font-bold">
+                                <div className="text-lg font-bold">
                                   {student.name}
                                 </div>
-                                <div className="text-sm">{student.rollNo}</div>
+                                <div className="text-lg">{student.rollNo}</div>
                               </div>
                               {typeof leaveCounts[student.rollNo] !==
                                 "undefined" && (
