@@ -23,7 +23,6 @@ router.get("/superpacc/status", studentController.getStudentsBySuperPacc);
 router.put(
   "/superpacc/update/:rollNo",
   studentController.updateSuperPaccStatus
-
 );
 
 router.get("/distinct-classes", studentController.getDistinctClasses);
@@ -34,4 +33,3 @@ router.post("/superpacc/batch-update", studentController.batchUpdateSuperPacc);
 router.put("/update-year", studentController.updateStudentYear);
 
 module.exports = router;
-

@@ -686,7 +686,7 @@ exports.searchStudentsByRollNo = async (req, res) => {
     });
   }
 };
-  exports.getDistinctClasses = async (req, res) => {
+exports.getDistinctClasses = async (req, res) => {
   try {
     // Use MongoDB aggregation to get distinct combinations of yearOfStudy, branch, and section
     const distinctClasses = await Student.aggregate([

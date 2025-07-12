@@ -15,6 +15,7 @@ const Hodinfo = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [isDetailCardOpen, setIsDetailCardOpen] = useState(false);
   const [leaveCounts, setLeaveCounts] = useState({}); // { rollNo: leaveCount }
+  const [attendanceStatus, setAttendanceStatus] = useState({}); // { index: "marked" | "not_marked" }
 
   const authToken = sessionStorage.getItem("authToken");
 
@@ -90,12 +91,12 @@ const Hodinfo = () => {
     }
   };
 
-  // Fetch absentees for a class using the same endpoint as DutyPage
-  const fetchAbsentees = async (course, idx) => {
+  // Check attendance status using attendance controller
+  const checkAttendanceStatus = async (course, idx) => {
     setLoadingAbsentees((prev) => ({ ...prev, [idx]: true }));
     try {
       const backendURL = import.meta.env.VITE_BACKEND_URL;
-      const url = `${backendURL}/api/students/remaining?yearOfStudy=${course.yearOfStudy}&branch=${course.branch}&section=${course.section}&date=${date}`;
+      const url = `${backendURL}/api/attendance/getAttendanceStatusCount?yearOfStudy=${course.yearOfStudy}&branch=${course.branch}&section=${course.section}&date=${date}`;
 
       const response = await axios.get(url, {
         headers: {
@@ -103,88 +104,135 @@ const Hodinfo = () => {
         },
       });
 
-      const { students, totalStudents } = response.data;
-      const formattedDate = formatDate(date);
+      const { absentCount, otherStatusCount } = response.data;
 
-      if (totalStudents === 0) {
+      // If attendance is not marked (returns "N/A")
+      if (absentCount === "N/A" || otherStatusCount === "N/A") {
         setAbsentees((prev) => ({
           ...prev,
           [idx]: [],
         }));
-        toast.info(
-          `No record found for ${course.yearOfStudy} - ${course.branch} - ${course.section}.`,
-          {
-            autoClose: 800,
-          }
-        );
+        setAttendanceStatus((prev) => ({
+          ...prev,
+          [idx]: "not_marked",
+        }));
         return;
       }
 
-      if (students.length === 0) {
-        setAbsentees((prev) => ({
-          ...prev,
-          [idx]: [],
-        }));
-        toast.info(
-          `For ${course.yearOfStudy} - ${course.branch} - ${course.section}, students attendance for ${formattedDate} has already been marked.`,
-          { autoClose: 800 }
-        );
-        return;
-      }
+      // If attendance is marked, get absent students using student controller
+      const absentResponse = await axios.get(
+        `${backendURL}/api/students/remaining`,
+        {
+          params: {
+            yearOfStudy: course.yearOfStudy,
+            branch: course.branch,
+            section: course.section,
+            date: date,
+          },
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+
+      const { students } = absentResponse.data;
 
       setAbsentees((prev) => ({
         ...prev,
-        [idx]: students.map((student) => ({
-          rollNo: student.rollNo,
-          name: student.name,
-        })),
+        [idx]: students || [],
       }));
+      setAttendanceStatus((prev) => ({
+        ...prev,
+        [idx]: "marked",
+      }));
+
       // Fetch leave counts for these absentees
-      fetchLeaveCounts(students, course);
+      if (students && students.length > 0) {
+        fetchLeaveCounts(students, course);
+      }
     } catch (err) {
       setAbsentees((prev) => ({ ...prev, [idx]: [] }));
-      toast.error("Failed to fetch absentees", { autoClose: 800 });
+      setAttendanceStatus((prev) => ({
+        ...prev,
+        [idx]: "not_marked",
+      }));
+      toast.error("Failed to fetch attendance status", { autoClose: 800 });
     } finally {
       setLoadingAbsentees((prev) => ({ ...prev, [idx]: false }));
     }
   };
 
-  // Fetch absentee counts for all classes upfront
-  const fetchAllAbsenteeCounts = async () => {
+  // Fetch attendance status for all classes upfront
+  const fetchAllAttendanceStatus = async () => {
     if (!courses || courses.length === 0) return;
 
     const promises = courses.map(async (course, idx) => {
       try {
         const backendURL = import.meta.env.VITE_BACKEND_URL;
-        const url = `${backendURL}/api/students/remaining?yearOfStudy=${course.yearOfStudy}&branch=${course.branch}&section=${course.section}&date=${date}`;
 
-        const response = await axios.get(url, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        });
+        // First check attendance status
+        const statusResponse = await axios.get(
+          `${backendURL}/api/attendance/getAttendanceStatusCount`,
+          {
+            params: {
+              yearOfStudy: course.yearOfStudy,
+              branch: course.branch,
+              section: course.section,
+              date: date,
+            },
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
 
-        const { students } = response.data;
-        return { idx, students: students || [] };
+        const { absentCount, otherStatusCount } = statusResponse.data;
+
+        // If attendance is not marked
+        if (absentCount === "N/A" || otherStatusCount === "N/A") {
+          return { idx, students: [], status: "not_marked" };
+        }
+
+        // If attendance is marked, get absent students
+        const absentResponse = await axios.get(
+          `${backendURL}/api/students/remaining`,
+          {
+            params: {
+              yearOfStudy: course.yearOfStudy,
+              branch: course.branch,
+              section: course.section,
+              date: date,
+            },
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
+
+        const { students } = absentResponse.data;
+        return { idx, students: students || [], status: "marked" };
       } catch (err) {
-        return { idx, students: [] };
+        return { idx, students: [], status: "not_marked" };
       }
     });
 
     try {
       const results = await Promise.all(promises);
       const newAbsentees = {};
+      const newAttendanceStatus = {};
 
-      results.forEach(({ idx, students }) => {
+      results.forEach(({ idx, students, status }) => {
         newAbsentees[idx] = students.map((student) => ({
           rollNo: student.rollNo,
           name: student.name,
         }));
+        newAttendanceStatus[idx] = status;
       });
 
       setAbsentees(newAbsentees);
+      setAttendanceStatus(newAttendanceStatus);
     } catch (err) {
-      console.error("Error fetching all absentee counts:", err);
+      console.error("Error fetching all attendance status:", err);
     }
   };
 
@@ -192,10 +240,10 @@ const Hodinfo = () => {
     fetchDistinctClasses();
   }, []);
 
-  // Fetch all absentee counts when courses are loaded
+  // Fetch all attendance status when courses are loaded
   useEffect(() => {
     if (courses.length > 0) {
-      fetchAllAbsenteeCounts();
+      fetchAllAttendanceStatus();
     }
   }, [courses, date]);
 
@@ -211,7 +259,7 @@ const Hodinfo = () => {
       setExpandedIndex(idx);
       // If for some reason data is missing, fetch it
       if (!absentees[idx]) {
-        fetchAbsentees(course, idx);
+        checkAttendanceStatus(course, idx);
       } else if (absentees[idx].length > 0) {
         // Fetch leave counts for already loaded absentees
         fetchLeaveCounts(absentees[idx], course);
@@ -284,15 +332,21 @@ const Hodinfo = () => {
                     {course.yearOfStudy} - {course.branch} - {course.section}
                   </div>
                   <div className="flex gap-3 items-center">
-                    {absentees[idx] && (
-                      <div className="flex gap-1 items-center">
-                        <span className="text-sm font-medium text-gray-600">
-                          Count:
-                        </span>
-                        <span className="text-lg font-semibold text-gray-800">
-                          {absentees[idx].length}
-                        </span>
+                    {attendanceStatus[idx] === "not_marked" ? (
+                      <div className="text-lg font-semibold text-red-500">
+                        Not Marked
                       </div>
+                    ) : (
+                      absentees[idx] && (
+                        <div className="flex gap-1 items-center">
+                          <span className="text-sm font-medium text-gray-600">
+                            Count:
+                          </span>
+                          <span className="text-lg font-semibold text-gray-800">
+                            {absentees[idx].length}
+                          </span>
+                        </div>
+                      )
                     )}
                     <div>
                       {expandedIndex === idx ? (
@@ -308,6 +362,10 @@ const Hodinfo = () => {
                     {loadingAbsentees[idx] ? (
                       <div className="py-4 text-center text-gray-500">
                         Loading absentees...
+                      </div>
+                    ) : attendanceStatus[idx] === "not_marked" ? (
+                      <div className="py-4 font-semibold text-center text-red-500">
+                        Attendance not marked for this class.
                       </div>
                     ) : absentees[idx] && absentees[idx].length > 0 ? (
                       <div>
