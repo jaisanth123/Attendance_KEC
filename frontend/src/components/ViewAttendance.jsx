@@ -17,12 +17,12 @@ function ViewAttendance({ toggleSidebar }) {
 
   return (
     <>
-      <div className="flex flex-col pt-10 h-3/4">
-        <h1 className="text-4xl font-bold text-center text-gray-800 min-h-56">
+      <div className="flex flex-col pt-8 h-3/4">
+        <h1 className="mb-12 text-4xl font-bold text-center text-gray-800">
           View Attendance Page
         </h1>
-        <div className="flex items-center justify-center flex-grow">
-          <div className="grid w-full max-w-4xl grid-cols-2 gap-6 px-1 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
+        <div className="flex flex-grow justify-center items-center">
+          <div className="grid grid-cols-2 gap-6 px-1 w-full max-w-4xl sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
             {/* Classes Information Card */}
 
             <ActionCard
@@ -55,5 +55,3 @@ function ViewAttendance({ toggleSidebar }) {
 }
 
 export default ViewAttendance;
-
-

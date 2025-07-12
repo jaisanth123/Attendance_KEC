@@ -6,7 +6,7 @@ const Staff = require("./models/staffSchema.js");
 // Connect to your MongoDB database
 mongoose
   .connect(
-    "mongodb+srv://krrashmika2004:nhwUubZLhWrmu7Lr@cluster0.sfj4f.mongodb.net/AI_Attendence?retryWrites=true&w=majority",
+    "mongodb+srv://jaisanth2006:cyjmsRJr7Q736bBW@attendancecse.ioskkko.mongodb.net/?retryWrites=true&w=majority&appName=attendanceCSE",
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,

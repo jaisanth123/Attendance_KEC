@@ -16,7 +16,7 @@ function Absentees() {
   ); // Default to today's date
 
   const [yearOfStudy, setYearOfStudy] = useState("nan");
-  const [branch, setBranch] = useState("nan");
+  const [branch, setBranch] = useState("CSE");
   const [section, setSection] = useState("nan");
   const [selectedCourse, setSelectedCourse] = useState("");
 
@@ -52,12 +52,7 @@ function Absentees() {
 
     setErrorMessage("");
 
-    if (
-      yearOfStudy !== "nan" &&
-      branch !== "nan" &&
-      section !== "nan" &&
-      date
-    ) {
+    if (yearOfStudy !== "nan" && section !== "nan" && date) {
       // Update selectedCourse when dropdown values change
       const courseValue =
         section === "-"
@@ -372,25 +367,6 @@ function Absentees() {
 
           <div className="flex-1 min-w-[100px] max-w-[150px]">
             <label
-              htmlFor="branch"
-              className="block text-lg font-medium text-white"
-            >
-              Branch:
-            </label>
-            <select
-              id="branch"
-              value={branch}
-              onChange={(e) => setBranch(e.target.value)}
-              className="px-4 py-2 w-full text-black bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-gray-600"
-            >
-              <option value="nan">Branch</option>
-              <option value="AIDS">AIDS</option>
-              <option value="AIML">AIML</option>
-            </select>
-          </div>
-
-          <div className="flex-1 min-w-[100px] max-w-[150px]">
-            <label
               htmlFor="section"
               className="block text-lg font-medium text-white"
             >
@@ -406,19 +382,18 @@ function Absentees() {
               <option value="A">A</option>
               <option value="B">B</option>
               <option value="C">C</option>
-              <option value="-">NA</option>
+              <option value="D">D</option>
+              <option value="E">E</option>
+              <option value="F">F</option>
             </select>
           </div>
-        </div>
 
-        {/* Date Selection */}
-        <div className="flex justify-center items-center pb-5 mt-8">
-          <div className="w-full max-w-sm">
+          <div className="flex-1 min-w-[100px] max-w-[200px]">
             <label
               htmlFor="date"
-              className="block mb-2 text-lg font-medium text-center text-white"
+              className="block text-lg font-medium text-white"
             >
-              Select Date:
+              Date:
             </label>
             <input
               type="date"
@@ -480,11 +455,9 @@ function Absentees() {
         {!markabsentbutton && (
           <button
             onClick={handleConfirm}
-            disabled={
-              yearOfStudy === "nan" || branch === "nan" || section === "nan"
-            }
+            disabled={yearOfStudy === "nan" || section === "nan"}
             className={`px-8 py-4 w-full text-xl font-semibold text-white rounded-lg transition-all duration-500 ${
-              yearOfStudy === "nan" || branch === "nan" || section === "nan"
+              yearOfStudy === "nan" || section === "nan"
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-red-600 hover:scale-110 hover:bg-red-700"
             }`}

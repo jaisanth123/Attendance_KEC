@@ -8,7 +8,7 @@ const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 function UpdateAttendance() {
   const [yearOfStudy, setYearOfStudy] = useState("nan");
-  const [branch, setBranch] = useState("nan");
+  const [branch, setBranch] = useState("CSE");
   const [section, setSection] = useState("nan");
   const location = useLocation();
   const navigate = useNavigate();
@@ -33,12 +33,7 @@ function UpdateAttendance() {
     return;
   }
   const fetchStudentData = async () => {
-    if (
-      yearOfStudy === "nan" ||
-      branch === "nan" ||
-      section === "nan" ||
-      !date
-    ) {
+    if (yearOfStudy === "nan" || section === "nan" || !date) {
       return;
     }
     setIsLoading(true);
@@ -238,56 +233,45 @@ function UpdateAttendance() {
           </h1>
 
           {/* Dropdowns */}
-          <div className="flex flex-col gap-4 justify-center mt-4 w-full sm:flex-row">
-            <Dropdown
-              label="Year"
-              value={yearOfStudy}
-              options={["IV", "III", "II"]}
-              onChange={(e) => {
-                setYearOfStudy(e.target.value);
-                fetchStudentData();
-              }}
-            />
-            <Dropdown
-              label="Section"
-              value={section}
-              options={["A", "B", "C"]}
-              onChange={(e) => {
-                setSection(e.target.value);
-                fetchStudentData();
-              }}
-            />
-            <Dropdown
-              label="Branch"
-              value={branch}
-              options={["AIDS", "AIML"]}
-              onChange={(e) => {
-                fetchStudentData();
-                setBranch(e.target.value);
-              }}
-            />
-          </div>
-
-          {/* Date Selection */}
-          <div className="flex justify-center items-center pb-5 mt-8">
-            <div className="w-full max-w-sm">
-              <label
-                htmlFor="date"
-                className="block mb-2 text-lg font-medium text-center text-white"
-              >
-                Date:
-              </label>
-              <input
-                type="date"
-                id="date"
-                value={date}
+          <div className="flex justify-center mt-4 w-full">
+            <div className="flex gap-x-6 w-full max-w-2xl">
+              <Dropdown
+                label="Year"
+                value={yearOfStudy}
+                options={["IV", "III", "II"]}
                 onChange={(e) => {
-                  setDate(e.target.value);
+                  setYearOfStudy(e.target.value);
                   fetchStudentData();
                 }}
-                max={new Date().toISOString().split("T")[0]} // Restrict future dates
-                className="px-4 py-2 w-full text-black bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-gray-600"
               />
+              <Dropdown
+                label="Section"
+                value={section}
+                options={["A", "B", "C", "D", "E", "F"]}
+                onChange={(e) => {
+                  setSection(e.target.value);
+                  fetchStudentData();
+                }}
+              />
+              <div className="flex-1">
+                <label
+                  htmlFor="date"
+                  className="block text-lg font-medium text-white"
+                >
+                  Date:
+                </label>
+                <input
+                  type="date"
+                  id="date"
+                  value={date}
+                  onChange={(e) => {
+                    setDate(e.target.value);
+                    fetchStudentData();
+                  }}
+                  max={new Date().toISOString().split("T")[0]} // Restrict future dates
+                  className="px-4 py-2 w-full text-black bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-gray-600"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -428,14 +412,14 @@ function UpdateAttendance() {
 
 function Dropdown({ label, value, options, onChange }) {
   return (
-    <div className="w-full max-w-[250px]">
-      <label htmlFor={label} className="block mb-2 text-white">
-        {label}
+    <div className="flex-1">
+      <label htmlFor={label} className="block text-lg font-medium text-white">
+        {label}:
       </label>
       <select
         value={value}
         onChange={onChange}
-        className="px-4 py-2 w-full text-white bg-gray-700 rounded-lg border border-gray-600 focus:outline-none focus:ring focus:ring-gray-600"
+        className="px-4 py-2 w-full text-black bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-gray-600"
       >
         <option value="nan">Select {label}</option>
         {options.map((option, idx) => (
