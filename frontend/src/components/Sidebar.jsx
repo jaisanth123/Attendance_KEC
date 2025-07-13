@@ -46,6 +46,16 @@ const FeatureSection = ({
   </div>
 );
 
+// Standalone menu item component
+const StandaloneMenuItem = ({ label, path, handleNavigation }) => (
+  <div
+    onClick={() => handleNavigation(path)}
+    className="flex items-center p-3 mt-8 text-lg font-medium text-white rounded-lg transition-all duration-500 cursor-pointer hover:text-gray-200 hover:scale-105 hover:bg-gray-700"
+  >
+    <span className="text-xl">{label}</span>
+  </div>
+);
+
 function Sidebar({ closeSidebar }) {
   const [expandedFeature, setExpandedFeature] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -177,15 +187,20 @@ function Sidebar({ closeSidebar }) {
             />
           )}
 
-          {/* Other Options - Admin Only */}
+          {/* Standalone Menu Items - Admin Only */}
           {role === "admin" && (
-            <FeatureSection
-              title="Other Options"
-              expandedFeature={expandedFeature}
-              toggleFeature={toggleFeature}
-              options={[{ label: "Leave Count", path: "/leave-count" }]}
-              handleNavigation={handleNavigation}
-            />
+            <>
+              <StandaloneMenuItem
+                label="Leave Count"
+                path="/leave-count"
+                handleNavigation={handleNavigation}
+              />
+              <StandaloneMenuItem
+                label="HodInfo"
+                path="/hodinfo"
+                handleNavigation={handleNavigation}
+              />
+            </>
           )}
         </div>
 
@@ -235,5 +250,3 @@ function Sidebar({ closeSidebar }) {
 }
 
 export default Sidebar;
-
-
