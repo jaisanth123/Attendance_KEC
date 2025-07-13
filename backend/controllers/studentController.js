@@ -652,7 +652,9 @@ exports.searchStudentsByRollNo = async (req, res) => {
     }
 
     // Create a case-insensitive regex pattern for partial roll number matching
-    const rollNoRegex = new RegExp(rollNo, "i");
+    // Escape special regex characters to prevent regex errors
+    const escapedRollNo = rollNo.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const rollNoRegex = new RegExp(escapedRollNo, "i");
 
     // Find students whose roll numbers match the search pattern
     const students = await Student.find({ rollNo: rollNoRegex })

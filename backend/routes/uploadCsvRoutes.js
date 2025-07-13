@@ -1,9 +1,12 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const upload = require('../middleware/upload'); // multer middleware
-const studentController = require('../controllers/uploadCSVController');
+const upload = require("../middleware/upload"); // multer middleware
+const studentController = require("../controllers/uploadCSVController");
 
-router.post('/add-student', upload.single('csvfile'), studentController.addStudent);
+router.post(
+  "/add-student",
+  upload.single("csvfile"),
+  studentController.addStudent
+);
 
 module.exports = router;
-

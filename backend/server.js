@@ -2,7 +2,7 @@
 const express = require('express');
 const connectDB = require('./dbConnection'); // Import the database connection function
 const cors = require('cors'); // Import the CORS middleware
-const bodyParser = require("body-parser");  
+const bodyParser = require("body-parser");
 const app = express();
 const cookieParser = require('cookie-parser');
 
@@ -31,13 +31,14 @@ const studentRoutes = require('./routes/studentRoutes');
 const attendanceRoutes = require('./routes/attendanceRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const authRoutes = require('./routes/authRoutes');
-
+const uploadRoutes = require('./routes/uploadCsvRoutes');
 //const excelReportRoutes = require('./routes/excelReportRoutes');
 
 app.use('/api/students', studentRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/report', reportRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/upload', uploadRoutes);
 
 //app.use('/api/excel', excelReportRoutes);
 
