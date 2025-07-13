@@ -12,8 +12,10 @@ require("dotenv").config(); // Load environment variables from .env file
 // Middleware
 // CORS configuration
 const corsOptions = {
-  //origin: 'https://ai-attendance-client.vercel.app', // Your client URL
-  origin: "https://attendance-kec.onrender.com",
+  origin: [
+    "https://attendance-kec.onrender.com",
+    "http://localhost:5173"
+  ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed methods
   credentials: true, // Allow cookies and credentials
   allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
