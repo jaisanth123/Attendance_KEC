@@ -167,6 +167,41 @@ exports.deleteStudentByRollNo = async (req, res) => {
   }
 };
 
+//! bulk delete Controller function
+exports.bulkDeleteStudents = async (req, res) => {
+  const { yearOfStudy, branch, section } = req.body;
+
+  try {
+    // Validate required parameters
+    if (!yearOfStudy || !branch || !section) {
+      return res.status(400).json({
+        success: false,
+        message: "Year of Study, Branch, and Section are required",
+      });
+    }
+
+    // Create filter object
+    const filter = { yearOfStudy, branch, section };
+
+    // Delete students matching the criteria
+    const result = await Student.deleteMany(filter);
+
+    // Return success response
+    res.status(200).json({
+      success: true,
+      message: `${result.deletedCount} student(s) deleted successfully`,
+      deletedCount: result.deletedCount,
+    });
+  } catch (error) {
+    console.error("Error bulk deleting students:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error deleting students",
+      error: error.message,
+    });
+  }
+};
+
 //! create student
 exports.createStudent = async (req, res) => {
   const studentData = req.body;
@@ -686,7 +721,7 @@ exports.searchStudentsByRollNo = async (req, res) => {
     });
   }
 };
-  exports.getDistinctClasses = async (req, res) => {
+exports.getDistinctClasses = async (req, res) => {
   try {
     // Use MongoDB aggregation to get distinct combinations of yearOfStudy, branch, and section
     const distinctClasses = await Student.aggregate([
