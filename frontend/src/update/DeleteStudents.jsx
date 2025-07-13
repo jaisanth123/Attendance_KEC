@@ -88,13 +88,16 @@ function DeleteStudents() {
     }
 
     try {
-      const res = await fetch(`${backendURL}/api/delete-students/students`, {
+      const res = await fetch(`${backendURL}/api/students/bulk-delete`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ yearOfStudy, branch, section }),
       });
-      const text = await res.text();
-      setMessage({ text, type: "success" });
+      const data = await res.json();
+      setMessage({
+        text: data.message,
+        type: data.success ? "success" : "error",
+      });
       // Clear form
       setYearOfStudy("");
       setBranch("");
@@ -114,14 +117,14 @@ function DeleteStudents() {
     }
 
     try {
-      const res = await fetch(
-        `${backendURL}/api/delete-students/student/${rollNo}`,
-        {
-          method: "DELETE",
-        }
-      );
-      const text = await res.text();
-      setMessage({ text, type: "success" });
+      const res = await fetch(`${backendURL}/api/students/delete/${rollNo}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      setMessage({
+        text: data.message,
+        type: data.success ? "success" : "error",
+      });
       // Clear form
       setRollNo("");
       setRollNoSearchResults([]);
@@ -264,6 +267,7 @@ function DeleteStudents() {
                     >
                       <option value="">Select Branch</option>
                       <option value="AIDS">AI & DS</option>
+                      <option value="CSE">CSE</option>
                       <option value="AIML">AI & ML</option>
                     </select>
                   </div>
