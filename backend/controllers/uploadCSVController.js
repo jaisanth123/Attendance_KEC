@@ -12,6 +12,7 @@ exports.addStudent = async (req, res) => {
 
   const results = [];
   const filePath = req.file.path;
+  let isFirstRow = true;
 
   fs.createReadStream(filePath)
     .pipe(
@@ -25,7 +26,14 @@ exports.addStudent = async (req, res) => {
         "section",
       ])
     )
-    .on("data", (data) => results.push(data))
+    .on("data", (data) => {
+      // Skip the first row (header row)
+      if (isFirstRow) {
+        isFirstRow = false;
+        return;
+      }
+      results.push(data);
+    })
     .on("end", async () => {
       try {
         if (results.length === 0) {
