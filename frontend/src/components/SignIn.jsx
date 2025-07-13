@@ -7,7 +7,6 @@ import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
 const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 // Debug: Log the backend URL to console
-console.log("Backend URL:", backendURL);
 
 function SignIn() {
   const navigate = useNavigate();
