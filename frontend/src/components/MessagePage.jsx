@@ -5,16 +5,22 @@ import { toast, ToastContainer } from "react-toastify"; // Import react-toastify
 import "react-toastify/dist/ReactToastify.css"; // Import toast styles
 import RoleFromToken from "./RoleFromToken"; // Import the function to get the role from token
 
+const backendURL = import.meta.env.VITE_BACKEND_URL;
+
 const MessagePage = ({ toggleSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [role, setRole] = useState(null);  // Store the role state
+  const [role, setRole] = useState(null); // Store the role state
 
   const [yearOfStudy, setYearOfStudy] = useState("");
   const [section, setSection] = useState("");
   const [branch, setBranch] = useState("");
-  const [selectedCourse, setSelectedCourse] = useState(location.state?.selectedCourse || "Select a course");
-  const [selectedDate, setSelectedDate] = useState(location.state?.selectedDate || "");
+  const [selectedCourse, setSelectedCourse] = useState(
+    location.state?.selectedCourse || "Select a course"
+  );
+  const [selectedDate, setSelectedDate] = useState(
+    location.state?.selectedDate || ""
+  );
 
   const [message, setMessage] = useState("");
   const [details, setDetails] = useState([]);
@@ -67,14 +73,16 @@ const MessagePage = ({ toggleSidebar }) => {
     console.log(yearOfStudy, branch, section);
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/report/absentStudents?yearOfStudy=${yearOfStudy}&branch=${branch}&section=${section}&date=${date}`,
+        `${backendURL}/api/report/absentStudents?yearOfStudy=${yearOfStudy}&branch=${branch}&section=${section}&date=${date}`,
         { withCredentials: true } // Add withCredentials in the configuration object
       );
-    
+
       if (response.data.message) {
         setMessage(response.data.message);
 
-        const detailsArray = response.data.details ? response.data.details.split("\n") : [];
+        const detailsArray = response.data.details
+          ? response.data.details.split("\n")
+          : [];
         setDetails(detailsArray);
         setMissingStudents(response.data.missingStudents || []);
         setErrorMessage("");
@@ -132,74 +140,95 @@ const MessagePage = ({ toggleSidebar }) => {
 
   return (
     <div className="p-4 text-center text-black">
-      <h1 className="text-2xl font-semibold md:text-3xl lg:text-4xl">{selectedCourse}</h1>
-      <h3 className="text-lg font-semibold md:text-xl lg:text-2xl">Message Page</h3>
-      <h3 className="mt-2 mb-4 text-base font-semibold md:text-lg lg:text-xl">{formatDate(selectedDate)}</h3>
+      <h1 className="text-2xl font-semibold md:text-3xl lg:text-4xl">
+        {selectedCourse}
+      </h1>
+      <h3 className="text-lg font-semibold md:text-xl lg:text-2xl">
+        Message Page
+      </h3>
+      <h3 className="mt-2 mb-4 text-base font-semibold md:text-lg lg:text-xl">
+        {formatDate(selectedDate)}
+      </h3>
 
       <div className="flex flex-col items-center gap-y-4">
         {/* Conditionally render Get Absentees Button based on role */}
-        
-          <div
-            onClick={() => {
-              getAbsentStudents(selectedCourse, selectedDate);
-              toggleCardVisibility();
-            }}
-            className="w-full max-w-xs p-6 mx-auto mt-6 text-white transition-all duration-500 bg-gray-800 rounded-lg shadow-lg hover:scale-110 hover:bg-gray-600"
-          >
-            <button className="w-full py-2 text-2xl font-semibold text-whiterounded-lg">
-              Get Absentees
-            </button>
-          </div>
-        
 
-        {showCard && (message || details.length > 0 || missingStudents.length > 0 || errorMessage) && (
-          <div
-            ref={cardRef}
-            className="w-full h-auto p-6 mx-auto mt-6 bg-white border-2 border-gray-300 rounded-lg shadow-lg sm:w-3/4 md:w-2/3 lg:w-1/2"
-          >
-            <div id="cardContent">
-              {message && (
-                <div className="mt-4">
-                  <p className="font-semibold text-gray-800" dangerouslySetInnerHTML={{ __html: formatTextWithLineBreaks(message) }} />
-                </div>
-              )}
+        <div
+          onClick={() => {
+            getAbsentStudents(selectedCourse, selectedDate);
+            toggleCardVisibility();
+          }}
+          className="w-full max-w-xs p-6 mx-auto mt-6 text-white transition-all duration-500 bg-gray-800 rounded-lg shadow-lg hover:scale-110 hover:bg-gray-600"
+        >
+          <button className="w-full py-2 text-2xl font-semibold text-whiterounded-lg">
+            Get Absentees
+          </button>
+        </div>
 
-              {Array.isArray(details) && details.length > 0 && (
-                <div className="mt-4">
-                  <ul className="mt-2 space-y-2 text-gray-700 list-none">
-                    {details.map((detail, index) => (
-                      <li key={index} className="font-bold">{detail}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {errorMessage && (
-                <div className="p-3 mt-4 border border-red-300 rounded bg-red-50">
-                  <p className="text-red-600">{errorMessage}</p>
-                </div>
-              )}
-              {missingStudents.length > 0 && (
-                <div className="mt-4">
-                  <p className="text-xl">Count of Missing Absentees Records: {missingStudents.length}</p>
-                </div>
-              )}
-            </div>
-
-            <button
-              onClick={copyCardContent}
-              className="px-6 py-2 mt-4 font-semibold text-white transition-all duration-500 bg-blue-800 rounded-lg shadow-lg hover:bg-blue-600 hover:scale-110"
+        {showCard &&
+          (message ||
+            details.length > 0 ||
+            missingStudents.length > 0 ||
+            errorMessage) && (
+            <div
+              ref={cardRef}
+              className="w-full h-auto p-6 mx-auto mt-6 bg-white border-2 border-gray-300 rounded-lg shadow-lg sm:w-3/4 md:w-2/3 lg:w-1/2"
             >
-              Copy Content
-            </button>
-          </div>
-        )}
+              <div id="cardContent">
+                {message && (
+                  <div className="mt-4">
+                    <p
+                      className="font-semibold text-gray-800"
+                      dangerouslySetInnerHTML={{
+                        __html: formatTextWithLineBreaks(message),
+                      }}
+                    />
+                  </div>
+                )}
+
+                {Array.isArray(details) && details.length > 0 && (
+                  <div className="mt-4">
+                    <ul className="mt-2 space-y-2 text-gray-700 list-none">
+                      {details.map((detail, index) => (
+                        <li key={index} className="font-bold">
+                          {detail}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {errorMessage && (
+                  <div className="p-3 mt-4 border border-red-300 rounded bg-red-50">
+                    <p className="text-red-600">{errorMessage}</p>
+                  </div>
+                )}
+                {missingStudents.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-xl">
+                      Count of Missing Absentees Records:{" "}
+                      {missingStudents.length}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={copyCardContent}
+                className="px-6 py-2 mt-4 font-semibold text-white transition-all duration-500 bg-blue-800 rounded-lg shadow-lg hover:bg-blue-600 hover:scale-110"
+              >
+                Copy Content
+              </button>
+            </div>
+          )}
 
         {/* Attendance Button */}
 
-
         {/* Home Button */}
-        <div onClick={navigateToHome} className="w-full max-w-xs p-6 mx-auto mt-6 text-white transition-all duration-500 bg-gray-800 rounded-lg shadow-lg hover:bg-gray-600 hover:scale-110">
+        <div
+          onClick={navigateToHome}
+          className="w-full max-w-xs p-6 mx-auto mt-6 text-white transition-all duration-500 bg-gray-800 rounded-lg shadow-lg hover:bg-gray-600 hover:scale-110"
+        >
           <button className="w-full py-2 text-2xl font-semibold text-white">
             Home
           </button>

@@ -9,8 +9,6 @@ function UpdateYear() {
   const [toYear, setToYear] = useState("");
   const [message, setMessage] = useState({ text: "", type: "" });
 
-  const apiBase = "http://localhost:5000";
-
   const handleUpdateYear = async () => {
     if (!fromYear || !toYear) {
       setMessage({

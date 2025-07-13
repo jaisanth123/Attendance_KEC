@@ -1,11 +1,10 @@
-
-
-
-import React, { useState ,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios"; // Import axios
 import "react-toastify/dist/ReactToastify.css"; // Import the toast CSS
+
+const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 const Hostelreport = () => {
   const [isLoading, setIsLoading] = useState(false); // State to track loading status
@@ -35,7 +34,7 @@ const Hostelreport = () => {
   };
 
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
     setDate(today);
   }, []);
 
@@ -45,11 +44,11 @@ const Hostelreport = () => {
       toast.info("Please select a date.", { autoClose: 800 });
       return;
     }
-  
+
     setIsLoading(true);
     setMessage("");
     const authToken = sessionStorage.getItem("authToken");
-  
+
     if (!authToken) {
       toast.error("Authorization token is missing. Please log in again.", {
         autoClose: 800,
@@ -57,9 +56,9 @@ const Hostelreport = () => {
       setIsLoading(false);
       return;
     }
-  
-    const url = `http://localhost:5000/api/report/download-absent-report?gender=${gender}&date=${date}&hostellerDayScholar=HOSTELLER&yearOfStudy=${yearOfStudy}&section=${section}&branch=${branch}`;
-  
+
+    const url = `${backendURL}/api/report/download-absent-report?gender=${gender}&date=${date}&hostellerDayScholar=HOSTELLER&yearOfStudy=${yearOfStudy}&section=${section}&branch=${branch}`;
+
     axios
       .get(url, {
         responseType: "blob",
@@ -81,10 +80,10 @@ const Hostelreport = () => {
       })
       .catch((error) => {
         setIsLoading(false);
-  
+
         if (error.response) {
           const { status, data } = error.response;
-  
+
           if (status === 404) {
             const formattedDate = formatDate(date);
             setMessage(
@@ -110,11 +109,13 @@ const Hostelreport = () => {
         }
       });
   };
-  
+
   return (
-<div className="flex items-start justify-center min-h-screen p-6">
-  <div className="w-full p-6 bg-gray-800 rounded-lg shadow-lg sm:w-96 md:w-80 lg:w-96 xl:w-1/3">
-    <h2 className="mb-2 text-2xl font-semibold text-center text-white">Download Absentee Report</h2>
+    <div className="flex items-start justify-center min-h-screen p-6">
+      <div className="w-full p-6 bg-gray-800 rounded-lg shadow-lg sm:w-96 md:w-80 lg:w-96 xl:w-1/3">
+        <h2 className="mb-2 text-2xl font-semibold text-center text-white">
+          Download Absentee Report
+        </h2>
 
         {/* Date input field */}
         <div className="mb-4">
@@ -152,8 +153,6 @@ const Hostelreport = () => {
             <option value="FEMALE">GIRLS</option>
           </select>
         </div>
-
-
 
         {/* Year of Study dropdown */}
         <div className="mb-4">
@@ -220,12 +219,14 @@ const Hostelreport = () => {
         {/* Button to download report */}
         <button
           onClick={handleDownload}
-          className={`w-full px-4 py-2 font-bold text-white transition duration-500 rounded-md shadow  ${isLoading? "bg-gray-600 hover:bg-gray-700 cursor-not-allowed":"bg-blue-600 hover:scale-105"}`}
+          className={`w-full px-4 py-2 font-bold text-white transition duration-500 rounded-md shadow  ${
+            isLoading
+              ? "bg-gray-600 hover:bg-gray-700 cursor-not-allowed"
+              : "bg-blue-600 hover:scale-105"
+          }`}
         >
           {isLoading ? "Loading..." : "Download Report"}
         </button>
-
-
 
         {/* Back button */}
         <button
@@ -236,16 +237,12 @@ const Hostelreport = () => {
         </button>
 
         {/* Display message if no students are absent */}
-        {message && (
-          <p className="mt-4 text-center text-white">{message}</p>
-        )}
+        {message && <p className="mt-4 text-center text-white">{message}</p>}
       </div>
 
       {/* Toast notifications */}
-    
     </div>
   );
 };
 
-
-export default Hostelreport
+export default Hostelreport;

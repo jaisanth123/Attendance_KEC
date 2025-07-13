@@ -1,13 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify"; // Importing toast and ToastContainer
-import 'react-toastify/dist/ReactToastify.css'; // Importing styles for toast notifications
+import "react-toastify/dist/ReactToastify.css"; // Importing styles for toast notifications
+
+const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 const SendEmail = () => {
   const [emailStatus, setEmailStatus] = useState("");
   const [file, setFile] = useState(null);
   const [isButtonClicked, setIsButtonClicked] = useState(false);
-  const [toEmails, setToEmails] = useState("vikymahendiran123@gmail.com, bdvbusiness247@gmail.com,jaisanth2006@gmail.com"); // Default emails
+  const [toEmails, setToEmails] = useState(
+    "vikymahendiran123@gmail.com, bdvbusiness247@gmail.com,jaisanth2006@gmail.com"
+  ); // Default emails
   const navigate = useNavigate();
 
   const handleFileChange = (e) => {
@@ -26,12 +30,12 @@ const SendEmail = () => {
 
     const formData = new FormData();
     formData.append("file", file);
-    const currentDate = new Date().toLocaleDateString('en-GB');
+    const currentDate = new Date().toLocaleDateString("en-GB");
     formData.append("subject", `${currentDate} - Absentees Report`);
     formData.append("content", "Please find the attached Excel report.");
     formData.append("toEmails", toEmails); // Use the toEmails state
     const authToken = sessionStorage.getItem("authToken");
-  
+
     if (!authToken) {
       toast.error("Authorization token is missing. Please log in again.", {
         autoClose: 800,
@@ -42,7 +46,7 @@ const SendEmail = () => {
     try {
       const response = await fetch(
         //"http://localhost:5000/api/attendance/send-email",
-        "http://localhost:5000/api/attendance/hostelreport",
+        `${backendURL}/api/attendance/hostelreport`,
         {
           method: "POST",
           body: formData,
@@ -72,11 +76,18 @@ const SendEmail = () => {
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="w-full max-w-lg p-8 bg-gray-800 rounded-lg shadow-3xl">
-        <h1 className="mb-6 text-3xl font-semibold text-center text-white">Send Email with Excel File</h1>
+        <h1 className="mb-6 text-3xl font-semibold text-center text-white">
+          Send Email with Excel File
+        </h1>
 
         <div className="space-y-6">
           <div>
-            <label htmlFor="file" className="block font-medium text-white text-md">Upload Excel File</label>
+            <label
+              htmlFor="file"
+              className="block font-medium text-white text-md"
+            >
+              Upload Excel File
+            </label>
             <input
               id="file"
               type="file"
@@ -87,7 +98,12 @@ const SendEmail = () => {
           </div>
 
           <div>
-            <label htmlFor="emails" className="block font-medium text-white text-md ">To (Default: Absentees)</label>
+            <label
+              htmlFor="emails"
+              className="block font-medium text-white text-md "
+            >
+              To (Default: Absentees)
+            </label>
             <input
               id="emails"
               type="text"
@@ -109,7 +125,6 @@ const SendEmail = () => {
               {isButtonClicked ? "Sending..." : "Send Email"}
             </button>
           </div>
-
         </div>
 
         <div className="flex justify-center mt-6 space-x-4">
