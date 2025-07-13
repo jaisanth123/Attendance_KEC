@@ -35,11 +35,17 @@ function UploadCsv() {
         method: "POST",
         body: formData,
       });
-      const text = await res.text();
-      setMessage(text);
-      setMessageType("success");
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const data = await res.json();
+      setMessage(data.message);
+      setMessageType(data.success ? "success" : "error");
     } catch (err) {
-      setMessage("Upload failed.");
+      console.error("Upload error:", err);
+      setMessage("Upload failed. Please check your file and try again.");
       setMessageType("error");
     } finally {
       setIsUploading(false);

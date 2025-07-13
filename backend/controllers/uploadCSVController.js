@@ -1,55 +1,15 @@
-// const express = require('express');
-// const multer = require('multer');
-// const csv = require('csv-parser');
-// const fs = require('fs');
-
-// const router = express.Router();
-// const upload = multer({ dest: 'uploads/' });
-
-// // POST /add-student
-// router.post('/add-student', upload.single('csvfile'), async (req, res) => {
-//   const results = [];
-//   const filePath = req.file.path;
-
-//   fs.createReadStream(filePath)
-//     .pipe(csv(['rollNo', 'name', 'hostellerDayScholar', 'gender', 'yearOfStudy', 'branch', 'section']))
-//     .on('data', (data) => results.push(data))
-//     .on('end', async () => {
-//       const db = req.app.locals.db;
-//       try {
-//         const collection = db.collection('students');
-
-//         const rollNos = results.map(r => r.rollNo);
-//         const existing = await collection
-//           .find({ rollNo: { $in: rollNos } })
-//           .project({ rollNo: 1 })
-//           .toArray();
-
-//         const existingRollNos = new Set(existing.map(doc => doc.rollNo));
-//         const newEntries = results.filter(r => !existingRollNos.has(r.rollNo));
-
-//         if (newEntries.length > 0) {
-//           await collection.insertMany(newEntries);
-//           res.send(`${newEntries.length} new student(s) inserted. Duplicates skipped.`);
-//         } else {
-//           res.send('No new students inserted. All roll numbers already exist.');
-//         }
-//       } catch (err) {
-//         console.error(err);
-//         res.status(500).send('Failed to upload to MongoDB.');
-//       } finally {
-//         fs.unlinkSync(filePath); // cleanup temp file
-//       }
-//     });
-// });
-
-// module.exports = router;
-
 const fs = require("fs");
-const csv = require("csv-parser"); // make sure it's installed
-const Student = require("../models/Student"); // adjust the path if needed
+const csv = require("csv-parser");
+const Student = require("../models/Student");
 
 exports.addStudent = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({
+      success: false,
+      message: "No file uploaded",
+    });
+  }
+
   const results = [];
   const filePath = req.file.path;
 
@@ -68,6 +28,13 @@ exports.addStudent = async (req, res) => {
     .on("data", (data) => results.push(data))
     .on("end", async () => {
       try {
+        if (results.length === 0) {
+          return res.status(400).json({
+            success: false,
+            message: "CSV file is empty or invalid format",
+          });
+        }
+
         const rollNos = results.map((r) => r.rollNo);
         const existing = await Student.find({
           rollNo: { $in: rollNos },
@@ -79,17 +46,35 @@ exports.addStudent = async (req, res) => {
 
         if (newEntries.length > 0) {
           await Student.insertMany(newEntries);
-          res.send(
-            `${newEntries.length} new student(s) inserted. Duplicates skipped.`
-          );
+          res.json({
+            success: true,
+            message: `${newEntries.length} new student(s) inserted. Duplicates skipped.`,
+          });
         } else {
-          res.send("No new students inserted. All roll numbers already exist.");
+          res.json({
+            success: true,
+            message:
+              "No new students inserted. All roll numbers already exist.",
+          });
         }
       } catch (err) {
-        console.error(err);
-        res.status(500).send("Failed to upload to MongoDB.");
+        console.error("Upload error:", err);
+        res.status(500).json({
+          success: false,
+          message: "Failed to upload to MongoDB.",
+        });
       } finally {
-        fs.unlinkSync(filePath); // cleanup temp file
+        // Cleanup temp file
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
       }
+    })
+    .on("error", (error) => {
+      console.error("CSV parsing error:", error);
+      res.status(400).json({
+        success: false,
+        message: "Error parsing CSV file. Please check the file format.",
+      });
     });
 };
