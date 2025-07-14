@@ -13,6 +13,7 @@ require("dotenv").config(); // Load environment variables from .env file
 // CORS configuration
 const corsOptions = {
   origin: [
+    
     "https://attendance-kec.onrender.com",
     "http://localhost:5173",
   ].filter(Boolean), // Remove any undefined values
