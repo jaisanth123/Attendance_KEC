@@ -8,7 +8,6 @@ const backendURL = import.meta.env.VITE_BACKEND_URL;
 function UpdateSuperpacc() {
   const navigate = useNavigate();
   const [yearOfStudy, setYearOfStudy] = useState("nan");
-  const [branch, setBranch] = useState("nan");
   const [section, setSection] = useState("nan");
   const [students, setStudents] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,13 +27,13 @@ function UpdateSuperpacc() {
   }
 
   useEffect(() => {
-    if (yearOfStudy !== "nan" && branch !== "nan" && section !== "nan") {
+    if (yearOfStudy !== "nan" && section !== "nan") {
       fetchStudents();
     } else {
       setStudents([]);
       setChangedStudents([]);
     }
-  }, [yearOfStudy, branch, section]);
+  }, [yearOfStudy, section]);
 
   const fetchStudents = async () => {
     setIsLoading(true);
@@ -48,7 +47,7 @@ function UpdateSuperpacc() {
           },
           params: {
             yearOfStudy,
-            branch,
+            branch: "CSE",
             section,
           },
         }
@@ -130,7 +129,7 @@ function UpdateSuperpacc() {
         `${backendURL}/api/students/superpacc/batch-update`,
         {
           yearOfStudy,
-          branch,
+          branch: "CSE",
           section,
           rollNumberStateMapping,
         },
@@ -210,25 +209,6 @@ function UpdateSuperpacc() {
               <option value="IV">IV</option>
               <option value="III">III</option>
               <option value="II">II</option>
-            </select>
-          </div>
-
-          <div className="flex-1 min-w-[100px] max-w-[150px]">
-            <label
-              htmlFor="branch"
-              className="block text-lg font-medium text-white"
-            >
-              Branch:
-            </label>
-            <select
-              id="branch"
-              value={branch}
-              onChange={(e) => setBranch(e.target.value)}
-              className="px-4 py-2 w-full text-black bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-gray-600"
-            >
-              <option value="nan">Branch</option>
-              <option value="AIDS">AIDS</option>
-              <option value="AIML">AIML</option>
             </select>
           </div>
 
