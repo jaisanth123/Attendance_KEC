@@ -63,6 +63,6 @@ const createStaff = async () => {
 };
 
 // Call the functions to create the user and admin
-// createUser();
-// createAdmin();
+createUser();
+createAdmin();
 createStaff();
