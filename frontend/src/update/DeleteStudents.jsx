@@ -15,7 +15,6 @@ function DeleteStudents() {
   const navigate = useNavigate();
   const [isBulkMode, setIsBulkMode] = useState(true);
   const [yearOfStudy, setYearOfStudy] = useState("");
-  const [branch, setBranch] = useState("");
   const [section, setSection] = useState("");
   const [rollNo, setRollNo] = useState("");
   const [message, setMessage] = useState({ text: "", type: "" });
@@ -79,9 +78,9 @@ function DeleteStudents() {
   };
 
   const handleBulkDelete = async () => {
-    if (!yearOfStudy || !branch || !section) {
+    if (!yearOfStudy || !section) {
       setMessage({
-        text: "All fields are required for bulk delete.",
+        text: "Year of Study and Section are required for bulk delete.",
         type: "error",
       });
       return;
@@ -91,7 +90,7 @@ function DeleteStudents() {
       const res = await fetch(`${backendURL}/api/students/bulk-delete`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ yearOfStudy, branch, section }),
+        body: JSON.stringify({ yearOfStudy, branch: "CSE", section }),
       });
       const data = await res.json();
       setMessage({
@@ -100,7 +99,6 @@ function DeleteStudents() {
       });
       // Clear form
       setYearOfStudy("");
-      setBranch("");
       setSection("");
     } catch (err) {
       setMessage({ text: "Bulk delete failed.", type: "error" });
@@ -238,7 +236,7 @@ function DeleteStudents() {
           <div className="p-6">
             {isBulkMode ? (
               <div className="space-y-6">
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <label className="block mb-1 text-sm font-medium text-gray-700">
                       Year of Study
@@ -249,25 +247,9 @@ function DeleteStudents() {
                       className="px-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
                     >
                       <option value="">Select Year</option>
-                      <option value="I">I</option>
                       <option value="II">II</option>
                       <option value="III">III</option>
                       <option value="IV">IV</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block mb-1 text-sm font-medium text-gray-700">
-                      Branch
-                    </label>
-                    <select
-                      value={branch}
-                      onChange={(e) => setBranch(e.target.value)}
-                      className="px-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
-                    >
-                      <option value="">Select Branch</option>
-                      <option value="AIDS">AI & DS</option>
-                      <option value="AIML">AI & ML</option>
                     </select>
                   </div>
 
@@ -292,9 +274,9 @@ function DeleteStudents() {
                 <div className="flex justify-end">
                   <button
                     onClick={handleBulkDelete}
-                    disabled={!yearOfStudy || !branch || !section}
+                    disabled={!yearOfStudy || !section}
                     className={`px-4 py-2 text-white rounded-lg transition-colors ${
-                      !yearOfStudy || !branch || !section
+                      !yearOfStudy || !section
                         ? "bg-gray-400 cursor-not-allowed"
                         : "bg-red-600 hover:bg-red-700"
                     }`}

@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 // MongoDB URI from MongoDB Atlas
 const uri =
-  "mongodb+srv://krrashmika2004:nhwUubZLhWrmu7Lr@cluster0.sfj4f.mongodb.net/AI_Attendence?retryWrites=true";
+  "mongodb+srv://hodcse:Z3EZVI40t7lpr23S@cluster0.dm26ae7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 // Connect to MongoDB
 
 const connectDB = async () => {
