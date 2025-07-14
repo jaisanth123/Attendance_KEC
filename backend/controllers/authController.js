@@ -53,14 +53,14 @@ const loginAdmin = async (req, res) => {
     return res.status(400).json({ message: "Invalid credentials" });
   }
 
-  
+
   sendToken(admin, 200, res, "Admin logged in successfully");
 };
 
 //! this is the controller for change password
 const changePassword = async (req, res) => {
   try {
-    const { currentPassword, newPassword } = req.body;
+    const { role, username, currentPassword, newPassword } = req.body;
 
     // Validate request body
     if (!currentPassword || !newPassword) {
@@ -78,14 +78,28 @@ const changePassword = async (req, res) => {
       });
     }
 
-    // Determine if the request is from a user or admin
     let user = req.user || req.admin;
 
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+    // If admin is changing someone else's password
+    if (role && username) {
+      let Model;
+      if (role === "admin") Model = Admin;
+      else if (role === "staff") Model = Staff;
+      else if (role === "user") Model = User;
+      else {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid role selected",
+        });
+      }
+
+      user = await Model.findOne({ username });
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
     }
 
     // Check if current password is correct
@@ -115,3 +129,4 @@ const changePassword = async (req, res) => {
   }
 };
 module.exports = { loginUser, loginAdmin, loginStaff, changePassword };
+

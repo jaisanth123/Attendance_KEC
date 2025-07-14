@@ -6,7 +6,7 @@ const Staff = require("./models/staffSchema.js");
 // Connect to your MongoDB database
 mongoose
   .connect(
-    "mongodb+srv://hodcse:Z3EZVI40t7lpr23S@cluster0.dm26ae7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+    "mongodb+srv://krrashmika2004:nhwUubZLhWrmu7Lr@cluster0.sfj4f.mongodb.net/AI_Attendence?retryWrites=true&w=majority",
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -66,3 +66,5 @@ const createStaff = async () => {
 createUser();
 createAdmin();
 createStaff();
+
+

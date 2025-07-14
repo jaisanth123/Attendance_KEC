@@ -12,8 +12,10 @@ require("dotenv").config(); // Load environment variables from .env file
 // Middleware
 // CORS configuration
 const corsOptions = {
-  //origin: 'https://ai-attendance-client.vercel.app', // Your client URL
-  origin: ["http://localhost:5173","https://attendance-cse-backend.onrender.com","https://attendance-kec-mfv7.onrender.com"],
+  origin: [
+    "https://attendance-kec.onrender.com",
+    "http://localhost:5173",
+  ].filter(Boolean), // Remove any undefined values
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed methods
   credentials: true, // Allow cookies and credentials
   allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
@@ -31,7 +33,6 @@ const attendanceRoutes = require("./routes/attendanceRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const authRoutes = require("./routes/authRoutes");
 const uploadRoutes = require("./routes/uploadCsvRoutes");
-
 //const excelReportRoutes = require('./routes/excelReportRoutes');
 
 app.use("/api/students", studentRoutes);
@@ -39,7 +40,6 @@ app.use("/api/attendance", attendanceRoutes);
 app.use("/api/report", reportRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/upload", uploadRoutes);
-
 //app.use('/api/excel', excelReportRoutes);
 
 // Start the server
@@ -47,3 +47,7 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
+
+
