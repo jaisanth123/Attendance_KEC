@@ -376,7 +376,16 @@ const Hodinfo = () => {
                               onClick={() =>
                                 handleStudentClick(student, course)
                               }
-                              className="relative flex justify-center items-center p-3 font-semibold text-white bg-red-600 rounded-lg shadow-md transition-all duration-300 transform cursor-pointer hover:scale-105 w-full min-h-[80px]"
+                              className={`relative flex justify-center items-center p-3 font-semibold text-white rounded-lg shadow-md transition-all duration-300 transform cursor-pointer hover:scale-105 w-full min-h-[80px] ${
+                                typeof leaveCounts[student.rollNo] !==
+                                "undefined"
+                                  ? leaveCounts[student.rollNo] >= 4
+                                    ? "bg-red-600 hover:bg-red-700"
+                                    : leaveCounts[student.rollNo] >= 2
+                                    ? "bg-yellow-600 hover:bg-yellow-700"
+                                    : "bg-green-600 hover:bg-green-700"
+                                  : "bg-red-600 hover:bg-red-700"
+                              }`}
                             >
                               <div className="text-center">
                                 <div className="text-sm font-bold">
@@ -386,7 +395,15 @@ const Hodinfo = () => {
                               </div>
                               {typeof leaveCounts[student.rollNo] !==
                                 "undefined" && (
-                                <span className="absolute bottom-1 right-1 px-2 py-0.5 text-xs font-semibold bg-white text-red-600 rounded-full">
+                                <span
+                                  className={`absolute bottom-1 right-1 px-2 py-0.5 text-xs font-semibold rounded-full ${
+                                    leaveCounts[student.rollNo] >= 4
+                                      ? "bg-white text-red-600"
+                                      : leaveCounts[student.rollNo] >= 2
+                                      ? "bg-white text-yellow-600"
+                                      : "bg-white text-green-600"
+                                  }`}
+                                >
                                   {leaveCounts[student.rollNo]}
                                 </span>
                               )}
