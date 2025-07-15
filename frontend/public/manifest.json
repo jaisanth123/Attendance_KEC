@@ -1,0 +1,20 @@
+{
+  "name": "CSE Attendance",
+  "short_name": "Attendance",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e293b",
+  "icons": [
+    {
+      "src": "/src/assets/Screenshot_20250712_193903-removebg-preview.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/src/assets/Screenshot_20250712_193903-removebg-preview.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
