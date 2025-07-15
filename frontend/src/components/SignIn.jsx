@@ -4,10 +4,12 @@ import axios from "axios"; // Import axios for API requests
 import { ToastContainer, toast } from "react-toastify"; // Import toastify
 import "react-toastify/dist/ReactToastify.css"; // Import toastify CSS
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
+import { useAuth } from "./AuthProvider";
 const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 function SignIn() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   // State for form inputs
   const [username, setUsername] = useState("");
@@ -45,9 +47,9 @@ function SignIn() {
         );
       }
 
-      // Save the token in sessionStorage
+      // Save the token and update auth state
       const token = response.data.token;
-      sessionStorage.setItem("authToken", token); // Store token in sessionStorage
+      login(token); // Use the auth context to login
 
       // Show success toast
       toast.success(response.data.message, {

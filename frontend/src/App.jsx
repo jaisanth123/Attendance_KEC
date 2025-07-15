@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import Toastify CSS
+import { AuthProvider, useAuth } from "./components/AuthProvider";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import HomePage from "./components/HomePage";
@@ -81,104 +82,118 @@ function App() {
   }, []);
 
   const logoutHandler = () => {
-    // Remove the token from sessionStorage
-    sessionStorage.removeItem("authToken");
+    // Use the auth context to logout
+    const { logout } = useAuth();
+    logout();
     // Redirect to the SignIn page
     window.location.href = "/signin";
   };
 
   return (
-    <Router>
-      <div className="flex flex-col h-screen">
-        {/* Render Navbar only if authenticated */}
-        {<Navbar toggleSidebar={toggleSidebar} logoutHandler={logoutHandler} />}
+    <AuthProvider>
+      <Router>
+        <div className="flex flex-col h-screen">
+          {/* Render Navbar only if authenticated */}
+          {
+            <Navbar
+              toggleSidebar={toggleSidebar}
+              logoutHandler={logoutHandler}
+            />
+          }
 
-        {/* Sidebar Overlay for Mobile */}
-        {isSidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black opacity-50 transition-opacity duration-300 md:hidden"
-            onClick={() => setIsSidebarOpen(false)}
-            aria-label="Close Sidebar"
-          ></div>
-        )}
+          {/* Sidebar Overlay for Mobile */}
+          {isSidebarOpen && (
+            <div
+              className="fixed inset-0 bg-black opacity-50 transition-opacity duration-300 md:hidden"
+              onClick={() => setIsSidebarOpen(false)}
+              aria-label="Close Sidebar"
+            ></div>
+          )}
 
-        {/* Main Content Area */}
-        <div className="flex-1 mt-20 md:mt-24">
-          <Routes>
-            {/* Authentication Pages */}
-            <Route path="/" element={<Navigate to="/signin" replace />} />
-            <Route path="/signin" element={<SignIn />} />
+          {/* Main Content Area */}
+          <div className="flex-1 mt-20 md:mt-24">
+            <Routes>
+              {/* Authentication Pages */}
+              <Route path="/" element={<Navigate to="/homePage" replace />} />
+              <Route path="/signin" element={<SignIn />} />
 
-            {/* Protected Routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route
-                path="/homePage"
-                element={<HomePage toggleSidebar={toggleSidebar} />}
-              />
-              <Route
-                path="/attendance"
-                element={<Attendace toggleSidebar={toggleSidebar} />}
-              />
-              <Route
-                path="/duty"
-                element={<DutyPage selectedCourse={selectedItem} />}
-              />
-              <Route
-                path="/absentees"
-                element={<Absentees selectedCourse={selectedItem} />}
-              />
-              <Route
-                path="/message"
-                element={
-                  <MessagePage
-                    selectedCourse={selectedItem}
-                    toggleSidebar={toggleSidebar}
-                  />
-                }
-              />
-              <Route path="/viewattendance" element={<ViewAttendance />} />
-              <Route path="/update-attendance" element={<UpdateAttendace />} />
-              <Route path="/update-data" element={<UpdateStudentData />} />
-              <Route path="/leave-count" element={<LeaveCountPage />} />
-              <Route
-                path="/generateMessage"
-                element={<GenerateMessage toggleSidebar={toggleSidebar} />}
-              />
-              <Route path="info-status" element={<InfoStatusPage />} />
-              <Route path="/generateExcel" element={<GenerateExcel />} />
-              <Route path="/add-student" element={<AddStudent />} />
-              <Route path="/add-student-db" element={<UploadCsv />} />
-              <Route path="/delete-student" element={<DeleteStudents />} />
-              <Route path="/send-email" element={<SendEmail />} />
-              <Route path="/hostelreport" element={<Hostelreport />} />
-              <Route path="/classinfo" element={<ClassInfo />} />
-              <Route path="/generateReport" element={<GenerateReport />} />
-              <Route path="/change-password" element={<ChangePasswordForm />} />
-              <Route path="/update" element={<Update />} />
-              <Route path="/update-superpacc" element={<UpdateSuperPacc />} />
-              <Route path="/update-year" element={<UpdateYear />} />
-              <Route path="/hodinfo" element={<Hodinfo />} />
-            </Route>
+              {/* Protected Routes */}
+              <Route element={<ProtectedRoute />}>
+                <Route
+                  path="/homePage"
+                  element={<HomePage toggleSidebar={toggleSidebar} />}
+                />
+                <Route
+                  path="/attendance"
+                  element={<Attendace toggleSidebar={toggleSidebar} />}
+                />
+                <Route
+                  path="/duty"
+                  element={<DutyPage selectedCourse={selectedItem} />}
+                />
+                <Route
+                  path="/absentees"
+                  element={<Absentees selectedCourse={selectedItem} />}
+                />
+                <Route
+                  path="/message"
+                  element={
+                    <MessagePage
+                      selectedCourse={selectedItem}
+                      toggleSidebar={toggleSidebar}
+                    />
+                  }
+                />
+                <Route path="/viewattendance" element={<ViewAttendance />} />
+                <Route
+                  path="/update-attendance"
+                  element={<UpdateAttendace />}
+                />
+                <Route path="/update-data" element={<UpdateStudentData />} />
+                <Route path="/leave-count" element={<LeaveCountPage />} />
+                <Route
+                  path="/generateMessage"
+                  element={<GenerateMessage toggleSidebar={toggleSidebar} />}
+                />
+                <Route path="info-status" element={<InfoStatusPage />} />
+                <Route path="/generateExcel" element={<GenerateExcel />} />
+                <Route path="/add-student" element={<AddStudent />} />
+                <Route path="/add-student-db" element={<UploadCsv />} />
+                <Route path="/delete-student" element={<DeleteStudents />} />
+                <Route path="/send-email" element={<SendEmail />} />
+                <Route path="/hostelreport" element={<Hostelreport />} />
+                <Route path="/classinfo" element={<ClassInfo />} />
+                <Route path="/generateReport" element={<GenerateReport />} />
+                <Route
+                  path="/change-password"
+                  element={<ChangePasswordForm />}
+                />
+                <Route path="/update" element={<Update />} />
+                <Route path="/update-superpacc" element={<UpdateSuperPacc />} />
+                <Route path="/update-year" element={<UpdateYear />} />
+                <Route path="/hodinfo" element={<Hodinfo />} />
+              </Route>
 
-            {/* Catch all unmatched routes */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+              {/* Catch all unmatched routes */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
+
+          {/* Sidebar Component */}
+          {isSidebarOpen && (
+            <Sidebar
+              ref={sidebarRef}
+              closeSidebar={() => setIsSidebarOpen(false)}
+              handleItemSelection={handleItemSelection}
+              handleHomeClick={handleHomeClick}
+            />
+          )}
         </div>
 
-        {/* Sidebar Component */}
-        {isSidebarOpen && (
-          <Sidebar
-            ref={sidebarRef}
-            closeSidebar={() => setIsSidebarOpen(false)}
-            handleItemSelection={handleItemSelection}
-            handleHomeClick={handleHomeClick}
-          />
-        )}
-      </div>
-
-      {/* ToastContainer for displaying toasts */}
-      <ToastContainer />
-    </Router>
+        {/* ToastContainer for displaying toasts */}
+        <ToastContainer />
+      </Router>
+    </AuthProvider>
   );
 }
 
