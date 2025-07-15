@@ -740,4 +740,3 @@ exports.bulkUpdateInfoStatus = async (req, res) => {
 };
 
 // Get distinct class combinations (yearOfStudy, branch, section)
-
