@@ -13,6 +13,7 @@ require("dotenv").config(); // Load environment variables from .env file
 // CORS configuration
 const corsOptions = {
   origin: [
+    "https://attendance-kec-mfv7.onrender.com/signin",
     "https://attendance-kec.onrender.com",
     "http://localhost:5173",
   ].filter(Boolean), // Remove any undefined values
@@ -47,7 +48,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-
-
-
