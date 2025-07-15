@@ -65,7 +65,7 @@ const LeaveCountPage = () => {
       <div className="px-4 py-6 mx-4 mt-4 mb-10 w-auto max-w-4xl text-white rounded-2xl sm:mx-6 md:mx-auto lg:mx-auto xl:mx-auto bg-slate-800">
         <div className="mx-auto w-full">
           <h1 className="mb-8 text-xl font-bold text-center sm:text-2xl md:text-3xl lg:text-4xl">
-            LEAVE COU
+            LEAVE COUNT
           </h1>
 
           <div className="w-full">
