@@ -9,8 +9,6 @@ export default defineConfig({
     port: 5173, // or whatever port you want
   },
   build: {
-    outDir: "dist",
-    assetsDir: "assets",
     rollupOptions: {
       output: {
         manualChunks: undefined,
