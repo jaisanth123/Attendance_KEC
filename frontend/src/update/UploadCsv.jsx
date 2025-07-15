@@ -56,7 +56,10 @@ function UploadCsv() {
   const handleDownloadMockData = () => {
     // Create a mock CSV data
     const mockData =
-      "rollNo,name,yearOfStudy,branch,section\n21PA1A0501,John Doe,II,AIDS,A\n21PA1A0502,Jane Smith,II,AIDS,A\n21PA1A0503,Bob Johnson,II,AIDS,A";
+      "rollNo,name,hostellerDayScholar,gender,yearOfStudy,branch,section,parentMobileNo,studentMobileNo,superPacc\n" +
+      "21PA1A0501,John Doe,HOSTELLER,MALE,II,CSE,A,9876543210,9123456780,YES\n" +
+      "21PA1A0502,Jane Smith,DAY SCHOLAR,FEMALE,II,CSE,A,9876543211,9123456781,NO\n" +
+      "21PA1A0503,Bob Johnson,HOSTELLER,MALE,II,CSE,A,9876543212,9123456782,YES";
 
     // Create blob and download
     const blob = new Blob([mockData], { type: "text/csv" });

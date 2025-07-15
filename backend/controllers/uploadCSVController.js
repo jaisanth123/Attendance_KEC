@@ -24,6 +24,9 @@ exports.addStudent = async (req, res) => {
         "yearOfStudy",
         "branch",
         "section",
+        "parentMobileNo",
+        "studentMobileNo",
+        "superPacc",
       ])
     )
     .on("data", (data) => {
