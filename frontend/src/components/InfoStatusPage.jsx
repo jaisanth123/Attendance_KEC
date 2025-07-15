@@ -13,7 +13,6 @@ function InfoStatusPage() {
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [yearOfStudy, setYearOfStudy] = useState("nan");
   const [section, setSection] = useState("nan");
-  const [branch, setBranch] = useState("nan");
 
   // States for data
   const [absentStudents, setAbsentStudents] = useState([]);
@@ -25,31 +24,21 @@ function InfoStatusPage() {
   const [initialStates, setInitialStates] = useState({});
 
   useEffect(() => {
-    if (
-      yearOfStudy !== "nan" &&
-      branch !== "nan" &&
-      section !== "nan" &&
-      date
-    ) {
-      fetchAbsentStudents(yearOfStudy, branch, section, date);
+    if (yearOfStudy !== "nan" && section !== "nan" && date) {
+      fetchAbsentStudents(yearOfStudy, section, date);
     } else {
       setAbsentStudents([]);
     }
-  }, [yearOfStudy, branch, section, date]);
+  }, [yearOfStudy, section, date]);
 
-  const fetchAbsentStudents = async (
-    yearOfStudy,
-    branch,
-    section,
-    selectedDate
-  ) => {
+  const fetchAbsentStudents = async (yearOfStudy, section, selectedDate) => {
     try {
       const response = await axios.get(
         `${backendURL}/api/attendance/absent-students-info`,
         {
           params: {
             yearOfStudy,
-            branch,
+            branch: "CSE",
             section,
             date: selectedDate,
           },
@@ -61,7 +50,7 @@ function InfoStatusPage() {
       if (!students || students.length === 0) {
         setMessage(
           message ||
-            `No absent students found for ${yearOfStudy} - ${branch} - ${section}`
+            `No absent students found for ${yearOfStudy} - CSE - ${section}`
         );
         setAbsentStudents([]);
         return;
@@ -149,7 +138,7 @@ function InfoStatusPage() {
       }
 
       setInfoStatusLogs([]);
-      await fetchAbsentStudents(yearOfStudy, branch, section, date);
+      await fetchAbsentStudents(yearOfStudy, section, date);
       setIsConfirmed(false);
     } catch (error) {
       console.error("Error updating info status:", error);
@@ -160,14 +149,14 @@ function InfoStatusPage() {
   };
 
   return (
-    <div className="flex flex-col flex-1 items-center p-6 md:p-8 lg:p-12">
-      <div className="p-6 w-full max-w-4xl bg-gray-800 rounded-lg shadow-lg">
-        <h1 className="text-4xl font-semibold text-center text-white">
+    <div className="flex flex-col flex-1 items-center p-4 sm:p-6 md:p-8 lg:p-12">
+      <div className="p-4 w-full max-w-4xl bg-gray-800 rounded-lg shadow-lg sm:p-6">
+        <h1 className="text-2xl font-semibold text-center text-white sm:text-3xl md:text-4xl">
           Update Information Status
         </h1>
 
         {/* Dropdowns Row */}
-        <div className="flex flex-wrap gap-x-4 gap-y-4 justify-center mt-4 w-full">
+        <div className="grid grid-cols-1 gap-4 mt-4 w-full sm:grid-cols-2 md:grid-cols-3">
           <Dropdown
             label="Year"
             value={yearOfStudy}
@@ -175,27 +164,17 @@ function InfoStatusPage() {
             onChange={(e) => setYearOfStudy(e.target.value)}
           />
           <Dropdown
-            label="Branch"
-            value={branch}
-            options={["AIDS", "AIML"]}
-            onChange={(e) => setBranch(e.target.value)}
-          />
-          <Dropdown
             label="Section"
             value={section}
             options={["A", "B", "C"]}
             onChange={(e) => setSection(e.target.value)}
           />
-        </div>
-
-        {/* Date Selection */}
-        <div className="flex justify-center items-center pb-5 mt-8">
-          <div className="w-full max-w-sm">
+          <div className="w-full">
             <label
               htmlFor="date"
-              className="block mb-2 text-lg font-medium text-center text-white"
+              className="block mb-2 text-sm font-medium text-white sm:text-base md:text-lg"
             >
-              Select Date:
+              Date:
             </label>
             <input
               type="date"
@@ -203,44 +182,46 @@ function InfoStatusPage() {
               value={date}
               onChange={(e) => setDate(e.target.value)}
               max={new Date().toISOString().split("T")[0]}
-              className="px-4 py-2 w-full text-black bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-gray-600"
+              className="px-3 py-2 w-full text-sm text-black bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-gray-600 sm:px-4 sm:text-base"
             />
           </div>
         </div>
       </div>
 
       {/* Status Legend */}
-      <div className="flex gap-4 justify-center my-6">
-        <button className="px-6 py-3 text-white bg-blue-600 rounded-lg shadow hover:bg-blue-700">
+      <div className="flex flex-row gap-2 justify-center my-4 sm:gap-4 sm:my-6">
+        <button className="px-3 py-2 text-xs text-white bg-blue-600 rounded-lg shadow hover:bg-blue-700 sm:px-4 sm:py-2 sm:text-sm md:px-6 md:py-3 md:text-base">
           Informed
         </button>
-        <button className="px-6 py-3 text-white bg-red-600 rounded-lg shadow hover:bg-red-700">
+        <button className="px-3 py-2 text-xs text-white bg-red-600 rounded-lg shadow hover:bg-red-700 sm:px-4 sm:py-2 sm:text-sm md:px-6 md:py-3 md:text-base">
           Not Informed
         </button>
       </div>
 
       {/* Message Display */}
       {message && (
-        <div className="p-4 mt-6 w-full max-w-lg text-lg text-center text-red-500">
+        <div className="p-3 mt-4 w-full max-w-lg text-sm text-center text-red-500 sm:p-4 sm:mt-6 sm:text-base md:text-lg">
           {message}
         </div>
       )}
 
       {/* Students Grid */}
       {absentStudents.length > 0 && (
-        <div className="grid grid-cols-2 gap-4 mt-6 w-full sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
+        <div className="grid grid-cols-1 gap-3 mt-4 w-full sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
           {absentStudents.map((student, index) => (
             <div
               key={index}
               onClick={() => toggleStatus(index)}
-              className={`flex flex-col items-center justify-center py-4 px-2 text-white transition-all transform duration-500 rounded-lg cursor-pointer shadow-md ${
+              className={`flex flex-col items-center justify-center py-3 px-2 text-white transition-all transform duration-500 rounded-lg cursor-pointer shadow-md sm:py-4 ${
                 student.infoStatus === "Informed"
                   ? "bg-blue-600 hover:bg-blue-700"
                   : "bg-red-600 hover:bg-red-700"
               } hover:scale-110`}
             >
-              <div className="text-xl font-semibold">{student.name}</div>
-              <div className="mt-1 text-sm font-medium text-center">
+              <div className="text-sm font-semibold sm:text-base md:text-lg lg:text-xl">
+                {student.name}
+              </div>
+              <div className="mt-1 text-xs font-medium text-center sm:text-sm">
                 {student.rollNo}
               </div>
             </div>
@@ -250,15 +231,15 @@ function InfoStatusPage() {
 
       {/* Info Status Logs */}
       {infoStatusLogs.length > 0 && (
-        <div className="p-6 mt-8 w-full max-w-3xl rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold text-center">
+        <div className="p-4 mt-6 w-full max-w-3xl rounded-lg shadow-lg sm:p-6 sm:mt-8">
+          <h2 className="text-lg font-bold text-center sm:text-xl md:text-2xl">
             Information Status Change Logs
           </h2>
-          <div className="mt-4">
+          <div className="mt-3 sm:mt-4">
             {infoStatusLogs.map((log, index) => (
               <div
                 key={index}
-                className="flex justify-between mb-3 font-semibold"
+                className="flex flex-col justify-between mb-2 text-sm font-semibold sm:flex-row sm:mb-3 sm:text-base"
               >
                 <span>
                   {log.rollNo} - {log.name}
@@ -277,11 +258,11 @@ function InfoStatusPage() {
         <button
           onClick={() => setIsConfirmed(true)}
           disabled={isUpdating || infoStatusLogs.length === 0}
-          className={`w-full px-6 py-3 mt-6 h-20 text-2xl text-white transition-all duration-500 ${
+          className={`w-full px-4 py-3 mt-4 h-16 text-lg text-white transition-all duration-500 sm:px-6 sm:py-3 sm:mt-6 sm:h-20 sm:text-xl md:text-2xl ${
             isUpdating || infoStatusLogs.length === 0
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-gray-800 hover:bg-gray-600 hover:scale-110"
-          } rounded-lg lg:w-1/4 md:w-1/5 sm:w-1/2`}
+          } rounded-lg sm:w-1/2 md:w-1/3 lg:w-1/4`}
         >
           {isUpdating ? "Updating Status..." : "Update Status"}
         </button>
@@ -289,7 +270,7 @@ function InfoStatusPage() {
 
       <button
         onClick={() => navigate("/homePage")}
-        className="px-6 py-3 mt-5 w-full h-20 text-2xl text-white bg-gray-800 rounded-lg transition-all duration-500 transform hover:bg-gray-600 hover:scale-110 lg:w-1/4 md:w-1/5 sm:w-1/2"
+        className="px-4 py-3 mt-3 w-full h-16 text-lg text-white bg-gray-800 rounded-lg transition-all duration-500 transform hover:bg-gray-600 hover:scale-110 sm:px-6 sm:py-3 sm:mt-5 sm:h-20 sm:text-xl md:text-2xl sm:w-1/2 md:w-1/3 lg:w-1/4"
       >
         Home
       </button>
@@ -344,14 +325,17 @@ function InfoStatusPage() {
 
 function Dropdown({ label, value, options, onChange }) {
   return (
-    <div className="w-full max-w-[250px]">
-      <label htmlFor={label} className="block mb-2 text-white">
+    <div className="w-full">
+      <label
+        htmlFor={label}
+        className="block mb-2 text-sm text-white sm:text-base md:text-lg"
+      >
         {label}
       </label>
       <select
         value={value}
         onChange={onChange}
-        className="px-4 py-2 w-full text-white bg-gray-700 rounded-lg border border-gray-600 focus:outline-none focus:ring focus:ring-gray-600"
+        className="px-3 py-2 w-full text-sm text-white bg-gray-700 rounded-lg border border-gray-600 focus:outline-none focus:ring focus:ring-gray-600 sm:px-4 sm:text-base"
       >
         <option value="nan">Select {label}</option>
         {options.map((option, idx) => (
