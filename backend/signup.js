@@ -6,7 +6,7 @@ const Staff = require("./models/staffSchema.js");
 // Connect to your MongoDB database
 mongoose
   .connect(
-    "mongodb+srv://krrashmika2004:nhwUubZLhWrmu7Lr@cluster0.sfj4f.mongodb.net/AI_Attendence?retryWrites=true&w=majority",
+    "mongodb+srv://hodcse:Z3EZVI40t7lpr23S@cluster0.dm26ae7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -47,6 +47,21 @@ const createAdmin = async () => {
   }
 };
 
+const createadmin = async () => {
+  try {
+    const admin = new Admin({
+      name: "Admin Mock",
+      username: "admin1234", // Make sure 'username' is unique in your DB
+      password: "admin1234",
+    });
+    //
+    await admin.save();
+    console.log("Admin created:", admin);
+  } catch (error) {
+    console.log("Error creating admin:", error);
+  }
+};
+
 const createStaff = async () => {
   try {
     const admin = new Staff({
@@ -63,8 +78,7 @@ const createStaff = async () => {
 };
 
 // Call the functions to create the user and admin
-createUser();
-createAdmin();
-createStaff();
-
-
+// createUser();
+// createAdmin();
+// createStaff();
+createadmin();
