@@ -6,7 +6,22 @@ const Attendance = require("../models/Attendance");
 exports.fetchRemainingStudents = async (req, res) => {
   const { yearOfStudy, branch, section, date } = req.query;
 
+  console.log("Fetch remaining students request:", {
+    yearOfStudy,
+    branch,
+    section,
+    date,
+  });
+
   try {
+    // Validate required parameters
+    if (!yearOfStudy || !branch || !section || !date) {
+      return res.status(400).json({
+        message:
+          "Missing required parameters: yearOfStudy, branch, section, date",
+      });
+    }
+
     // Fetch roll numbers of students marked as "Absent" on the specified date
     const absentStudents = await Attendance.find({
       date,
@@ -16,6 +31,8 @@ exports.fetchRemainingStudents = async (req, res) => {
       section,
     }).select("rollNo -_id");
 
+    console.log("Found absent students:", absentStudents.length);
+
     // Extract roll numbers from the absent students
     const rollNumbers = absentStudents.map((student) => student.rollNo);
 
@@ -23,6 +40,8 @@ exports.fetchRemainingStudents = async (req, res) => {
     const studentsWithNames = await Student.find({
       rollNo: { $in: rollNumbers }, // Match roll numbers from Attendance
     }).select("rollNo name -_id");
+
+    console.log("Found students with names:", studentsWithNames.length);
 
     // Sort the students by roll number (numeric part only)
     studentsWithNames.sort((a, b) => {

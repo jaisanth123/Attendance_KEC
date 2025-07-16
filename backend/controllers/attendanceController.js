@@ -8,11 +8,33 @@ const path = require("path");
 exports.markOnDuty = async (req, res) => {
   const { rollNumbers, date, yearOfStudy, branch, section } = req.body;
 
-  console.log(rollNumbers, date, yearOfStudy, branch, section);
-  try {
-    // Array to track roll numbers that are already marked
+  console.log("On Duty request:", {
+    rollNumbers,
+    date,
+    yearOfStudy,
+    branch,
+    section,
+  });
 
-    // Create new On Duty records for the roll numbersd
+  try {
+    // Validate input
+    if (
+      !rollNumbers ||
+      !Array.isArray(rollNumbers) ||
+      rollNumbers.length === 0
+    ) {
+      return res.status(400).json({
+        message: "Invalid roll numbers provided",
+      });
+    }
+
+    if (!date || !yearOfStudy || !branch || !section) {
+      return res.status(400).json({
+        message: "Missing required fields: date, yearOfStudy, branch, section",
+      });
+    }
+
+    // Update attendance records from "Absent" to "On Duty"
     const result = await Attendance.updateMany(
       {
         rollNo: { $in: rollNumbers }, // Match roll numbers in the provided array
@@ -26,9 +48,23 @@ exports.markOnDuty = async (req, res) => {
         $set: { status: "On Duty", leaveCount: 0 }, // Set the status to "On Duty"
       }
     );
-    res.json({ message: "Marked as On Duty successfully" });
+
+    console.log("On Duty update result:", result);
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({
+        message:
+          "No students found with 'Absent' status for the specified criteria",
+      });
+    }
+
+    res.json({
+      message: `Marked ${result.modifiedCount} students as On Duty successfully`,
+      modifiedCount: result.modifiedCount,
+      matchedCount: result.matchedCount,
+    });
   } catch (error) {
-    console.error(error);
+    console.error("Error marking as On Duty:", error);
     res.status(500).json({ message: "Error marking as On Duty" });
   }
 };

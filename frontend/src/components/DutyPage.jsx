@@ -33,6 +33,7 @@ function DutyPage() {
   useEffect(() => {
     // Clear selected roll numbers whenever year, branch, section, or date changes
     setSelectedRollNumbers([]);
+    setShowGenerateMessageButton(false);
 
     console.log("Triggering immediate fetch...");
     if (yearOfStudy !== "nan" && section !== "nan" && date) {
@@ -52,21 +53,16 @@ function DutyPage() {
     const url = `http://localhost:5000/api/students/remaining?yearOfStudy=${yearOfStudy}&branch=${branch}&section=${section}&date=${selectedDate}`;
 
     try {
+      console.log("Fetching roll numbers from:", url);
       const response = await axios.get(url);
-      const { students, totalStudents } = response.data;
+      console.log("API Response:", response.data);
+
+      const { students } = response.data;
       const formattedDate = formatDate(selectedDate);
 
-      if (totalStudents === 0) {
+      if (!students || students.length === 0) {
         setMessage(
-          `No record found for ${yearOfStudy} - ${branch} - ${section}.`
-        );
-        setRollNumbers([]);
-        return;
-      }
-
-      if (students.length === 0) {
-        setMessage(
-          `For ${yearOfStudy} - ${branch} - ${section}, students attendance for ${formattedDate} has already been marked.`
+          `For ${yearOfStudy} - ${branch} - ${section}, no students are marked as Absent for ${formattedDate}.`
         );
         setRollNumbers([]);
         return;
@@ -78,9 +74,11 @@ function DutyPage() {
         name: student.name,
         isSelected: false,
       }));
+      console.log("Processed roll numbers:", fetchedRollNumbers);
       setRollNumbers(fetchedRollNumbers);
     } catch (error) {
       console.error("Error fetching roll numbers:", error);
+      console.error("Error response:", error.response?.data);
       setMessage(
         "An error occurred while fetching roll numbers. Please try again later."
       );
@@ -142,11 +140,15 @@ function DutyPage() {
       section,
     };
 
+    console.log("Submitting On Duty payload:", payload);
+
     try {
       const response = await axios.post(
         "http://localhost:5000/api/attendance/onDuty",
         payload
       );
+      console.log("On Duty response:", response.data);
+
       if (response.status === 200) {
         toast.success(
           `${selectedRollNumbers.length} students marked as On Duty`,
@@ -154,14 +156,14 @@ function DutyPage() {
             autoClose: 800,
           }
         );
+
+        // Reset states
         setIsConfirmed(false);
         setSelectedRollNumbers([]);
-        await fetchRollNumbers(yearOfStudy, branch, section, date);
-
         setShowGenerateMessageButton(true);
-        // Clear selected roll numbers
 
-        // Await the fetchRollNumbers function to ensure data is updated before proceeding
+        // Refresh the list to show updated data
+        await fetchRollNumbers(yearOfStudy, branch, section, date);
 
         setTimeout(() => {
           setIsConfirmed(false);
@@ -173,6 +175,7 @@ function DutyPage() {
       }
     } catch (error) {
       console.error("Error submitting attendance:", error);
+      console.error("Error response:", error.response?.data);
       toast.error("Error submitting OD. Please try again.", {
         autoClose: 800,
       });
