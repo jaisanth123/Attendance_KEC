@@ -22,8 +22,6 @@ function DeleteStudents() {
   const [rollNoSearchResults, setRollNoSearchResults] = useState([]);
   const [showRollNoDropdown, setShowRollNoDropdown] = useState(false);
 
-  const apiBase = "http://localhost:5000";
-
   // Function to search students by roll number for suggestions
   const searchStudentsByRollNo = async (rollNo) => {
     if (!rollNo.trim()) {

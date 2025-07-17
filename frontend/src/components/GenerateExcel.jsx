@@ -3,6 +3,8 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import the toast CSS
 import { useNavigate } from "react-router-dom"; // Make sure you import the `useNavigate` hook from react-router-dom
 
+const backendURL = import.meta.env.VITE_BACKEND_URL;
+
 const GenerateExcel = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -24,7 +26,6 @@ const GenerateExcel = () => {
     return `${day}-${month}-${year}`;
   };
   const handleDownload = () => {
-    d;
     if (!date) {
       toast.info("Please select a date.", { autoClose: 800 });
       return;
@@ -33,7 +34,7 @@ const GenerateExcel = () => {
     setIsLoading(true);
     setMessage("");
 
-    const url = `http://localhost:5000/api/report/downloadreport/${gender.toLowerCase()}?date=${date}&branch=${branch}`;
+    const url = `${backendURL}/api/report/downloadreport/${gender.toLowerCase()}?date=${date}&branch=${branch}`;
 
     fetch(url)
       .then((response) => {
