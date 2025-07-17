@@ -22,6 +22,8 @@ function DutyPage() {
   const [branch, setBranch] = useState("CSE");
   const [selectedCourse, setSelectedCourse] = useState("");
 
+  const backendURL = import.meta.env.VITE_BACKEND_URL;
+
   const formatDate = (dateString) => {
     const dateObj = new Date(dateString);
     const day = String(dateObj.getDate()).padStart(2, "0");
@@ -50,7 +52,7 @@ function DutyPage() {
     selectedDate
   ) => {
     setSelectedCourse(`${yearOfStudy}-${branch}-${section}`);
-    const url = `http://localhost:5000/api/students/remaining?yearOfStudy=${yearOfStudy}&branch=${branch}&section=${section}&date=${selectedDate}`;
+    const url = `${backendURL}/api/students/remaining?yearOfStudy=${yearOfStudy}&branch=${branch}&section=${section}&date=${selectedDate}`;
 
     try {
       console.log("Fetching roll numbers from:", url);
@@ -144,7 +146,7 @@ function DutyPage() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/attendance/onDuty",
+        `${backendURL}/api/attendance/onDuty`,
         payload
       );
       console.log("On Duty response:", response.data);
@@ -187,19 +189,20 @@ function DutyPage() {
   };
 
   return (
-    <div className="flex flex-col flex-1 items-center p-6 md:p-8 lg:p-12">
-      <div className="p-6 w-full max-w-4xl bg-gray-800 rounded-lg shadow-lg">
-        <h1 className="text-4xl font-semibold text-center text-white">
+    <div className="flex flex-col flex-1 items-center p-4 md:p-6 lg:p-8">
+      <div className="p-4 w-full max-w-4xl bg-gray-800 rounded-lg shadow-lg md:p-6">
+        <h1 className="mb-4 text-2xl font-semibold text-center text-white md:text-3xl lg:text-4xl md:mb-6">
           ON DUTY
         </h1>
 
-        {/* Dropdowns Row */}
-        <div className="flex justify-center mt-4 w-full">
-          <div className="flex gap-x-6 w-full max-w-2xl">
+        {/* Dropdowns Row - Responsive Layout */}
+        <div className="flex flex-col gap-4 w-full">
+          {/* First Row - Year and Section */}
+          <div className="flex flex-col gap-4 w-full sm:flex-row">
             <div className="flex-1">
               <label
                 htmlFor="yearOfStudy"
-                className="block text-lg font-medium text-white"
+                className="block mb-2 text-sm font-medium text-white md:text-lg"
               >
                 Year:
               </label>
@@ -207,7 +210,7 @@ function DutyPage() {
                 id="yearOfStudy"
                 value={yearOfStudy}
                 onChange={(e) => setYearOfStudy(e.target.value)}
-                className="px-4 py-2 w-full text-black bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-gray-600"
+                className="px-3 py-2 w-full text-sm text-black bg-white rounded-lg border border-gray-300 md:px-4 md:text-base focus:outline-none focus:ring focus:ring-gray-600"
               >
                 <option value="nan">Year</option>
                 <option value="IV">IV</option>
@@ -219,7 +222,7 @@ function DutyPage() {
             <div className="flex-1">
               <label
                 htmlFor="section"
-                className="block text-lg font-medium text-white"
+                className="block mb-2 text-sm font-medium text-white md:text-lg"
               >
                 Section:
               </label>
@@ -227,7 +230,7 @@ function DutyPage() {
                 id="section"
                 value={section}
                 onChange={(e) => setSection(e.target.value)}
-                className="px-4 py-2 w-full text-black bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-gray-600"
+                className="px-3 py-2 w-full text-sm text-black bg-white rounded-lg border border-gray-300 md:px-4 md:text-base focus:outline-none focus:ring focus:ring-gray-600"
               >
                 <option value="nan">Section</option>
                 <option value="A">A</option>
@@ -238,41 +241,42 @@ function DutyPage() {
                 <option value="F">F</option>
               </select>
             </div>
+          </div>
 
-            <div className="flex-1">
-              <label
-                htmlFor="date"
-                className="block text-lg font-medium text-white"
-              >
-                Date:
-              </label>
-              <input
-                type="date"
-                id="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="px-4 py-2 w-full text-black bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-gray-600"
-              />
-            </div>
+          {/* Second Row - Date */}
+          <div className="w-full">
+            <label
+              htmlFor="date"
+              className="block mb-2 text-sm font-medium text-white md:text-lg"
+            >
+              Date:
+            </label>
+            <input
+              type="date"
+              id="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="px-3 py-2 w-full text-sm text-black bg-white rounded-lg border border-gray-300 md:px-4 md:text-base focus:outline-none focus:ring focus:ring-gray-600"
+            />
           </div>
         </div>
       </div>
 
       {/* Message Display */}
       {message && (
-        <div className="p-4 mt-6 w-full max-w-lg text-lg text-center text-red-500">
+        <div className="p-3 mt-4 w-full max-w-lg text-sm text-center text-red-500 md:p-4 md:mt-6 md:text-lg">
           {message}
         </div>
       )}
 
       {/* Roll Numbers */}
       {rollNumbers.length > 0 && (
-        <div className="grid grid-cols-2 gap-4 mt-6 w-full sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8">
+        <div className="grid grid-cols-2 gap-2 mt-4 w-full md:gap-4 md:mt-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
           {rollNumbers.map((rollNumber, index) => (
             <div
               key={index}
               onClick={() => toggleSelection(index)}
-              className={`flex items-center justify-center p-6 text-white transition-all transform duration-500 text-xl font-semibold rounded-lg cursor-pointer shadow-md ${
+              className={`flex items-center justify-center p-3 md:p-6 text-white transition-all transform duration-500 text-sm md:text-xl font-semibold rounded-lg cursor-pointer shadow-md ${
                 rollNumber.isSelected ? "bg-blue-600" : "bg-red-600"
               } hover:scale-110`}
             >
@@ -283,17 +287,20 @@ function DutyPage() {
       )}
 
       {selectedRollNumbers.length > 0 && (
-        <div className="p-4 mt-6 w-full text-lg text-black">
-          <h4 className="mb-10 text-3xl font-semibold text-center">
+        <div className="p-3 mt-4 w-full text-sm text-black md:p-4 md:mt-6 md:text-lg">
+          <h4 className="mb-6 text-xl font-semibold text-center md:mb-10 md:text-3xl">
             Selected Roll Numbers:
           </h4>
-          <div className="flex flex-col items-center space-y-4">
+          <div className="flex flex-col items-center space-y-2 md:space-y-4">
             {selectedRollNumbers.map((rollNo, index) => {
               const student = rollNumbers.find(
                 (student) => student.rollNo === rollNo
               );
               return (
-                <span key={index} className="text-xl font-bold text-center">
+                <span
+                  key={index}
+                  className="text-sm font-bold text-center md:text-xl"
+                >
                   {" "}
                   {student ? `${student.rollNo} - ${student.name}` : rollNo}
                 </span>
@@ -306,7 +313,7 @@ function DutyPage() {
       <button
         onClick={() => setIsConfirmed(true)}
         disabled={yearOfStudy === "nan" || section === "nan"}
-        className={`w-full px-6 py-3 mt-10 h-20 text-white transition-all text-2xl duration-500 transform rounded-lg lg:w-1/4 md:w-1/5 sm:w-1/2 ${
+        className={`w-full px-4 md:px-6 py-3 md:py-3 mt-6 md:mt-10 h-16 md:h-20 text-white transition-all text-lg md:text-2xl duration-500 transform rounded-lg lg:w-1/4 md:w-1/3 sm:w-1/2 ${
           yearOfStudy === "nan" || section === "nan"
             ? "bg-gray-400  cursor-not-allowed"
             : "bg-gray-800 hover:bg-gray-600 hover:scale-110"
@@ -328,7 +335,7 @@ function DutyPage() {
             })
           }
           disabled={yearOfStudy === "nan" || section === "nan"}
-          className={`w-full px-6 py-3 mt-5 h-20 text-white transition-all text-2xl duration-500 transform rounded-lg lg:w-1/4 md:w-1/5 sm:w-1/2 ${
+          className={`w-full px-4 md:px-6 py-3 md:py-3 mt-3 md:mt-5 h-16 md:h-20 text-white transition-all text-lg md:text-2xl duration-500 transform rounded-lg lg:w-1/4 md:w-1/3 sm:w-1/2 ${
             yearOfStudy === "nan" || section === "nan"
               ? "bg-gray-400  cursor-not-allowed"
               : "bg-gray-800 hover:bg-gray-600 hover:scale-110"
@@ -340,15 +347,15 @@ function DutyPage() {
 
       <button
         onClick={navigateToHome}
-        className="px-6 py-3 mt-5 w-full h-20 text-2xl text-white bg-gray-800 rounded-lg transition-all duration-500 transform hover:bg-gray-600 hover:scale-110 lg:w-1/4 md:w-1/5 sm:w-1/2"
+        className="px-4 py-3 mt-3 w-full h-16 text-lg text-white bg-gray-800 rounded-lg transition-all duration-500 transform md:px-6 md:py-3 md:mt-5 md:h-20 md:text-2xl hover:bg-gray-600 hover:scale-110 lg:w-1/4 md:w-1/3 sm:w-1/2"
       >
         Home
       </button>
 
       {isConfirmed && (
         <div className="flex fixed inset-0 justify-center items-center bg-black bg-opacity-60 backdrop-blur-sm animate-fadeIn">
-          <div className="p-8 w-96 bg-gray-800 rounded-lg shadow-lg transition-all duration-500 transform scale-110 animate-slideDown">
-            <h2 className="mb-4 text-2xl font-semibold text-center text-white">
+          <div className="p-6 w-80 bg-gray-800 rounded-lg shadow-lg transition-all duration-500 transform scale-110 md:p-8 md:w-96 animate-slideDown">
+            <h2 className="mb-4 text-xl font-semibold text-center text-white md:text-2xl">
               Confirm Action
             </h2>
             <p className="mb-6 text-center text-white">
@@ -359,13 +366,13 @@ function DutyPage() {
             <div className="flex justify-center space-x-4">
               <button
                 onClick={handleConfirm}
-                className="px-6 py-3 w-32 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                className="px-4 py-2 w-24 text-white bg-blue-600 rounded-lg md:px-6 md:py-3 md:w-32 hover:bg-blue-700"
               >
                 Yes
               </button>
               <button
                 onClick={handleClosePopup}
-                className="px-6 py-3 w-32 text-white bg-gray-500 rounded-lg hover:bg-gray-600"
+                className="px-4 py-2 w-24 text-white bg-gray-500 rounded-lg md:px-6 md:py-3 md:w-32 hover:bg-gray-600"
               >
                 No
               </button>
