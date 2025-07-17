@@ -195,59 +195,55 @@ function DutyPage() {
           ON DUTY
         </h1>
 
-        {/* Dropdowns Row - Responsive Layout */}
-        <div className="flex flex-col gap-4 w-full">
-          {/* First Row - Year and Section */}
-          <div className="flex flex-col gap-4 w-full sm:flex-row">
-            <div className="flex-1">
-              <label
-                htmlFor="yearOfStudy"
-                className="block mb-2 text-sm font-medium text-white md:text-lg"
-              >
-                Year:
-              </label>
-              <select
-                id="yearOfStudy"
-                value={yearOfStudy}
-                onChange={(e) => setYearOfStudy(e.target.value)}
-                className="px-3 py-2 w-full text-sm text-black bg-white rounded-lg border border-gray-300 md:px-4 md:text-base focus:outline-none focus:ring focus:ring-gray-600"
-              >
-                <option value="nan">Year</option>
-                <option value="IV">IV</option>
-                <option value="III">III</option>
-                <option value="II">II</option>
-              </select>
-            </div>
-
-            <div className="flex-1">
-              <label
-                htmlFor="section"
-                className="block mb-2 text-sm font-medium text-white md:text-lg"
-              >
-                Section:
-              </label>
-              <select
-                id="section"
-                value={section}
-                onChange={(e) => setSection(e.target.value)}
-                className="px-3 py-2 w-full text-sm text-black bg-white rounded-lg border border-gray-300 md:px-4 md:text-base focus:outline-none focus:ring focus:ring-gray-600"
-              >
-                <option value="nan">Section</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-                <option value="D">D</option>
-                <option value="E">E</option>
-                <option value="F">F</option>
-              </select>
-            </div>
+        {/* Dropdowns Row - Similar to Absentees.jsx */}
+        <div className="flex flex-wrap gap-x-4 gap-y-4 justify-center mt-4 w-full">
+          <div className="flex-1 min-w-[100px] max-w-[150px]">
+            <label
+              htmlFor="yearOfStudy"
+              className="block text-lg font-medium text-white"
+            >
+              Year:
+            </label>
+            <select
+              id="yearOfStudy"
+              value={yearOfStudy}
+              onChange={(e) => setYearOfStudy(e.target.value)}
+              className="px-4 py-2 w-full text-black bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-gray-600"
+            >
+              <option value="nan">Year</option>
+              <option value="IV">IV</option>
+              <option value="III">III</option>
+              <option value="II">II</option>
+            </select>
           </div>
 
-          {/* Second Row - Date */}
-          <div className="w-full">
+          <div className="flex-1 min-w-[100px] max-w-[150px]">
+            <label
+              htmlFor="section"
+              className="block text-lg font-medium text-white"
+            >
+              Section:
+            </label>
+            <select
+              id="section"
+              value={section}
+              onChange={(e) => setSection(e.target.value)}
+              className="px-4 py-2 w-full text-black bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-gray-600"
+            >
+              <option value="nan">Section</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+              <option value="D">D</option>
+              <option value="E">E</option>
+              <option value="F">F</option>
+            </select>
+          </div>
+
+          <div className="flex-1 min-w-[100px] max-w-[200px]">
             <label
               htmlFor="date"
-              className="block mb-2 text-sm font-medium text-white md:text-lg"
+              className="block text-lg font-medium text-white"
             >
               Date:
             </label>
@@ -256,7 +252,7 @@ function DutyPage() {
               id="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="px-3 py-2 w-full text-sm text-black bg-white rounded-lg border border-gray-300 md:px-4 md:text-base focus:outline-none focus:ring focus:ring-gray-600"
+              className="px-4 py-2 w-full text-black bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring focus:ring-gray-600"
             />
           </div>
         </div>
