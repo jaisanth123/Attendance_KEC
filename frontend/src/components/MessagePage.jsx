@@ -5,6 +5,8 @@ import { toast, ToastContainer } from "react-toastify"; // Import react-toastify
 import "react-toastify/dist/ReactToastify.css"; // Import toast styles
 import RoleFromToken from "./RoleFromToken"; // Import the function to get the role from token
 
+const backendURL = import.meta.env.VITE_BACKEND_URL;
+
 const MessagePage = ({ toggleSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -77,7 +79,7 @@ const MessagePage = ({ toggleSidebar }) => {
 
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/report/absentStudents?yearOfStudy=${yearOfStudy}&branch=${branch}&section=${section}&date=${date}`
+        `${backendURL}/api/report/absentStudents?yearOfStudy=${yearOfStudy}&branch=${branch}&section=${section}&date=${date}`
       );
 
       console.log("API Response:", response.data);
@@ -197,7 +199,7 @@ const MessagePage = ({ toggleSidebar }) => {
           className="p-6 mx-auto mt-6 w-full max-w-xs text-white bg-gray-800 rounded-lg shadow-lg transition-all duration-500 hover:scale-110 hover:bg-gray-600"
         >
           <button className="py-2 w-full text-2xl font-semibold text-whiterounded-lg">
-            Get Absentees
+            Get Absenteses
           </button>
         </div>
 
