@@ -20,7 +20,6 @@ const corsOptions = {
       "https://attendance-kec-mfv7.onrender.com",
       "https://attendance-kec.onrender.com",
       "http://localhost:5173",
-      "http://localhost:3000",
     ];
 
     if (allowedOrigins.indexOf(origin) !== -1) {

@@ -19,6 +19,9 @@ router.delete("/delete/:rollNo", studentController.deleteStudentByRollNo);
 router.delete("/bulk-delete", studentController.bulkDeleteStudents);
 router.get("/leaves", studentController.getStudentsWithLeaveCount);
 
+// Optimized batch route for leave counts
+router.post("/batch-leaves", studentController.getBatchLeaveCounts);
+
 // New routes for SuperPacc management
 router.get("/superpacc/status", studentController.getStudentsBySuperPacc);
 router.put(

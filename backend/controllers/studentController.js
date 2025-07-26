@@ -819,3 +819,87 @@ exports.getDistinctClasses = async (req, res) => {
     });
   }
 };
+
+// Optimized batch endpoint: Get leave counts for multiple classes in a single request
+exports.getBatchLeaveCounts = async (req, res) => {
+  try {
+    const { classes, date } = req.body;
+
+    // Validate required parameters
+    if (!classes || !Array.isArray(classes) || classes.length === 0 || !date) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required parameters: classes array and date",
+      });
+    }
+
+    // Validate each class object
+    for (const classInfo of classes) {
+      if (!classInfo.yearOfStudy || !classInfo.branch || !classInfo.section) {
+        return res.status(400).json({
+          success: false,
+          message: "Each class must have yearOfStudy, branch, and section",
+        });
+      }
+    }
+
+    const allLeaveCounts = {};
+
+    // Process each class
+    for (const classInfo of classes) {
+      const { yearOfStudy, branch, section } = classInfo;
+
+      try {
+        // Use aggregation pipeline to find students with leaveCount > 0 for this class
+        const studentsWithLeaveCount = await Attendance.aggregate([
+          {
+            $match: {
+              date: date,
+              yearOfStudy: yearOfStudy,
+              branch: branch,
+              section: section,
+              status: "Absent",
+              leaveCount: { $gt: 0 },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              rollNo: 1,
+              leaveCount: 1,
+            },
+          },
+        ]);
+
+        // Create a map of rollNo to leaveCount for this class
+        const classLeaveCounts = {};
+        studentsWithLeaveCount.forEach((student) => {
+          classLeaveCounts[student.rollNo] = student.leaveCount;
+        });
+
+        // Merge into the main result
+        Object.assign(allLeaveCounts, classLeaveCounts);
+      } catch (error) {
+        console.error(
+          `Error processing class ${yearOfStudy}-${branch}-${section}:`,
+          error
+        );
+        // Continue with other classes even if one fails
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      date: date,
+      totalClasses: classes.length,
+      leaveCounts: allLeaveCounts,
+    });
+  } catch (error) {
+    console.error("Error in batch leave counts:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch batch leave counts",
+      error: error.message,
+    });
+  }
+};

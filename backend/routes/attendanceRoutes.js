@@ -42,6 +42,12 @@ router.get(
   attendanceController.getAttendanceStatusCount
 );
 
+// Optimized route: Get attendance status and absent students in a single call
+router.get(
+  "/getAttendanceWithAbsentees",
+  attendanceController.getAttendanceWithAbsentees
+);
+
 const storage = multer.memoryStorage(); // Store files in memory, not on disk
 const upload = multer({ storage: storage });
 

@@ -776,3 +776,107 @@ exports.bulkUpdateInfoStatus = async (req, res) => {
 };
 
 // Get distinct class combinations (yearOfStudy, branch, section)
+
+// Optimized endpoint: Get attendance status and absent students in a single call
+exports.getAttendanceWithAbsentees = async (req, res) => {
+  const { yearOfStudy, branch, section, date } = req.query;
+
+  // Ensure all required query parameters are provided
+  if (!yearOfStudy || !branch || !section || !date) {
+    return res.status(400).json({
+      message: "Please provide yearOfStudy, branch, section, and date",
+    });
+  }
+
+  console.log("Optimized attendance request:", {
+    yearOfStudy,
+    branch,
+    section,
+    date,
+  });
+
+  try {
+    // Fetch all students in the specified year, branch, and section
+    const allStudents = await Student.find({
+      yearOfStudy,
+      branch,
+      section,
+    }).select("rollNo name -_id");
+
+    console.log("All Students Found:", allStudents.length);
+
+    // Fetch attendance records for the specified date
+    const attendanceRecords = await Attendance.find({
+      date,
+      yearOfStudy,
+      branch,
+      section,
+    }).select("rollNo status");
+
+    console.log("Attendance Records Found:", attendanceRecords.length);
+
+    // If no attendance records are found, return not marked status
+    if (attendanceRecords.length === 0) {
+      return res.json({
+        attendanceStatus: "not_marked",
+        absentStudents: [],
+        absentCount: "N/A",
+        otherStatusCount: "N/A",
+      });
+    }
+
+    // Map the attendance states for each student
+    const attendanceMap = attendanceRecords.reduce((acc, record) => {
+      acc[record.rollNo] = record.status;
+      return acc;
+    }, {});
+
+    // For each student, get their attendance state from the attendance map, defaulting to "Absent" if no record exists
+    const attendanceStates = allStudents.map((student) => ({
+      rollNo: student.rollNo,
+      name: student.name,
+      state: attendanceMap[student.rollNo] || "Absent",
+    }));
+
+    // Count students with "Absent" status and all other statuses
+    let absentCount = 0;
+    let otherStatusCount = 0;
+    const absentStudents = [];
+
+    attendanceStates.forEach((student) => {
+      if (student.state === "Absent") {
+        absentCount++;
+        absentStudents.push({
+          rollNo: student.rollNo,
+          name: student.name,
+        });
+      } else {
+        otherStatusCount++;
+      }
+    });
+
+    // Sort absent students by roll number (numeric part only)
+    absentStudents.sort((a, b) => {
+      const numA = parseInt(a.rollNo.replace(/[^0-9]/g, ""), 10);
+      const numB = parseInt(b.rollNo.replace(/[^0-9]/g, ""), 10);
+      return numA - numB;
+    });
+
+    // Send the combined response
+    res.json({
+      attendanceStatus: "marked",
+      absentStudents,
+      absentCount,
+      otherStatusCount,
+    });
+  } catch (error) {
+    console.error("Error in optimized attendance endpoint:", error);
+    res.status(500).json({
+      message: "Server error",
+      attendanceStatus: "not_marked",
+      absentStudents: [],
+      absentCount: "N/A",
+      otherStatusCount: "N/A",
+    });
+  }
+};
