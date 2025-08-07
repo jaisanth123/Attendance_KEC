@@ -234,26 +234,30 @@ function UpdateAttendance() {
 
           {/* Dropdowns */}
           <div className="flex justify-center mt-4 w-full">
-            <div className="flex gap-x-6 w-full max-w-2xl">
-              <Dropdown
-                label="Year"
-                value={yearOfStudy}
-                options={["IV", "III", "II"]}
-                onChange={(e) => {
-                  setYearOfStudy(e.target.value);
-                  fetchStudentData();
-                }}
-              />
-              <Dropdown
-                label="Section"
-                value={section}
-                options={["A", "B", "C", "D", "E", "F"]}
-                onChange={(e) => {
-                  setSection(e.target.value);
-                  fetchStudentData();
-                }}
-              />
-              <div className="flex-1">
+            <div className="flex flex-col gap-4 w-full max-w-2xl">
+              {/* Year and Section in same row */}
+              <div className="flex gap-4 w-full">
+                <Dropdown
+                  label="Year"
+                  value={yearOfStudy}
+                  options={["IV", "III", "II"]}
+                  onChange={(e) => {
+                    setYearOfStudy(e.target.value);
+                    fetchStudentData();
+                  }}
+                />
+                <Dropdown
+                  label="Section"
+                  value={section}
+                  options={["A", "B", "C", "D", "E", "F"]}
+                  onChange={(e) => {
+                    setSection(e.target.value);
+                    fetchStudentData();
+                  }}
+                />
+              </div>
+              {/* Date in next row */}
+              <div className="w-full">
                 <label
                   htmlFor="date"
                   className="block text-lg font-medium text-white"
@@ -276,28 +280,28 @@ function UpdateAttendance() {
           </div>
         </div>
         <div className="flex flex-wrap gap-2 justify-center my-6 sm:gap-4">
-          <button className="px-3 py-2 text-sm text-white bg-amber-600 rounded-lg shadow transition-all duration-200 sm:px-6 sm:py-3 sm:text-base hover:bg-amber-700">
+          <button className="px-2 py-1 text-xs text-white bg-amber-600 rounded-lg shadow transition-all duration-200 sm:px-3 sm:py-2 sm:text-sm md:px-6 md:py-3 md:text-base hover:bg-amber-700">
             SuperPacc
           </button>
-          <button className="px-3 py-2 text-sm text-white bg-red-600 rounded-lg shadow transition-all duration-200 sm:px-6 sm:py-3 sm:text-base hover:bg-red-700">
+          <button className="px-2 py-1 text-xs text-white bg-red-600 rounded-lg shadow transition-all duration-200 sm:px-3 sm:py-2 sm:text-sm md:px-6 md:py-3 md:text-base hover:bg-red-700">
             Absent
           </button>
-          <button className="px-3 py-2 text-sm text-white bg-green-900 rounded-lg shadow transition-all duration-200 sm:px-6 sm:py-3 sm:text-base hover:bg-green-800">
+          <button className="px-2 py-1 text-xs text-white bg-green-900 rounded-lg shadow transition-all duration-200 sm:px-3 sm:py-2 sm:text-sm md:px-6 md:py-3 md:text-base hover:bg-green-800">
             Present
           </button>
-          <button className="px-3 py-2 text-sm text-white bg-sky-700 rounded-lg shadow transition-all duration-200 sm:px-6 sm:py-3 sm:text-base hover:bg-sky-600">
+          <button className="px-2 py-1 text-xs text-white bg-sky-700 rounded-lg shadow transition-all duration-200 sm:px-3 sm:py-2 sm:text-sm md:px-6 md:py-3 md:text-base hover:bg-sky-600">
             On Duty
           </button>
         </div>
 
         {/* Roll Numbers */}
         {rollNumbers.length > 0 && (
-          <div className="grid grid-cols-2 gap-4 mt-6 w-full sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8">
+          <div className="grid grid-cols-1 gap-3 mt-6 w-full sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
             {rollNumbers.map((rollNumber, index) => (
               <div
                 key={index}
                 onClick={() => toggleState(index)}
-                className={`flex items-center justify-center p-6 text-white transition-all transform duration-500 text-xl font-semibold rounded-lg cursor-pointer shadow-md ${
+                className={`flex items-center justify-center p-3 text-white transition-all transform duration-500 text-sm font-semibold rounded-lg cursor-pointer shadow-md sm:p-4 sm:text-base md:p-6 md:text-xl ${
                   rollNumber.state === "SuperPacc"
                     ? "bg-amber-600  rounded-lg shadow   hover:scale-110"
                     : rollNumber.state === "Absent"
@@ -344,9 +348,9 @@ function UpdateAttendance() {
           <button
             onClick={() => setIsConfirmed(true)}
             disabled={isUpdating} // Disable button when updating
-            className={`w-full px-6 py-3 mt-6  h-20 text-white text-2xl transition-all duration-500 ${
+            className={`w-full px-4 py-3 mt-6 h-16 text-white text-lg transition-all duration-500 sm:h-20 sm:text-xl md:text-2xl ${
               isUpdating ? "bg-gray-400 cursor-not-allowed" : "bg-gray-800"
-            } rounded-lg lg:w-1/4 md:w-1/5 sm:w-1/2 hover:scale-110 hover:bg-gray-600`}
+            } rounded-lg lg:w-1/4 md:w-1/3 sm:w-1/2 hover:scale-110 hover:bg-gray-600`}
           >
             {isUpdating ? "Updating Attendance..." : "Update Attendance"}{" "}
             {/* Update button text */}
@@ -355,7 +359,7 @@ function UpdateAttendance() {
 
         <button
           onClick={navigateToHome}
-          className="px-6 py-3 mt-5 w-full h-20 text-2xl text-white bg-gray-800 rounded-lg transition-all duration-500 transform hover:bg-gray-600 hover:scale-110 lg:w-1/4 md:w-1/5 sm:w-1/2"
+          className="px-4 py-3 mt-5 w-full h-16 text-lg text-white bg-gray-800 rounded-lg transition-all duration-500 transform hover:bg-gray-600 hover:scale-110 sm:h-20 sm:text-xl md:text-2xl lg:w-1/4 md:w-1/3 sm:w-1/2"
         >
           Home
         </button>
@@ -412,7 +416,7 @@ function UpdateAttendance() {
 
 function Dropdown({ label, value, options, onChange }) {
   return (
-    <div className="flex-1">
+    <div className="flex-1 min-w-0">
       <label htmlFor={label} className="block text-lg font-medium text-white">
         {label}:
       </label>
