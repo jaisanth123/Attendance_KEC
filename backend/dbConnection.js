@@ -1,11 +1,10 @@
 // dbConnection.js
 const mongoose = require("mongoose");
 
-// MongoDB URI from MongoDB Atlas
-const uri = "mongodb+srv://hodcse:Z3EZVI40t7lpr23S@cluster0.dm26ae7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-  // "mongodb+srv://hodcse:Z3EZVI40t7lpr23S@cluster0.dm26ae7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-// "mongodb+srv://hodcse:Z3EZVI40t7lpr23S@cluster0.dm26ae7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-// Connect to MongoDB
+const uri =
+  "mongodb+srv://hodcse:Z3EZVI40t7lpr23S@cluster0.dm26ae7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+// const uri = "mongodb+srv://jaisanth:S63JMLVvYmT3c18J@attendancecse.ioskkko.mongodb.net/?retryWrites=true&w=majority&appName=attendanceCSE";
 const connectDB = async () => {
   try {
     await mongoose.connect(uri, {

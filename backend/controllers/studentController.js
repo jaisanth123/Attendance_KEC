@@ -331,8 +331,8 @@ exports.getAllStudentsBasicInfo = async (req, res) => {
 
 //! <======= Update student data ============>
 exports.updateStudentData = async (req, res) => {
-  const { rollNo } = req.params;
-  const updateData = req.body;
+  const { rollNo } = req.params; // existing/old roll number
+  const updateData = req.body; // may include new rollNo
 
   try {
     // Validate roll number
@@ -351,8 +351,9 @@ exports.updateStudentData = async (req, res) => {
       });
     }
 
-    // Validate update fields match the schema
+    // Allowed fields including rollNo change
     const allowedFields = [
+      "rollNo",
       "name",
       "hostellerDayScholar",
       "gender",
@@ -364,7 +365,17 @@ exports.updateStudentData = async (req, res) => {
       "superPacc",
     ];
 
-    // Filter out any fields that aren't in our schema
+    // Helpers to normalize inputs (trim only end, preserve inner spaces)
+    const trimEndOnly = (value) =>
+      typeof value === "string" ? value.replace(/\s+$/u, "") : value;
+    const toUpperTrimEnd = (value) =>
+      typeof value === "string" ? trimEndOnly(value).toUpperCase() : value;
+
+    const hasRollChange =
+      typeof updateData.rollNo === "string" &&
+      toUpperTrimEnd(updateData.rollNo) !== rollNo;
+
+    // Build update object
     const validUpdateData = Object.keys(updateData)
       .filter((key) => allowedFields.includes(key))
       .reduce((obj, key) => {
@@ -372,7 +383,53 @@ exports.updateStudentData = async (req, res) => {
         return obj;
       }, {});
 
-    // Check if there are any valid fields to update
+    if (hasRollChange) {
+      validUpdateData.rollNo = toUpperTrimEnd(updateData.rollNo);
+      // Ensure new roll not taken
+      const exists = await Student.findOne({ rollNo: validUpdateData.rollNo });
+      if (exists) {
+        return res.status(409).json({
+          success: false,
+          message: "Another student already exists with the new roll number",
+        });
+      }
+    }
+
+    // Normalize other updatable fields
+    if (typeof validUpdateData.name === "string") {
+      validUpdateData.name = trimEndOnly(validUpdateData.name);
+    }
+    if (typeof validUpdateData.hostellerDayScholar === "string") {
+      validUpdateData.hostellerDayScholar = toUpperTrimEnd(
+        validUpdateData.hostellerDayScholar
+      );
+    }
+    if (typeof validUpdateData.gender === "string") {
+      validUpdateData.gender = toUpperTrimEnd(validUpdateData.gender);
+    }
+    if (typeof validUpdateData.yearOfStudy === "string") {
+      validUpdateData.yearOfStudy = toUpperTrimEnd(validUpdateData.yearOfStudy);
+    }
+    if (typeof validUpdateData.branch === "string") {
+      validUpdateData.branch = toUpperTrimEnd(validUpdateData.branch);
+    }
+    if (typeof validUpdateData.section === "string") {
+      validUpdateData.section = toUpperTrimEnd(validUpdateData.section);
+    }
+    if (typeof validUpdateData.parentMobileNo === "string") {
+      validUpdateData.parentMobileNo = trimEndOnly(
+        validUpdateData.parentMobileNo
+      );
+    }
+    if (typeof validUpdateData.studentMobileNo === "string") {
+      validUpdateData.studentMobileNo = trimEndOnly(
+        validUpdateData.studentMobileNo
+      );
+    }
+    if (typeof validUpdateData.superPacc === "string") {
+      validUpdateData.superPacc = toUpperTrimEnd(validUpdateData.superPacc);
+    }
+
     if (Object.keys(validUpdateData).length === 0) {
       return res.status(400).json({
         success: false,
@@ -380,11 +437,11 @@ exports.updateStudentData = async (req, res) => {
       });
     }
 
-    // Find the student by roll number and update their data
+    // Update the student first
     const updatedStudent = await Student.findOneAndUpdate(
       { rollNo },
       { $set: validUpdateData },
-      { new: true } // Return the updated document
+      { new: true, runValidators: true }
     );
 
     // Check if student exists
@@ -395,10 +452,29 @@ exports.updateStudentData = async (req, res) => {
       });
     }
 
-    // Respond with success and the updated student data
+    // If roll changed, cascade to Attendance
+    if (hasRollChange) {
+      const oldRoll = rollNo;
+      const newRoll = validUpdateData.rollNo;
+      try {
+        await Attendance.updateMany(
+          { rollNo: oldRoll },
+          { $set: { rollNo: newRoll } }
+        );
+      } catch (e) {
+        // Log but still return success for student update
+        console.error(
+          "Failed to cascade roll number to attendance records:",
+          e
+        );
+      }
+    }
+
     res.status(200).json({
       success: true,
-      message: "Student data updated successfully",
+      message: hasRollChange
+        ? "Student data and roll number updated successfully"
+        : "Student data updated successfully",
       data: updatedStudent,
     });
   } catch (error) {

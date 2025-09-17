@@ -199,7 +199,17 @@ export default function UpdateStudentData() {
   // Handle input change in the edit form
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setUpdatedData((prev) => ({ ...prev, [name]: value }));
+    // Normalize inputs: rollNo uppercased and trimmed at end; others trim end only
+    const trimEndOnly = (v) =>
+      typeof v === "string" ? v.replace(/\s+$/u, "") : v;
+    let normalized = value;
+    if (name === "rollNo") {
+      normalized = trimEndOnly(value).toUpperCase();
+    } else {
+      normalized = trimEndOnly(value);
+    }
+
+    setUpdatedData((prev) => ({ ...prev, [name]: normalized }));
   };
 
   // Handle form submission to update student data
@@ -528,16 +538,17 @@ export default function UpdateStudentData() {
               {editMode ? (
                 <form onSubmit={handleUpdateStudent}>
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {/* Roll Number (read-only) */}
+                    {/* Roll Number (editable) */}
                     <div>
                       <label className="block mb-1 text-sm font-medium text-gray-700">
                         Roll Number
                       </label>
                       <input
                         type="text"
+                        name="rollNo"
                         value={updatedData.rollNo || ""}
-                        disabled
-                        className="p-3 w-full bg-gray-100 rounded-lg border border-gray-300"
+                        onChange={handleInputChange}
+                        className="p-3 w-full bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
                       />
                     </div>
 
