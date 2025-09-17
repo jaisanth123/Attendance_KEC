@@ -155,30 +155,36 @@ exports.addStudent = async (req, res) => {
           });
         }
 
-        // Get existing roll numbers
-        const rollNos = results.map((r) => r.rollNo);
-        const existing = await Student.find({
-          rollNo: { $in: rollNos },
-        }).select("rollNo");
-        const existingRollNos = new Set(existing.map((doc) => doc.rollNo));
+        // De-duplicate within-batch by rollNo (keep first occurrence)
+        const seen = new Set();
+        const batchUnique = results.filter((r) => {
+          if (seen.has(r.rollNo)) return false;
+          seen.add(r.rollNo);
+          return true;
+        });
 
-        // Separate new entries and duplicates
-        const newEntries = results.filter(
-          (r) => !existingRollNos.has(r.rollNo)
-        );
-        const duplicates = results.filter((r) => existingRollNos.has(r.rollNo));
+        // Upsert-only-on-miss to avoid duplicates even if indexes are missing
+        let bulkResult = { upsertedCount: 0, matchedCount: 0 };
+        if (batchUnique.length > 0) {
+          const ops = batchUnique.map((doc) => ({
+            updateOne: {
+              filter: { rollNo: doc.rollNo },
+              update: { $setOnInsert: doc },
+              upsert: true,
+            },
+          }));
 
-        let insertedCount = 0;
-        if (newEntries.length > 0) {
-          await Student.insertMany(newEntries);
-          insertedCount = newEntries.length;
+          bulkResult = await Student.bulkWrite(ops, { ordered: false });
         }
+
+        const insertedCount = bulkResult.upsertedCount || 0;
+        const duplicatesCount = batchUnique.length - insertedCount;
 
         // Prepare response with detailed stats
         const stats = {
           total: results.length + errors.length,
           inserted: insertedCount,
-          duplicates: duplicates.length,
+          duplicates: duplicatesCount,
           errors: errors.length,
           validRecords: results.length,
         };
@@ -187,15 +193,15 @@ exports.addStudent = async (req, res) => {
         if (insertedCount > 0) {
           message += `Successfully inserted ${insertedCount} new student(s). `;
         }
-        if (duplicates.length > 0) {
-          message += `${duplicates.length} duplicate(s) skipped. `;
+        if (duplicatesCount > 0) {
+          message += `${duplicatesCount} duplicate(s) skipped. `;
         }
         if (errors.length > 0) {
           message += `${errors.length} record(s) had validation errors.`;
         }
         if (
           insertedCount === 0 &&
-          duplicates.length === 0 &&
+          duplicatesCount === 0 &&
           errors.length === 0
         ) {
           message = "No valid records found in the CSV file.";
