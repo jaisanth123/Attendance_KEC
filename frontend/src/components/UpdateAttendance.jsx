@@ -98,8 +98,9 @@ function UpdateAttendance() {
   };
 
   const updateAttendanceStatus = async () => {
-    handleClosePopup();
+    if (isUpdating) return;
     setIsUpdating(true); // Set isUpdating to true when starting the update process
+    handleClosePopup();
 
     try {
       const rollNumberStateMapping = rollNumbers.reduce((acc, student) => {
@@ -395,9 +396,12 @@ function UpdateAttendance() {
               <div className="flex justify-between mt-6">
                 <button
                   onClick={updateAttendanceStatus}
-                  className="py-2 mr-3 w-1/2 font-medium text-white bg-green-500 rounded-lg shadow-md x-4 hover:bg-green-600 focus:ring-4 focus:ring-green-300"
+                  disabled={isUpdating}
+                  className={`py-2 mr-3 w-1/2 font-medium text-white rounded-lg shadow-md x-4 focus:ring-4 focus:ring-green-300 ${
+                    isUpdating ? "bg-green-400 cursor-not-allowed" : "bg-green-500 hover:bg-green-600"
+                  }`}
                 >
-                  Confirm
+                  {isUpdating ? "Processing..." : "Confirm"}
                 </button>
                 <button
                   onClick={handleClosePopup}

@@ -1,4 +1,10 @@
 // app.js
+// Polyfill SlowBuffer for buffer-equal-constant-time in Node >= v26
+const buffer = require("buffer");
+if (!buffer.SlowBuffer) {
+  buffer.SlowBuffer = buffer.Buffer;
+}
+
 const express = require("express");
 const connectDB = require("./dbConnection"); // Import the database connection function
 const cors = require("cors"); // Import the CORS middleware

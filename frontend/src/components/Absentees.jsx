@@ -9,6 +9,7 @@ function Absentees() {
   const navigate = useNavigate();
   const [isMarkingLoading, setIsMarkingLoading] = useState(false);
   const [isSuperMarkingLoading, setIsSuperMarkingLoading] = useState(false);
+  const [isAbsentMarkingLoading, setIsAbsentMarkingLoading] = useState(false);
 
   // State variables
   const [date, setDate] = useState(
@@ -165,6 +166,7 @@ function Absentees() {
   };
 
   const handleConfirmationPopupOk = async () => {
+    if (isAbsentMarkingLoading) return;
     const numSelected = selectedRollNos.length;
 
     if (numSelected === 0) {
@@ -179,6 +181,7 @@ function Absentees() {
       // revent further execution
     }
 
+    setIsAbsentMarkingLoading(true);
     try {
       // Make sure the server endpoint and data are correct
       const response = await axios.post(`${backendURL}/api/attendance/absent`, {
@@ -213,6 +216,8 @@ function Absentees() {
       toast.error(errorMessage, {
         autoClose: 3000, // Increased auto-close duration
       });
+    } finally {
+      setIsAbsentMarkingLoading(false);
     }
   };
 
@@ -294,6 +299,7 @@ function Absentees() {
     onCancel,
     confirmText = "Confirm",
     cancelText = "Cancel",
+    isConfirming = false,
   }) => {
     if (!show) return null;
 
@@ -316,17 +322,19 @@ function Absentees() {
             {/* Confirm Button */}
             <button
               onClick={() => {
+                if (isConfirming) return;
                 onConfirm(); // Confirm action
-                setShowMarkPresentPopup(false); // Close the popup
               }}
-              className="px-6 py-2 font-semibold text-white bg-blue-700 rounded-md transition-colors hover:bg-blue-800"
+              disabled={isConfirming}
+              className={`px-6 py-2 font-semibold text-white bg-blue-700 rounded-md transition-colors hover:bg-blue-800 ${isConfirming ? "opacity-50 cursor-not-allowed" : ""}`}
             >
-              {confirmText}
+              {isConfirming ? "Processing..." : confirmText}
             </button>
             {/* Cancel Button */}
             <button
               onClick={onCancel}
-              className="px-6 py-2 font-semibold text-white bg-red-600 rounded-md transition-colors hover:bg-red-700"
+              disabled={isConfirming}
+              className={`px-6 py-2 font-semibold text-white bg-red-600 rounded-md transition-colors hover:bg-red-700 ${isConfirming ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               {cancelText}
             </button>
@@ -550,6 +558,7 @@ function Absentees() {
         color="bg-red-600" // Popup with red theme for absentees
         onConfirm={handleConfirmationPopupOk}
         onCancel={() => setShowConfirmationPopup(false)}
+        isConfirming={isAbsentMarkingLoading}
       />
 
       <ReusablePopup
@@ -560,6 +569,7 @@ function Absentees() {
         onCancel={() => setShowMarkSuperPaccPopup(false)} // Close popup on cancel
         confirmText="Confirm"
         cancelText="Cancel"
+        isConfirming={isSuperMarkingLoading}
       />
 
       <ReusablePopup
@@ -568,6 +578,7 @@ function Absentees() {
         color="bg-green-600" // Popup with green theme for mark present
         onConfirm={handleMarkPresentConfirm}
         onCancel={() => setShowMarkPresentPopup(false)}
+        isConfirming={isMarkingLoading}
       />
     </div>
   );

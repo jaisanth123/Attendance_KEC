@@ -21,6 +21,7 @@ function DutyPage() {
   const [section, setSection] = useState("nan");
   const [branch, setBranch] = useState("CSE");
   const [selectedCourse, setSelectedCourse] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const backendURL = import.meta.env.VITE_BACKEND_URL;
 
@@ -122,6 +123,7 @@ function DutyPage() {
   };
 
   const handleConfirm = async () => {
+    if (isSubmitting) return;
     if (selectedRollNumbers.length === 0) {
       toast.info("0 Students are Marked as On Duty", {
         position: "top-right",
@@ -134,6 +136,7 @@ function DutyPage() {
       return;
     }
 
+    setIsSubmitting(true);
     const payload = {
       rollNumbers: selectedRollNumbers,
       date,
@@ -181,6 +184,8 @@ function DutyPage() {
       toast.error("Error submitting OD. Please try again.", {
         autoClose: 800,
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -362,9 +367,12 @@ function DutyPage() {
             <div className="flex justify-center space-x-4">
               <button
                 onClick={handleConfirm}
-                className="px-4 py-2 w-24 text-white bg-blue-600 rounded-lg md:px-6 md:py-3 md:w-32 hover:bg-blue-700"
+                disabled={isSubmitting}
+                className={`px-4 py-2 w-24 text-white rounded-lg md:px-6 md:py-3 md:w-32 ${
+                  isSubmitting ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+                }`}
               >
-                Yes
+                {isSubmitting ? "Wait..." : "Yes"}
               </button>
               <button
                 onClick={handleClosePopup}
