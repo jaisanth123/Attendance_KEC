@@ -43,6 +43,10 @@ function HomePage({ toggleSidebar }) {
                 label="Mark On Duty"
                 onClick={() => navigate("/duty")}
               />
+              <ActionCard
+                label="Generate Report"
+                onClick={() => navigate("/generateReport")}
+              />
             </>
           )}
           {/* //! --------------staff cards section -------------- */}

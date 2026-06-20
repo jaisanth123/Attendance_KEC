@@ -12,19 +12,61 @@ const GenerateMessage = () => {
   const [showCard, setShowCard] = useState(false);
   const navigate = useNavigate();
 
+  const [dateMode, setDateMode] = useState("single");
   const [date, setDate] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [month, setMonth] = useState("");
   const [gender, setGender] = useState("ALL");
   const [hostellerDayScholar, setHostellerDayScholar] = useState("ALL");
-  const [yearOfStudy, setYearOfStudy] = useState("ALL");
-  const [section, setSection] = useState("ALL");
+  const [yearOfStudy, setYearOfStudy] = useState(["ALL"]);
+  const [section, setSection] = useState(["ALL"]);
   const [branch, setBranch] = useState("CSE");
 
   const handleDateChange = (e) => setDate(e.target.value);
-  const handleGenderChange = (e) => setGender(e.target.value.toUpperCase());
-  const handleHostellerDayScholarChange = (e) =>
+  const handleGenderChange = (e) => {
+    setGender(e.target.value.toUpperCase());
+    setShowCard(false);
+  };
+  const handleHostellerDayScholarChange = (e) => {
     setHostellerDayScholar(e.target.value);
-  const handleYearOfStudyChange = (e) => setYearOfStudy(e.target.value);
-  const handleSectionChange = (e) => setSection(e.target.value);
+    setShowCard(false);
+  };
+
+  const handleYearOfStudyChange = (e) => {
+    setShowCard(false);
+    const value = e.target.value;
+    if (value === "ALL") {
+      setYearOfStudy(["ALL"]);
+    } else {
+      let newYears = yearOfStudy.filter((y) => y !== "ALL");
+      if (newYears.includes(value)) {
+        newYears = newYears.filter((y) => y !== value);
+      } else {
+        newYears.push(value);
+      }
+      if (newYears.length === 0) newYears = ["ALL"];
+      setYearOfStudy(newYears);
+    }
+  };
+
+  const handleSectionChange = (e) => {
+    setShowCard(false);
+    const value = e.target.value;
+    if (value === "ALL") {
+      setSection(["ALL"]);
+    } else {
+      let newSections = section.filter((s) => s !== "ALL");
+      if (newSections.includes(value)) {
+        newSections = newSections.filter((s) => s !== value);
+      } else {
+        newSections.push(value);
+      }
+      if (newSections.length === 0) newSections = ["ALL"];
+      setSection(newSections);
+    }
+  };
+
   const handleBranchChange = (e) => setBranch(e.target.value);
 
   const formatDate = (dateStr) => {
@@ -38,6 +80,9 @@ const GenerateMessage = () => {
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
     setDate(today);
+    setStartDate(today);
+    setEndDate(today);
+    setMonth(today.substring(0, 7));
   }, []);
 
   const copyCardContent = () => {
@@ -61,8 +106,14 @@ const GenerateMessage = () => {
   };
 
   const handleDownload = () => {
-    if (!date) {
+    if (dateMode === "single" && !date) {
       toast.info("Please select a date.", { autoClose: 800 });
+      return;
+    } else if (dateMode === "range" && (!startDate || !endDate)) {
+      toast.info("Please select both start and end dates.", { autoClose: 800 });
+      return;
+    } else if (dateMode === "month" && !month) {
+      toast.info("Please select a month.", { autoClose: 800 });
       return;
     }
 
@@ -81,7 +132,9 @@ const GenerateMessage = () => {
     }
 
     // Construct the URL for the report
-    const url = `http://localhost:5000/api/report/absentStudentsCustom?gender=${gender}&date=${date}&hostellerDayScholar=${hostellerDayScholar}&yearOfStudy=${yearOfStudy}&section=${section}&branch=${branch}`;
+    const yearQuery = yearOfStudy.join(",");
+    const sectionQuery = section.join(",");
+    const url = `http://localhost:5000/api/report/absentStudentsCustom?gender=${gender}&dateMode=${dateMode}&date=${date}&startDate=${startDate}&endDate=${endDate}&month=${month}&hostellerDayScholar=${hostellerDayScholar}&yearOfStudy=${yearQuery}&section=${sectionQuery}&branch=${branch}`;
 
     // Add the Authorization header to the fetch request
     fetch(url, {
@@ -114,121 +167,160 @@ const GenerateMessage = () => {
         <h2 className="mb-2 text-2xl font-semibold text-center text-white">
           Generate Absentee Message
         </h2>
-        {/* Date input field */}
+        {/* Date Mode Selection */}
         <div>
-          <label
-            htmlFor="date"
-            className="block text-sm font-medium text-gray-300"
-          >
-            Date:
+          <label className="block text-sm font-medium text-gray-300">
+            Date Mode:
           </label>
-          <input
-            type="date"
-            id="date"
-            value={date}
-            onChange={handleDateChange}
+          <select
+            value={dateMode}
+            onChange={(e) => setDateMode(e.target.value)}
+            style={{ padding: "5px", margin: "10px 0" }}
             className="block px-3 py-2 mt-1 w-full text-white bg-gray-700 rounded-md border border-gray-500 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-        {/* Gender dropdown */}
-        <div>
-          <label
-            htmlFor="gender"
-            className="block text-sm font-medium text-gray-300"
           >
+            <option value="single">Single Date</option>
+            <option value="range">Date Range</option>
+            <option value="month">Month</option>
+          </select>
+        </div>
+
+        {/* Date inputs */}
+        {dateMode === "single" && (
+          <div>
+            <label htmlFor="date" className="block text-sm font-medium text-gray-300">
+              Date:
+            </label>
+            <input
+              type="date"
+              id="date"
+              value={date}
+              onChange={handleDateChange}
+              style={{ padding: "5px", margin: "10px 0" }}
+              className="block px-3 py-2 mt-1 w-full text-white bg-gray-700 rounded-md border border-gray-500 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+        )}
+
+        {dateMode === "range" && (
+          <div className="flex space-x-2">
+            <div className="w-1/2">
+              <label htmlFor="startDate" className="block text-sm font-medium text-gray-300">
+                Start Date:
+              </label>
+              <input
+                type="date"
+                id="startDate"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                style={{ padding: "5px", margin: "10px 0" }}
+                className="block px-3 py-2 mt-1 w-full text-white bg-gray-700 rounded-md border border-gray-500 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="w-1/2">
+              <label htmlFor="endDate" className="block text-sm font-medium text-gray-300">
+                End Date:
+              </label>
+              <input
+                type="date"
+                id="endDate"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                style={{ padding: "5px", margin: "10px 0" }}
+                className="block px-3 py-2 mt-1 w-full text-white bg-gray-700 rounded-md border border-gray-500 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
+        )}
+
+        {dateMode === "month" && (
+          <div>
+            <label htmlFor="month" className="block text-sm font-medium text-gray-300">
+              Month:
+            </label>
+            <input
+              type="month"
+              id="month"
+              value={month}
+              onChange={(e) => setMonth(e.target.value)}
+              style={{ padding: "5px", margin: "10px 0" }}
+              className="block px-3 py-2 mt-1 w-full text-white bg-gray-700 rounded-md border border-gray-500 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+        )}
+        {/* Gender radio buttons */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Gender:
           </label>
-          <select
-            id="gender"
-            value={gender}
-            onChange={(e) => {
-              handleGenderChange(e);
-              setShowCard(false);
-            }}
-            style={{ padding: "5px", margin: "10px 0" }}
-            className="block px-3 py-2 mt-1 w-full text-white bg-gray-700 rounded-md border border-gray-500 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="MALE">BOYS</option>
-            <option value="FEMALE">GIRLS</option>
-            <option value="ALL">ALL</option>
-          </select>
+          <div className="flex space-x-4 text-white">
+            <label className="flex items-center">
+              <input type="radio" value="ALL" checked={gender === "ALL"} onChange={handleGenderChange} className="mr-2" /> ALL
+            </label>
+            <label className="flex items-center">
+              <input type="radio" value="MALE" checked={gender === "MALE"} onChange={handleGenderChange} className="mr-2" /> BOYS
+            </label>
+            <label className="flex items-center">
+              <input type="radio" value="FEMALE" checked={gender === "FEMALE"} onChange={handleGenderChange} className="mr-2" /> GIRLS
+            </label>
+          </div>
         </div>
 
-        {/* Hosteller/Day Scholar dropdown */}
-        <div>
-          <label
-            htmlFor="hostellerDayScholar"
-            className="block text-sm font-medium text-gray-300"
-          >
+        {/* Hostel Type radio buttons */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Hostel Type:
           </label>
-          <select
-            id="hostellerDayScholar"
-            value={hostellerDayScholar}
-            onChange={(e) => {
-              handleHostellerDayScholarChange(e);
-              setShowCard(false);
-            }}
-            style={{ padding: "5px", margin: "10px 0" }}
-            className="block px-3 py-2 mt-1 w-full text-white bg-gray-700 rounded-md border border-gray-500 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="ALL">ALL</option>
-            <option value="HOSTELLER">HOSTELLER</option>
-            <option value="DAY SCHOLAR">DAY SCHOLAR</option>
-          </select>
+          <div className="flex space-x-4 text-white">
+            <label className="flex items-center">
+              <input type="radio" value="ALL" checked={hostellerDayScholar === "ALL"} onChange={handleHostellerDayScholarChange} className="mr-2" /> ALL
+            </label>
+            <label className="flex items-center">
+              <input type="radio" value="HOSTELLER" checked={hostellerDayScholar === "HOSTELLER"} onChange={handleHostellerDayScholarChange} className="mr-2" /> HOSTELLER
+            </label>
+            <label className="flex items-center">
+              <input type="radio" value="DAY SCHOLAR" checked={hostellerDayScholar === "DAY SCHOLAR"} onChange={handleHostellerDayScholarChange} className="mr-2" /> DAY SCHOLAR
+            </label>
+          </div>
         </div>
 
-        {/* Year of Study dropdown */}
-        <div>
-          <label
-            htmlFor="yearOfStudy"
-            className="block text-sm font-medium text-gray-300"
-          >
+        {/* Year of Study checkboxes */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Year of Study:
           </label>
-          <select
-            id="yearOfStudy"
-            value={yearOfStudy}
-            onChange={(e) => {
-              handleYearOfStudyChange(e);
-              setShowCard(false);
-            }}
-            style={{ padding: "5px", margin: "10px 0" }}
-            className="block px-3 py-2 mt-1 w-full text-white bg-gray-700 rounded-md border border-gray-500 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="ALL">ALL</option>
-            <option value="II">Second Year</option>
-            <option value="III">Third Year</option>
-            <option value="IV">Fourth Year</option>
-          </select>
+          <div className="flex flex-wrap gap-4 text-white">
+            {["ALL", "II", "III", "IV"].map(yr => (
+              <label key={yr} className="flex items-center">
+                <input 
+                  type="checkbox" 
+                  value={yr} 
+                  checked={yearOfStudy.includes(yr)} 
+                  onChange={handleYearOfStudyChange} 
+                  className="mr-2" 
+                /> {yr === "ALL" ? "ALL" : `${yr} Year`}
+              </label>
+            ))}
+          </div>
         </div>
 
-        {/* Section dropdown */}
-        <div>
-          <label
-            htmlFor="section"
-            className="block text-sm font-medium text-gray-300"
-          >
+        {/* Section checkboxes */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Section:
           </label>
-          <select
-            id="section"
-            value={section}
-            onChange={(e) => {
-              handleSectionChange(e);
-              setShowCard(false);
-            }}
-            style={{ padding: "5px", margin: "10px 0" }}
-            className="block px-3 py-2 mt-1 w-full text-white bg-gray-700 rounded-md border border-gray-500 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="ALL">ALL</option>
-            <option value="A">A</option>
-            <option value="B">B</option>
-            <option value="C">C</option>
-            <option value="D">D</option>
-            <option value="E">E</option>
-            <option value="F">F</option>
-          </select>
+          <div className="flex flex-wrap gap-4 text-white">
+            {["ALL", "A", "B", "C", "D", "E", "F"].map(sec => (
+              <label key={sec} className="flex items-center">
+                <input 
+                  type="checkbox" 
+                  value={sec} 
+                  checked={section.includes(sec)} 
+                  onChange={handleSectionChange} 
+                  className="mr-2" 
+                /> {sec}
+              </label>
+            ))}
+          </div>
         </div>
 
         {/* Button to trigger report download */}

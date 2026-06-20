@@ -154,148 +154,174 @@ exports.generateAbsentStudentsMessage = async (req, res) => {
 // Convert Roman numeral to integer
 
 exports.handleCustomAbsentMessage = async (req, res) => {
-  const { gender, date, hostellerDayScholar, yearOfStudy, section, branch } =
-    req.query; // Added branch filter from query params
-  console.log(
-    "Request received to generate report for gender:",
-    gender,
-    "date:",
-    date,
-    "hostellerDayScholar:",
-    hostellerDayScholar,
-    "yearOfStudy:",
-    yearOfStudy,
-    "section:",
-    section,
-    "branch:",
-    branch
-  );
-
-  try {
-    let allStudents;
-
-    // Fetch students based on gender selection
-    if (gender === "ALL") {
-      allStudents = await Student.find().select(
-        "rollNo name gender yearOfStudy branch section hostellerDayScholar"
-      );
-    } else {
-      allStudents = await Student.find({ gender }).select(
-        "rollNo name gender yearOfStudy branch section hostellerDayScholar"
-      );
-    }
-    console.log("Total students fetched:", allStudents.length);
-
-    // Apply branch filter if provided
-    if (branch && branch !== "ALL") {
-      allStudents = allStudents.filter((student) => student.branch === branch);
-    }
-
-    // Apply hostellerDayScholar filter if provided
-    if (hostellerDayScholar && hostellerDayScholar !== "ALL") {
-      allStudents = allStudents.filter(
-        (student) => student.hostellerDayScholar === hostellerDayScholar
-      );
-    }
-
-    // Apply yearOfStudy filter if provided
-    if (yearOfStudy && yearOfStudy !== "ALL") {
-      allStudents = allStudents.filter(
-        (student) => student.yearOfStudy === yearOfStudy
-      );
-    }
-
-    // Apply section filter if provided
-    if (section && section !== "ALL") {
-      allStudents = allStudents.filter(
-        (student) => student.section === section
-      );
-    }
-
-    // Fetch attendance records for the specified date (only absent students)
-    const attendanceRecords = await Attendance.find({
+    const { gender, dateMode, date, startDate, endDate, month, hostellerDayScholar, yearOfStudy, section, branch } =
+      req.query; // Added branch filter from query params
+    console.log(
+      "Request received to generate report for gender:",
+      gender,
+      "dateMode:",
+      dateMode,
+      "date:",
       date,
-      status: "Absent",
-    }).select("rollNo");
+      "hostellerDayScholar:",
+      hostellerDayScholar,
+      "yearOfStudy:",
+      yearOfStudy,
+      "section:",
+      section,
+      "branch:",
+      branch
+    );
+  
+    try {
+      let allStudents;
+  
+      // Fetch students based on gender selection
+      if (gender === "ALL") {
+        allStudents = await Student.find().select(
+          "rollNo name gender yearOfStudy branch section hostellerDayScholar"
+        );
+      } else {
+        allStudents = await Student.find({ gender }).select(
+          "rollNo name gender yearOfStudy branch section hostellerDayScholar"
+        );
+      }
+      console.log("Total students fetched:", allStudents.length);
+  
+      // Apply branch filter if provided
+      if (branch && branch !== "ALL") {
+        allStudents = allStudents.filter((student) => student.branch === branch);
+      }
+  
+      // Apply hostellerDayScholar filter if provided
+      if (hostellerDayScholar && hostellerDayScholar !== "ALL") {
+        allStudents = allStudents.filter(
+          (student) => student.hostellerDayScholar === hostellerDayScholar
+        );
+      }
+  
+      // Apply yearOfStudy filter if provided
+      if (yearOfStudy && yearOfStudy !== "ALL") {
+        const yearsArray = yearOfStudy.split(",");
+        allStudents = allStudents.filter((student) =>
+          yearsArray.includes(student.yearOfStudy)
+        );
+      }
+  
+      // Apply section filter if provided
+      if (section && section !== "ALL") {
+        const sectionsArray = section.split(",");
+        allStudents = allStudents.filter((student) =>
+          sectionsArray.includes(student.section)
+        );
+      }
+  
+      // Determine date query based on dateMode
+      let dateQuery = {};
+      if (dateMode === 'range') {
+        dateQuery = { $gte: startDate, $lte: endDate };
+      } else if (dateMode === 'month') {
+        dateQuery = { $regex: `^${month}` }; // Matches YYYY-MM
+      } else {
+        dateQuery = date;
+      }
+  
+      // Fetch attendance records for the specified date (only absent students)
+      const attendanceRecords = await Attendance.find({
+        date: dateQuery,
+        status: "Absent",
+      }).select("rollNo date");
     console.log(
       "Total attendance records fetched for absent students:",
       attendanceRecords.length
     );
 
-    // Filter students who were absent on the given date
-    const absentStudents = allStudents.filter((student) =>
-      attendanceRecords.some((record) => record.rollNo === student.rollNo)
-    );
-    console.log("Absent Students before hostel filter:", absentStudents);
+    // Filter students who were absent on the given date(s)
+    const absences = [];
+    attendanceRecords.forEach((record) => {
+      const student = allStudents.find((s) => s.rollNo === record.rollNo);
+      if (student) {
+        absences.push({
+          ...student.toObject(),
+          date: record.date,
+        });
+      }
+    });
 
-    if (absentStudents.length === 0) {
+    console.log("Total absences found:", absences.length);
+
+    if (absences.length === 0) {
       console.log(
-        `No absent students found for specified criteria on ${date}.`
+        `No absent students found for specified criteria.`
       );
       return res.status(404).json({
-        message: `No absent students found for specified criteria on ${date}.`,
+        message: `No absent students found for specified criteria.`,
       });
     }
 
-    // Sort absent students first by yearOfStudy (Roman numeral order), then by branch (AIDS before AIML), and then by rollNo
-    absentStudents.sort((a, b) => {
+    // Sort absences first by date, then by yearOfStudy, then by branch, then by rollNo
+    absences.sort((a, b) => {
+      if (a.date !== b.date) {
+        return new Date(a.date) - new Date(b.date);
+      }
       const yearA = romanToInt(a.yearOfStudy);
       const yearB = romanToInt(b.yearOfStudy);
 
-      // If the years are the same, sort by branch (AIDS before AIML)
       if (yearA === yearB) {
         const branchOrder = ["AIDS", "AIML"]; // Custom order for branches
         const branchAIndex = branchOrder.indexOf(a.branch);
         const branchBIndex = branchOrder.indexOf(b.branch);
 
         if (branchAIndex === branchBIndex) {
-          // If branches are the same, sort by rollNo
-          const rollNoA = parseInt(a.rollNo.replace(/\D/g, "")); // Extract numeric part of rollNo
+          const rollNoA = parseInt(a.rollNo.replace(/\D/g, "")); 
           const rollNoB = parseInt(b.rollNo.replace(/\D/g, ""));
-          return rollNoA - rollNoB; // Sort by rollNo if branch is the same
+          return rollNoA - rollNoB; 
         }
-
-        return branchAIndex - branchBIndex; // Sort by custom branch order
+        return branchAIndex - branchBIndex;
       }
-
-      return yearA - yearB; // If years are different, sort by year
+      return yearA - yearB;
     });
+
     // Prepare the message header
-    // Prepare the message header
-    const formattedDate = formatDate(date);
-    let messageHeader = `Kongu Engineering College\nDepartment of Artificial Intelligence\nStudents Absentees List - ${formattedDate}\n\n`;
+    let dateStrForHeader = dateMode === 'range' ? `${formatDate(startDate)} to ${formatDate(endDate)}` : dateMode === 'month' ? month : formatDate(date);
+    let messageHeader = `Kongu Engineering College\nDepartment of Artificial Intelligence\nStudents Absentees List - ${dateStrForHeader}\n\n`;
 
-    // Group students by year and branch
-    let groupedDetails = {};
+    // Group absences by date, then by year and branch
+    let groupedByDate = {};
 
-    absentStudents.forEach((student) => {
-      const groupKey = `${student.yearOfStudy} ${student.branch}-${student.section}`; // Year and Branch group key
+    absences.forEach((absence) => {
+      if (!groupedByDate[absence.date]) {
+        groupedByDate[absence.date] = {};
+      }
+      
+      const groupKey = `${absence.yearOfStudy} ${absence.branch}-${absence.section}`; 
 
-      if (!groupedDetails[groupKey]) {
-        groupedDetails[groupKey] = [];
+      if (!groupedByDate[absence.date][groupKey]) {
+        groupedByDate[absence.date][groupKey] = [];
       }
 
       const hostellerOrDayScholar =
-        student.hostellerDayScholar === "HOSTELLER" ? "Hostel" : "Day Scholar";
-      groupedDetails[groupKey].push(
-        `${student.rollNo} ${student.name} (${hostellerOrDayScholar})`
+        absence.hostellerDayScholar === "HOSTELLER" ? "Hostel" : "Day Scholar";
+      groupedByDate[absence.date][groupKey].push(
+        `${absence.rollNo} ${absence.name} (${hostellerOrDayScholar})`
       );
     });
 
-    // Format the grouped students with an extra newline between each group
+    // Format the grouped absences
     let absentDetails = "";
-    for (let groupKey in groupedDetails) {
-      absentDetails += `\n${groupKey}\n`;
-      absentDetails += "\n"; // Add group heading
-      absentDetails += groupedDetails[groupKey].join("\n") + "\n"; // Add students under that group
-      absentDetails += "               "; // Add an extra newline after each group for spacing
+    for (let dateKey in groupedByDate) {
+      absentDetails += `\n--- Date: ${formatDate(dateKey)} ---\n`;
+      const groupedDetails = groupedByDate[dateKey];
+      for (let groupKey in groupedDetails) {
+        absentDetails += `\n${groupKey}\n`;
+        absentDetails += groupedDetails[groupKey].join("\n") + "\n";
+      }
     }
 
-    // Trim any leading or trailing spaces from the final message
     // Send the response with the formatted message and details
     res.json({
       message: messageHeader,
-      details: absentDetails,
+      details: absentDetails.trim(),
     });
   } catch (error) {
     console.error("Error generating report:", error);
@@ -497,11 +523,13 @@ exports.handleDownloadAbsentReport = async (gender, req, res) => {
 };
 
 exports.handleCustomDownloadAbsentReport = async (req, res) => {
-  const { gender, date, hostellerDayScholar, yearOfStudy, section, branch } =
+  const { gender, dateMode, date, startDate, endDate, month, hostellerDayScholar, yearOfStudy, section, branch } =
     req.query;
   console.log(
     "Request received to generate report for gender:",
     gender,
+    "dateMode:",
+    dateMode,
     "date:",
     date,
     "hostellerDayScholar:",
@@ -543,45 +571,68 @@ exports.handleCustomDownloadAbsentReport = async (req, res) => {
 
     // Apply yearOfStudy filter if provided
     if (yearOfStudy && yearOfStudy !== "ALL") {
-      allStudents = allStudents.filter(
-        (student) => student.yearOfStudy === yearOfStudy
+      const yearsArray = yearOfStudy.split(",");
+      allStudents = allStudents.filter((student) =>
+        yearsArray.includes(student.yearOfStudy)
       );
     }
 
     // Apply section filter if provided
     if (section && section !== "ALL") {
-      allStudents = allStudents.filter(
-        (student) => student.section === section
+      const sectionsArray = section.split(",");
+      allStudents = allStudents.filter((student) =>
+        sectionsArray.includes(student.section)
       );
+    }
+
+    // Determine date query based on dateMode
+    let dateQuery = {};
+    if (dateMode === 'range') {
+      dateQuery = { $gte: startDate, $lte: endDate };
+    } else if (dateMode === 'month') {
+      dateQuery = { $regex: `^${month}` }; // Matches YYYY-MM
+    } else {
+      dateQuery = date;
     }
 
     // Fetch attendance records for the specified date (only absent students)
     const attendanceRecords = await Attendance.find({
-      date,
+      date: dateQuery,
       status: "Absent",
-    }).select("rollNo");
+    }).select("rollNo date");
     console.log(
       "Total attendance records fetched for absent students:",
       attendanceRecords.length
     );
 
     // Filter students who were absent on the given date
-    const absentStudents = allStudents.filter((student) =>
-      attendanceRecords.some((record) => record.rollNo === student.rollNo)
-    );
-    console.log("Absent Students before hostel filter:", absentStudents);
+    const absences = [];
+    attendanceRecords.forEach((record) => {
+      const student = allStudents.find((s) => s.rollNo === record.rollNo);
+      if (student) {
+        absences.push({
+          ...student.toObject(),
+          date: record.date,
+        });
+      }
+    });
 
-    if (absentStudents.length === 0) {
+    console.log("Total absences found:", absences.length);
+
+    if (absences.length === 0) {
       console.log(
-        `No absent students found for specified criteria on ${date}.`
+        `No absent students found for specified criteria.`
       );
       return res.status(404).json({
-        message: `No absent students found for specified criteria on ${date}.`,
+        message: `No absent students found for specified criteria.`,
       });
     }
 
-    // Sort absent students first by yearOfStudy (Roman numeral order), then by branch (AIDS before AIML), and then by rollNo
-    absentStudents.sort((a, b) => {
+    // Sort absences first by date, then by yearOfStudy, then by branch, then by rollNo
+    absences.sort((a, b) => {
+      if (a.date !== b.date) {
+        return new Date(a.date) - new Date(b.date);
+      }
       const yearA = romanToInt(a.yearOfStudy);
       const yearB = romanToInt(b.yearOfStudy);
 
@@ -591,23 +642,25 @@ exports.handleCustomDownloadAbsentReport = async (req, res) => {
         const branchBIndex = branchOrder.indexOf(b.branch);
 
         if (branchAIndex === branchBIndex) {
+          if (a.section !== b.section) {
+            return a.section.localeCompare(b.section);
+          }
           const rollNoA = parseInt(a.rollNo.replace(/\D/g, ""));
           const rollNoB = parseInt(b.rollNo.replace(/\D/g, ""));
           return rollNoA - rollNoB;
         }
-
         return branchAIndex - branchBIndex;
       }
-
       return yearA - yearB;
     });
 
     console.log("Absent students sorted successfully");
-    const formattedDate = formatDate(date);
+    let dateStrForHeader = dateMode === 'range' ? `${formatDate(startDate)} to ${formatDate(endDate)}` : dateMode === 'month' ? month : formatDate(date);
 
     // Dynamic title based on filters
     const titleParts = [
       "Students Absentees List",
+      `Date: ${dateStrForHeader}`,
       gender !== "ALL" ? `Gender: ${gender}` : null,
       branch !== "ALL" ? `Branch: ${branch}` : null,
       yearOfStudy !== "ALL" ? `Year: ${yearOfStudy}` : null,
@@ -621,8 +674,8 @@ exports.handleCustomDownloadAbsentReport = async (req, res) => {
 
     const headers =
       hostellerDayScholar === "ALL"
-        ? ["S.No", "Roll No", "Student Name", "Year", "Branch", "ResidentType"]
-        : ["S.No", "Roll No", "Student Name", "Year", "Branch"];
+        ? ["S.No", "Roll No", "Student Name", "Section", "ResidentType", "Year"]
+        : ["S.No", "Roll No", "Student Name", "Section", "Year"];
 
     const reportData = [
       ["Kongu Engineering College"],
@@ -631,19 +684,38 @@ exports.handleCustomDownloadAbsentReport = async (req, res) => {
       headers,
     ];
 
-    // Add the absent students' data
-    absentStudents.forEach((student, index) => {
+    // Add the absent students' data grouped by date
+    let currentDate = null;
+    let sNo = 1;
+    let dateRowIndices = []; // To keep track of rows that just have the Date so we can merge them
+    
+    absences.forEach((absence) => {
+      const formattedAbsenceDate = formatDate(absence.date);
+
+      if (currentDate !== formattedAbsenceDate) {
+        if (currentDate !== null) {
+          reportData.push([]); // Leave an empty line before next date
+        }
+        currentDate = formattedAbsenceDate;
+        sNo = 1; // Reset S.No for each date group
+
+        // Push the date header row
+        reportData.push([`Date: ${formattedAbsenceDate}`]);
+        dateRowIndices.push(reportData.length); // record the 1-based row index for merging later
+      }
+
       const row = [
-        index + 1,
-        student.rollNo,
-        student.name,
-        student.yearOfStudy,
-        `${student.branch}-${student.section}`,
+        sNo++,
+        absence.rollNo,
+        absence.name,
+        absence.section,
       ];
 
       if (hostellerDayScholar === "ALL") {
-        row.push(student.hostellerDayScholar);
+        row.push(absence.hostellerDayScholar);
       }
+
+      row.push(absence.yearOfStudy); // Year is always the last column
 
       reportData.push(row);
     });
@@ -652,24 +724,33 @@ exports.handleCustomDownloadAbsentReport = async (req, res) => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Absent Students");
 
+    // Set column widths for better readability
+    const columns = [
+      { width: 8 },  // S.No
+      { width: 15 }, // Roll No
+      { width: 35 }, // Student Name
+      { width: 10 }, // Section
+    ];
+    if (hostellerDayScholar === "ALL") {
+      columns.push({ width: 15 }); // ResidentType
+    }
+    columns.push({ width: 10 }); // Year (last column)
+    worksheet.columns = columns;
+
     // Add the report data to the worksheet
     worksheet.addRows(reportData);
 
     // Apply row height adjustments
-    worksheet.getRow(1).height = 25;
-    worksheet.getRow(2).height = 25;
-    worksheet.getRow(3).height = 25;
-    worksheet.getRow(4).height = 25;
-    for (let row = 5; row <= reportData.length; row++) {
+    for (let row = 1; row <= reportData.length; row++) {
       worksheet.getRow(row).height = 25;
     }
 
-    // Apply thicker borders and alignment
+    // Apply thinner borders and alignment
     const borderStyle = {
-      top: { style: "medium" },
-      left: { style: "medium" },
-      bottom: { style: "medium" },
-      right: { style: "medium" },
+      top: { style: "thin" },
+      left: { style: "thin" },
+      bottom: { style: "thin" },
+      right: { style: "thin" },
     };
 
     const columnCount = headers.length;
@@ -682,23 +763,91 @@ exports.handleCustomDownloadAbsentReport = async (req, res) => {
       };
       worksheet.getCell(4, col).font = {
         bold: true,
-        name: "Times New Roman",
         size: 12,
       };
     }
 
     for (let row = 5; row <= reportData.length; row++) {
+      // Don't apply borders to empty rows
+      if (!worksheet.getCell(row, 1).value) continue;
+      
+      const isDateRow = dateRowIndices.includes(row);
+
       for (let col = 1; col <= columnCount; col++) {
+        // Only apply border to the first column if it's a date row and we plan to merge it,
+        // or apply to all if it's a normal data row. Actually, applying to all cells in a merged row is standard.
         worksheet.getCell(row, col).border = borderStyle;
         worksheet.getCell(row, col).alignment = {
-          horizontal: "center",
+          horizontal: isDateRow ? "left" : "center",
           vertical: "middle",
         };
         worksheet.getCell(row, col).font = {
-          name: "Times New Roman",
           size: 12,
+          bold: isDateRow, // Make date row bold
         };
       }
+
+      if (isDateRow) {
+        worksheet.mergeCells(`A${row}:${String.fromCharCode(64 + columnCount)}${row}`);
+      }
+    }
+
+    // Merge section cells (column D/4) and Year cells (last column) vertically for students in the same class/year
+    let startMergeRowSec = -1;
+    let currentSection = null;
+    
+    let startMergeRowYear = -1;
+    let currentYear = null;
+
+    for (let row = 5; row <= reportData.length; row++) {
+      const isDataRow = !!worksheet.getCell(row, 1).value && !dateRowIndices.includes(row);
+      
+      if (isDataRow) {
+        const sec = worksheet.getCell(row, 4).value; // Section is 4th column
+        const yr = worksheet.getCell(row, columnCount).value; // Year is last column
+
+        if (sec === currentSection) {
+          // Continue the block
+        } else {
+          if (startMergeRowSec !== -1 && row - 1 > startMergeRowSec) {
+            worksheet.mergeCells(`D${startMergeRowSec}:D${row - 1}`);
+          }
+          currentSection = sec;
+          startMergeRowSec = row;
+        }
+
+        if (yr === currentYear) {
+          // Continue the block
+        } else {
+          if (startMergeRowYear !== -1 && row - 1 > startMergeRowYear) {
+            const colLetter = String.fromCharCode(64 + columnCount);
+            worksheet.mergeCells(`${colLetter}${startMergeRowYear}:${colLetter}${row - 1}`);
+          }
+          currentYear = yr;
+          startMergeRowYear = row;
+        }
+      } else {
+        // Not a data row, break the block
+        if (startMergeRowSec !== -1 && row - 1 > startMergeRowSec) {
+          worksheet.mergeCells(`D${startMergeRowSec}:D${row - 1}`);
+        }
+        if (startMergeRowYear !== -1 && row - 1 > startMergeRowYear) {
+          const colLetter = String.fromCharCode(64 + columnCount);
+          worksheet.mergeCells(`${colLetter}${startMergeRowYear}:${colLetter}${row - 1}`);
+        }
+        currentSection = null;
+        startMergeRowSec = -1;
+        currentYear = null;
+        startMergeRowYear = -1;
+      }
+    }
+    // Handle any trailing blocks at the end of the sheet
+    if (startMergeRowSec !== -1 && reportData.length > startMergeRowSec) {
+      worksheet.mergeCells(`D${startMergeRowSec}:D${reportData.length}`);
+    }
+    if (startMergeRowYear !== -1 && reportData.length > startMergeRowYear) {
+      const colLetter = String.fromCharCode(64 + columnCount);
+      worksheet.mergeCells(`${colLetter}${startMergeRowYear}:${colLetter}${reportData.length}`);
     }
 
     console.log("Borders and alignment applied successfully.");
@@ -713,7 +862,6 @@ exports.handleCustomDownloadAbsentReport = async (req, res) => {
       vertical: "middle",
     };
     worksheet.getCell("A1").font = {
-      name: "Times New Roman",
       size: 12,
       bold: true,
     };
@@ -722,7 +870,6 @@ exports.handleCustomDownloadAbsentReport = async (req, res) => {
       vertical: "middle",
     };
     worksheet.getCell("A2").font = {
-      name: "Times New Roman",
       size: 12,
       bold: true,
     };
@@ -731,7 +878,6 @@ exports.handleCustomDownloadAbsentReport = async (req, res) => {
       vertical: "middle",
     };
     worksheet.getCell("A3").font = {
-      name: "Times New Roman",
       size: 12,
       bold: true,
     };
@@ -739,7 +885,8 @@ exports.handleCustomDownloadAbsentReport = async (req, res) => {
     console.log("Header merged and centered successfully.");
 
     // Set the file as an attachment for download
-    res.attachment(`Absent_Students_${formattedDate}.xlsx`);
+    const safeFilenameDate = dateStrForHeader.replace(/ /g, "_");
+    res.attachment(`Absent_Students_${safeFilenameDate}.xlsx`);
 
     // Write the workbook to the response as a stream
     await workbook.xlsx.write(res);
@@ -749,6 +896,6 @@ exports.handleCustomDownloadAbsentReport = async (req, res) => {
     console.error("Error generating report:", error);
     res
       .status(500)
-      .json({ message: "Error generating absent students report" });
+      .json({ message: "Error generating absent students report", error: error.message, stack: error.stack });
   }
 };
