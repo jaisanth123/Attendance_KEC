@@ -192,15 +192,23 @@ exports.bulkDeleteStudents = async (req, res) => {
 
   try {
     // Validate required parameters
-    if (!yearOfStudy || !branch || !section) {
+    if (!yearOfStudy) {
       return res.status(400).json({
         success: false,
-        message: "Year of Study, Branch, and Section are required",
+        message: "Year of Study is required",
       });
     }
 
     // Create filter object
-    const filter = { yearOfStudy, branch, section };
+    const filter = { yearOfStudy };
+
+    if (branch) {
+      filter.branch = branch;
+    }
+
+    if (section) {
+      filter.section = section;
+    }
 
     // Delete students matching the criteria
     const result = await Student.deleteMany(filter);

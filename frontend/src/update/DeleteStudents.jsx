@@ -122,9 +122,9 @@ function DeleteStudents() {
   };
 
   const handleBulkDelete = async () => {
-    if (!yearOfStudy || !section) {
+    if (!yearOfStudy) {
       setMessage({
-        text: "Year of Study and Section are required for bulk delete.",
+        text: "Year of Study is required for bulk delete.",
         type: "error",
       });
       return;
@@ -313,9 +313,9 @@ function DeleteStudents() {
                       value={section}
                       onChange={(e) => setSection(e.target.value)}
                       className="px-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
-                      disabled={!yearOfStudy || availableSections.length === 0}
+                      disabled={!yearOfStudy}
                     >
-                      <option value="">Select Section</option>
+                      <option value="">All Sections</option>
                       {availableSections.map((sectionOption) => (
                         <option key={sectionOption} value={sectionOption}>
                           {sectionOption}
@@ -328,9 +328,9 @@ function DeleteStudents() {
                 <div className="flex justify-end">
                   <button
                     onClick={handleBulkDelete}
-                    disabled={!yearOfStudy || !section}
+                    disabled={!yearOfStudy}
                     className={`px-4 py-2 text-white rounded-lg transition-colors ${
-                      !yearOfStudy || !section
+                      !yearOfStudy
                         ? "bg-gray-400 cursor-not-allowed"
                         : "bg-red-600 hover:bg-red-700"
                     }`}
