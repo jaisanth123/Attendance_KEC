@@ -795,9 +795,23 @@ exports.handleCustomDownloadAbsentReport = async (req, res) => {
     // Merge section cells (column D/4) and Year cells (last column) vertically for students in the same class/year
     let startMergeRowSec = -1;
     let currentSection = null;
+    let currentSectionYear = null; // To track if Year changes while Section is same
     
     let startMergeRowYear = -1;
     let currentYear = null;
+
+    const mergeColumn = (colLetter, startRow, endRow) => {
+      if (startRow !== -1 && endRow > startRow) {
+        const cellRef = `${colLetter}${startRow}:${colLetter}${endRow}`;
+        worksheet.mergeCells(cellRef);
+        worksheet.getCell(`${colLetter}${startRow}`).alignment = {
+          vertical: "middle",
+          horizontal: "center",
+        };
+      }
+    };
+
+    const colLetterYear = String.fromCharCode(64 + columnCount);
 
     for (let row = 5; row <= reportData.length; row++) {
       const isDataRow = !!worksheet.getCell(row, 1).value && !dateRowIndices.includes(row);
@@ -806,49 +820,35 @@ exports.handleCustomDownloadAbsentReport = async (req, res) => {
         const sec = worksheet.getCell(row, 4).value; // Section is 4th column
         const yr = worksheet.getCell(row, columnCount).value; // Year is last column
 
-        if (sec === currentSection) {
-          // Continue the block
-        } else {
-          if (startMergeRowSec !== -1 && row - 1 > startMergeRowSec) {
-            worksheet.mergeCells(`D${startMergeRowSec}:D${row - 1}`);
-          }
-          currentSection = sec;
-          startMergeRowSec = row;
-        }
-
-        if (yr === currentYear) {
-          // Continue the block
-        } else {
-          if (startMergeRowYear !== -1 && row - 1 > startMergeRowYear) {
-            const colLetter = String.fromCharCode(64 + columnCount);
-            worksheet.mergeCells(`${colLetter}${startMergeRowYear}:${colLetter}${row - 1}`);
-          }
+        // Check if Year breaks
+        if (yr !== currentYear) {
+          mergeColumn(colLetterYear, startMergeRowYear, row - 1);
           currentYear = yr;
           startMergeRowYear = row;
         }
+
+        // Check if Section breaks (either different section, or same section but different year)
+        if (sec !== currentSection || yr !== currentSectionYear) {
+          mergeColumn("D", startMergeRowSec, row - 1);
+          currentSection = sec;
+          currentSectionYear = yr;
+          startMergeRowSec = row;
+        }
       } else {
         // Not a data row, break the block
-        if (startMergeRowSec !== -1 && row - 1 > startMergeRowSec) {
-          worksheet.mergeCells(`D${startMergeRowSec}:D${row - 1}`);
-        }
-        if (startMergeRowYear !== -1 && row - 1 > startMergeRowYear) {
-          const colLetter = String.fromCharCode(64 + columnCount);
-          worksheet.mergeCells(`${colLetter}${startMergeRowYear}:${colLetter}${row - 1}`);
-        }
+        mergeColumn("D", startMergeRowSec, row - 1);
+        mergeColumn(colLetterYear, startMergeRowYear, row - 1);
+        
         currentSection = null;
+        currentSectionYear = null;
         startMergeRowSec = -1;
         currentYear = null;
         startMergeRowYear = -1;
       }
     }
     // Handle any trailing blocks at the end of the sheet
-    if (startMergeRowSec !== -1 && reportData.length > startMergeRowSec) {
-      worksheet.mergeCells(`D${startMergeRowSec}:D${reportData.length}`);
-    }
-    if (startMergeRowYear !== -1 && reportData.length > startMergeRowYear) {
-      const colLetter = String.fromCharCode(64 + columnCount);
-      worksheet.mergeCells(`${colLetter}${startMergeRowYear}:${colLetter}${reportData.length}`);
-    }
+    mergeColumn("D", startMergeRowSec, reportData.length);
+    mergeColumn(colLetterYear, startMergeRowYear, reportData.length);
 
     console.log("Borders and alignment applied successfully.");
 

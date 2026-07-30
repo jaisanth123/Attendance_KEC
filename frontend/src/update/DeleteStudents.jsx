@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Trash2,
   Users,
@@ -19,8 +19,45 @@ function DeleteStudents() {
   const [rollNo, setRollNo] = useState("");
   const [message, setMessage] = useState({ text: "", type: "" });
   const [isLoading, setIsLoading] = useState(false);
+  const [isClassesLoading, setIsClassesLoading] = useState(false);
   const [rollNoSearchResults, setRollNoSearchResults] = useState([]);
   const [showRollNoDropdown, setShowRollNoDropdown] = useState(false);
+  const [availableClasses, setAvailableClasses] = useState([]);
+
+  const yearOrder = { I: 1, II: 2, III: 3, IV: 4 };
+
+  const fetchAvailableClasses = async () => {
+    try {
+      setIsClassesLoading(true);
+      const res = await fetch(`${backendURL}/api/students/distinct-classes`);
+      const data = await res.json();
+
+      if (data.success && Array.isArray(data.classes)) {
+        setAvailableClasses(data.classes);
+      } else {
+        setAvailableClasses([]);
+      }
+    } catch (error) {
+      console.error("Error fetching class options:", error);
+      setAvailableClasses([]);
+    } finally {
+      setIsClassesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAvailableClasses();
+  }, []);
+
+  const availableYears = [...new Set(availableClasses.map((cls) => cls.yearOfStudy).filter(Boolean))]
+    .sort((a, b) => (yearOrder[a] ?? 999) - (yearOrder[b] ?? 999) || a.localeCompare(b));
+
+  const availableSections = [...new Set(
+    availableClasses
+      .filter((cls) => !yearOfStudy || cls.yearOfStudy === yearOfStudy)
+      .map((cls) => cls.section)
+      .filter(Boolean)
+  )].sort((a, b) => a.localeCompare(b));
 
   // Function to search students by roll number for suggestions
   const searchStudentsByRollNo = async (rollNo) => {
@@ -73,6 +110,15 @@ function DeleteStudents() {
     setRollNo(student.rollNo);
     setShowRollNoDropdown(false);
     setRollNoSearchResults([]);
+  };
+
+  const handleYearChange = (e) => {
+    const value = e.target.value;
+    setYearOfStudy(value);
+
+    if (section && !availableClasses.some((cls) => cls.yearOfStudy === value && cls.section === section)) {
+      setSection("");
+    }
   };
 
   const handleBulkDelete = async () => {
@@ -236,35 +282,45 @@ function DeleteStudents() {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
-                    <label className="block mb-1 text-sm font-medium text-gray-700">
-                      Year of Study
-                    </label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Year of Study
+                      </label>
+                      {isClassesLoading && <Loader className="w-4 h-4 animate-spin text-slate-500" />}
+                    </div>
                     <select
                       value={yearOfStudy}
-                      onChange={(e) => setYearOfStudy(e.target.value)}
+                      onChange={handleYearChange}
                       className="px-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
                     >
                       <option value="">Select Year</option>
-                      <option value="II">II</option>
-                      <option value="III">III</option>
-                      <option value="IV">IV</option>
+                      {availableYears.map((year) => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
+                      ))}
                     </select>
                   </div>
 
                   <div>
-                    <label className="block mb-1 text-sm font-medium text-gray-700">
-                      Section
-                    </label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Section
+                      </label>
+                      {isClassesLoading && <Loader className="w-4 h-4 animate-spin text-slate-500" />}
+                    </div>
                     <select
                       value={section}
                       onChange={(e) => setSection(e.target.value)}
                       className="px-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                      disabled={!yearOfStudy || availableSections.length === 0}
                     >
                       <option value="">Select Section</option>
-                      <option value="A">A</option>
-                      <option value="B">B</option>
-                      <option value="C">C</option>
-                      <option value="D">D</option>
+                      {availableSections.map((sectionOption) => (
+                        <option key={sectionOption} value={sectionOption}>
+                          {sectionOption}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
